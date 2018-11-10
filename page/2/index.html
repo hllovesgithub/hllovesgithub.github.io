@@ -1,0 +1,2650 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>第 2 页 | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <div id="cover">
+	<div id="profile" alt="http://ww3.sinaimg.cn/large/9460be12gw1eodo2zufbnj21kw0yshdt.jpg">
+		<a href="/">
+			<div class="logo">
+				<img src="/logo.png" alt="Profile Picture">
+			</div>
+			<div id="title">Game Curiosity Development</div>
+		</a>
+
+		
+			<div id="subtitle">一步一脚印，一花一世界。</div>
+		
+		 <ul class="my-socials">
+  
+  <li>
+  	<a href="https://github.com/hllovesgithub" class="github" target="_blank">
+  		<i class="fa fa-github"></i>
+  	</a>
+  </li>
+  
+  <li>
+  	<a href="http://weibo.com/2489368082/profile?topnav=1&wvr=6" class="weibo" target="_blank">
+  		<i class="fa fa-weibo"></i>
+  	</a>
+  </li>
+  
+  <li>
+  	<a href="https://twitter.com/hllovestt" class="twitter" target="_blank">
+  		<i class="fa fa-twitter"></i>
+  	</a>
+  </li>
+  
+  <li>
+  	<a href="https://www.facebook.com/profile.php?id=100007623375387" class="facebook" target="_blank">
+  		<i class="fa fa-facebook"></i>
+  	</a>
+  </li>
+  
+ 
+</ul>
+	</div>
+</div>
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-12-12T06:01:03.000Z"><a href="/2015/12/12/2015-12-12[Objc高级编程之Block-读书笔记]/">周六, 12月 12 2015, 2:01:03 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/12/12/2015-12-12[Objc高级编程之Block-读书笔记]/">Objc高级编程之Block-读书笔记</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="Block存储域"><a href="#Block存储域" class="headerlink" title="Block存储域"></a>Block存储域</h3><p>Block也是Objc对象，其类型有以下几种：</p>
+<ul>
+<li>_NSConcreteStatckBlock</li>
+<li>_NSConcreteGlobalBlock</li>
+<li>_NSConcreteMallocBlock</li>
+</ul>
+<p>目前ARC已经不再创建_NSConcreteStatckBlock类型的Block对象，进一步确保了block在使用时候的有效性，不过本书的内容我还是如实记录。_NSConcreteStatckBlock类的对象存储在栈(Stack)上，_NSConcreteGlobalBlock类的对象存储在数据区(.data)上，_NSConcreteMallocBlock类的对象存储在堆(Heap)上。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyexv5omj20zi0t6tdm.jpg" alt=""></p>
+<p>因为_NSConcreteGlobalBlock类型的block内部不依赖执行时的状态，所以能够用结构体存储在与全局变量相同的数据区域中。在整个程序周期内都可以安全地使用。但是在栈上_NSConcreteStatckBlock类的block，如果其所在作用域结束后就会被销毁，__block变量也一样。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyf5zapgj21eq0pwwl4.jpg" alt=""></p>
+<p>Apple提供了将block和__block变量从栈<strong>复制</strong>到堆的方法解决了这个问题，这样即使block的作用域结束，我们还是可以继续安全地访问堆上的block。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyffcaq6j21do15c7db.jpg" alt=""></p>
+<p>通过block结构体成员变量<strong>forwarding的帮助，</strong>block变量无论在栈上还是在堆上都能够被正确地访问(后面详细说明)。</p>
+<pre><code>typedef int (^blk_t)(int);
+blk_t func(int rate) {
+    return ^(int count) {return rate * count;};
+}
+//等价于
+typedef int (^blk_t)(int);
+blk_t func(int rate) {
+    blk_t tmp = &amp;__func_block_impl_0(__func_block_func_0, &amp;__func_block_desc_0_DATA, rate);
+    tmp = objc_retainBlock(tmp);
+    return objc_autoreleaseReturnValue(tmp);
+}
+//而objc_retainBlock实际上就是_Block_copy
+</code></pre><p>大多数情况下编译器会适当地判断block的内存管理，不过少数情况还是需要开发者手动管理。比如向方法的参数传递block时，编译器就不能判断是否对block进行copy。这主要以来方法内部的实现是否自己对作为参数的block进行copy，对于copy过的方法，使用时就不用再对block手动copy。相反，就需要考虑手动复制(当然，目前已经没有_NSConcreteStatckBlock类的block存在也不存在这样的问题了)。</p>
+<pre><code>- (id)getBlockArray {
+    int val = 10;
+    return @[[^{NSLog(@&quot;blk0:%d&quot;, val);} copy], [^{NSLog(@&quot;blk1:%d&quot;, val);} copy]];
+}
+</code></pre><p>不管block之前存储在哪，用copy复制都不会引起任何问题，如果不确定时最好copy。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxyh6kwg9j21xm0l8n2b.jpg" alt=""></p>
+<h3 id="block变量存储域"><a href="#block变量存储域" class="headerlink" title="__block变量存储域"></a>__block变量存储域</h3><p>当block从栈copy到堆时，其使用的所有<strong>block变量也全部从栈复制到堆。如果block已经在堆上，对block再次copy也不会对</strong>block变量有任何影响。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyfmyecjj212y0smtdw.jpg" alt=""></p>
+<p>多个block使用同一个<strong>block变量时，任何一个block先从栈copy到堆后，</strong>block变量也被copy到堆上并被持有，当其他block再copy到堆上时，仅仅增加__block变量的引用计数。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyfy0c8rj21qq1ceand.jpg" alt=""></p>
+<p>block从堆中被销毁时，其使用的__block变量也会被销毁。block的内存管理和objc对象的内存管理完全相同。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxygbkd1rj21tw1d87kg.jpg" alt=""></p>
+<p>不管<strong>block变量存储在栈上还是堆上，都能够正确地访问对应的变量。所有栈中的</strong>block变量，将其架构体内部的forwarding值从自己替换为堆上的<strong>block变量，这样无论栈上</strong>block还是堆上__block都是forwarding指向同一个堆上结构体。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxygqh06uj21qa1bwqfc.jpg" alt=""></p>
+<h3 id="截获对象"><a href="#截获对象" class="headerlink" title="截获对象"></a>截获对象</h3><pre><code>blk_t blk;
+{
+   id array = [[]NSMutableArray alloc] init];
+   blk = [^(id obj) {
+       [array addObject:obj];
+       NSLog(@&quot;array count = %ld&quot;, [array count]);
+   } copy];
+}
+blk([[NSObject alloc] init]);
+blk([[NSObject alloc] init]);
+blk([[NSObject alloc] init]);
+</code></pre><p>作用域结束后block调用正常，意味着变量array其超出作用域而存在并没有被销毁。</p>
+<pre><code>//编译器模拟代码
+struct __block_impl {
+    void *isa;
+    int Flags;
+    int Reserved;
+    void *FuncPtr;
+};
+
+static void __main_block_copy_0(struct __main_block_impl_0 *dst, struct __main_block_impl_0 *src) {
+    _Block_object_assign(&amp;dst-&gt;array, src-&gt;array, BLOCK_FIELD_IS_OBJECT);
+}
+
+static void __main_block_dispose_0(struct __main_block_impl_0 *src) {
+    _Block_object_dispose(src-&gt;array, BLOCK_FIELD_IS_OBJECT);
+}
+
+static struct __main_block_desc_0 {
+    unsigned long reserved;
+    unsigned long Block_size;
+    void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
+    void (*dispose)(struct __main_block_impl_0*);
+}__main_block_desc_0_DATA = {
+    0,
+    sizeof(struct __main_block_impl_0),
+    __main_block_copy_0,
+    __main_block_dispose_0
+};
+
+struct __main_block_impl_0 {
+    struct __block_impl impl;
+    struct __main_block_desc_0* Desc;
+    id __strong array;
+    __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, id __strong _array, int flags=0) : array(_array) {
+        impl.isa = &amp;_NSConcreteStackBlock;
+        impl.Flags = flags;
+        impl.FuncPtr = fp;
+        Desc = desc;
+    }
+};
+
+static void __main_block_func_0(struct __main_block_impl_0 *__cself, id obj) {
+    id __strong array = __cself-&gt;array;
+    [array addObject:obj];
+    NSLog(@&quot;array count = %ld&quot;, [array count]);
+}
+
+blk_t blk;
+{
+    id __strong array = [[NSMutableArray alloc] init];
+    blk = &amp;__main_block_impl_0(__main_block_func_0, &amp;__main_block_desc_0_DATA, array, 0x22000000);
+    blk = [blk copy];
+}
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+</code></pre><p>作用域的局部自动变量array赋值给了block结构体中的成员变量，按照之前的描述，C语言结构体不能含有strong修饰符变量，因为编译器不知道应该何时对C语言结构体进行初始化和销毁从而管理内存，但是objc的runtime能够准确把握block从栈copy到堆以及从堆中销毁的时机，因此能够自动管理block结构体的初始化和销毁时机。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxyhiguv6j21xi0f8n0z.jpg" alt=""></p>
+<p>具体表现如下：</p>
+<ul>
+<li>调用block的copy方法时</li>
+<li>block作为方法的返回值返回时</li>
+<li>将block赋值给类的__strong修饰符id类型成员变量</li>
+<li>方法名中含有usingBlock的Cocoa框架方法和GCD方法中传递block作为参数时</li>
+</ul>
+<p>实现该功能需要在block描述结构体(XX_block_desc_X)中添加copy和dispose方法。在main_block_copy_0方法里，<strong>_Block_object_assign</strong>相当于retain，持有对象并赋值给block实现结构体(XX_block_impl_X)中的成员变量。在main_block_dispose_0方法里，<strong>_Block_object_dispose</strong>相当于release，释放赋值在block实现结构体中的成员变量。其中，参数BLOCK_FIELD_IS_OBJECT和BLOCK_FIELD_IS_BYREF用语区分对象类型和__block类型。</p>
+<h3 id="block变量和对象"><a href="#block变量和对象" class="headerlink" title="__block变量和对象"></a>__block变量和对象</h3><pre><code>__block id obj = [[NSObject alloc] init];
+
+//编译器模拟代码
+struct __Block_byref_obj_0 {
+    void *__isa;
+    __Block_byref_obj_0 *__forwarding;
+    int __flags;
+    int __size;
+    void (*__Block_byref_id_object_copy)(void*, void*);
+    void (*__Block_byref_id_object_dispose)(void*);
+    __strong id obj;
+};
+
+static void __Block_byref_id_object_copy_131(void *dst, void *src) {
+    _Block_object_assign((char*)dst + 40, *(void * *) ((char*)src + 40), 131);
+}
+
+static void __Block_byref_id_object_dispose_131(void *src) {
+    _Block_object_dispose(*(void * *) ((char*)src + 40), 131);
+}
+
+__Block_byref_obj_0 obj = {
+    0,
+    &amp;obj,
+    0x2000000,
+    sizeof(__Block_byref_obj_0),
+    __Block_byref_id_object_copy_131,
+    __Block_byref_id_object_dispose_131,
+    [[NSObject alloc] init]
+};
+</code></pre><p>由此看出，<strong>block变量虽然是个结构体，但实际上也是一个objc对象，并有持有和释放方法，其中使用_Block_object_assign持有</strong>block对象，使用_Block_object_dispose释放<strong>block对象。</strong>block对象可以为<strong>strong、</strong>weak和<strong>unsafe_unretained，不过使用</strong>unsafe_unretained时注意出现野指针访问无效对象的情况，而<strong>autoreleasing与</strong>block编译时不通过。</p>
+<h3 id="copy-release"><a href="#copy-release" class="headerlink" title="copy/release"></a>copy/release</h3><p>由于block时C语言的扩展，所以在C语言中也可以使用block语法。此时，使用Block_copy和Block_release代替objc的copy和release方法即可。另外，ARC无效时，<strong>block修饰符被用来避免block中的循环引用。因为block从栈copy到堆时，</strong>block成员变量如果是对象类型，则block不会retain它，反之则retain它。这样来避免block的循环引用。由于ARC和MRC时，__block修饰符的用途有很大区别，因为在开发时，必须要知道编译环境是ARC还是MRC，这一点需要特别注意。</p>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/12/12/2015-12-12[Objc高级编程之Block-读书笔记]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/12/12/2015-12-12[Objc高级编程之Block-读书笔记]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/12/12/2015-12-12[Objc高级编程之Block-读书笔记]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-12-06T01:55:18.000Z"><a href="/2015/12/06/2015-12-06[Objc高级编程之ARC-读书笔记]/">周日, 12月 6 2015, 9:55:18 上午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/12/06/2015-12-06[Objc高级编程之ARC-读书笔记]/">Objc高级编程之ARC-读书笔记</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="内存管理原则"><a href="#内存管理原则" class="headerlink" title="内存管理原则"></a>内存管理原则</h3><p>MRC和ARC都使用引用计数方式来对内存进行管理，简单地说就是下面几条原则：</p>
+<ul>
+<li>自己生成的对象，自己所持有。</li>
+<li>非自己生成的对象，自己也能持有。</li>
+<li>自己不再需要持有对象时需要释放。</li>
+<li>非自己持有的对象无法释放。</li>
+</ul>
+<p>以上对对象的操作与Objc方法的映射关系为：</p>
+<ul>
+<li>生成并持有对象 ＝ alloc/new/copy/mutableCopy等</li>
+<li>持有对象 ＝ retain</li>
+<li>释放对象 ＝ release</li>
+<li>销毁对象 ＝ dealloc</li>
+</ul>
+<p>实际上以上这些方法并不是语言本身，而是Cocoa/CocoaTouch Framework的Foundation里面的NSObject的方法。Apple建议所有的Objc对象都继承自NSObject，这样可以依赖已有的稳定安全内存管理不用自己操心。</p>
+<p>GNUstep是一个盒Cocoa Framework兼容的实现，虽然不能期望它是完全和Apple一样实现的，但是它有相同的表现所以实现上也应该很相似。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxjmtzfhj21x41b4duo.jpg" alt=""></p>
+<p>理解了GNUstep的源代码可以帮助我们猜测Apple的Cocoa是如何实现的。以下是<strong>GNUstep</strong>的实现：</p>
+<pre><code>struct obj_layout {
+    NSUInteger retained;
+};
++ (id)alloc {
+    return [self allocWithZone:NSDefaultMallocZone()];
+}
++ (id)allocWithZone:(NSZone *)z {
+    return NSAllocateObject(self, 0, z);
+}
+inline id NSAllocateObject(Class aClass, NSUInteger extraBytes, NSZone *zone) {
+    int size = baseBytes + extraBytes
+    id new = NSZoneMalloc(zone, size);
+    memset(new, 0, size);
+    new = (id)&amp;((struct obj_layout *)new)[1];
+}
+</code></pre><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxk6u6tlj218q0mwn0q.jpg" alt=""></p>
+<pre><code>- (NSUInteger)retainCout {
+    return NSExtraRefCount(self) + 1;
+}
+inline NSUInteger NSExtraRefCount(id anObject) {
+    return ((struct obj_layout *)anObject)[-1].retained;
+}
+</code></pre><p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxkkgy1rj215e0oswih.jpg" alt=""></p>
+<pre><code>- (id)retain {
+    NSIncrementExtraRefCount(self);
+    return self;
+}
+inline void NSIncrementExtraRefCount(id anObject) {
+    if (((struct obj_layout *)anObject)[-1].retained == UINT_MAX - 1) {
+        NSString *format = @&quot;NSIncrementExtraRefCount() asked to increment too far&quot;;
+        [NSException raise:NSInternalInconsistencyException format:format];
+    }
+    ((struct obj_layout *)anObject)[-1].retained++;
+}
+
+- (void)release {
+    if (NSDecrementExtraRefCountWasZero(eslf)) {
+        []self dealloc];
+    }
+}
+inline BOOL NSDecrementExtraRefCountWasZero(id anObject) {
+    if (((struct obj_layout *)anObject)[-1].retained == 0) {
+        return YES;
+    } else {
+        ((struct obj_layout *)anObject)[-1].retained--;
+        return NO;
+    }
+}
+
+- (void)dealloc {
+    NSDeallocateObject(self);
+}
+inline void NSDeallocateObject(id anObject) {
+    struct obj_layout *o = &amp;((struct obj_layout *)anObject)[-1];
+    free(o);
+}
+</code></pre><p>可以看出每个Objc对象，在其内存布局前都有一个NSUInteger类型变量，用来表示引用计数。alloc/new/copy/mutableCopy/retain都会增加计数，release会减少计数，当计数减至为0时调用dealloc从内存中销毁该对象。</p>
+<p>研究<strong>Apple</strong>的实现之前因为NSObject的源代码没有公开，通过使用Xcode的调试器(lldb)来研究其实现。在NSObject类的alloc里设置端点，可以发现栈中的调用顺序为：</p>
+<pre><code>+alloc
++allocWithZone:    
+class_createInstance
+calloc
+</code></pre><p>大体上Apple和GNUstep的实现没有什么差别。同样的方法能够得到retainCount和retain还有release的调用顺序。</p>
+<pre><code>-retainCount
+__CFDoExternRefOperation
+CFBasicHashGetCountOfKey
+
+-retain
+__CFDoExternRefOperation
+CFBasicHashAddValue
+
+-release
+__CFDoExternRefOperation
+CFBaseHashRemoveValue
+</code></pre><p>在Core Foundation Framework中找到__CFDoExternRefOperation：</p>
+<pre><code>int __CFDoExternRefOperation(uintptr_t op, id obj) {
+    CFBasicHashRef table = get hashtable from obj;
+    int count;
+    switch (op) {
+        case OPERATION_retainCount:
+            count = CFBasicHashGetCountOfKey(table, obj);
+            return count;
+
+        case OPERATION_retain:
+            CFBasicHashAddValue(table, obj);
+            return obj;
+
+        case OPERATION_release:
+            count = CFBasicHashRemoveValue(table, obj);
+            return 0 == count;
+    }
+}
+</code></pre><p>由此可以猜测，retainCount和retain还有release的实现大致是这样：</p>
+<pre><code>- (NSUInteger)retainCount {
+    return (NSUInteger)__CFDoExternRefOperation(OPERATION_retainCount, self);
+}
+- (id)retain {
+    return (id)__CFDoExternRefOperation(OPERATION_retain, self);
+}
+- (void)release {
+    return __CFDoExternRefOperation(OPERATION_release, self);
+}
+</code></pre><p>同时也可以猜测，Apple的实现大概是采用Hash散列表(引用计数表)完成的：</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxktjifvj21140twaeo.jpg" alt=""></p>
+<p>GNUstep将引用计数保存在对象内存块头部的变量中，Apple将引用计数保存在一张散列表中。GNUstep的实现看起来简单又高效，但Apple这样实现也必然有它的好处。GNUstep的好处是：少量代码就能实现；引用计数内存和对象内存能统一管理。Apple的好处是：为对象分配内存时无需考虑引用计数，不用担心对象内存块头部问题；散列表用对象内存地址作为Key，这样能追溯各个对象内存块位置，在调试时非常有用。即使出现错误导致对象内存块损坏，只要散列表没问题，就能找到正确的内存块位置。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxl5ffx8j21fw0oodm4.jpg" alt=""></p>
+<p>另外利用Instrument检查内存泄漏时，散列表的记录也有助于帮助检测各对象持有者是否存在。</p>
+<hr>
+<h3 id="GNUstep实现的Autorelease"><a href="#GNUstep实现的Autorelease" class="headerlink" title="GNUstep实现的Autorelease"></a>GNUstep实现的Autorelease</h3><pre><code>- (id)autorelease {
+    [NSAutoreleasePool addObject:self];
+}
+</code></pre><p>实际上，GNUstep应用了IMP缓存技术，缓存了不变的Class，SEL，IMP使得运行效率能满足频繁调用的autorelease</p>
+<pre><code>id autorelease_class = [NSAutoreleasePool class];
+SEL autorelease_sel = @selector(addObject:);
+IMP autorelease_imp = [autorelease_class methodForSelector: autorelease_sel];
+- (id)autorelease {
+    (*autorelease_imp)(autorelease_class, autorelease_sel, self);
+}
+</code></pre><p>NSAutoreleasePool：</p>
+<pre><code>+ (void)addObject:(id)anObj {
+    NSAutoreleasePool *pool = //获取当前的autoreleasePool;
+    if (pool != nil) {
+        [pool addObject:anObj];
+    } else {
+        NSLog(@&quot;autorelease is called without active NSAutoreleasePool.&quot;);
+    }
+}
+- (void)drain {
+    [self dealloc];
+}
+- (void)dealloc {
+    [self emptyPool];
+}
+- (void)emptyPool {
+    for (id obj in array) {
+        [obj release];
+    }
+}
+</code></pre><h3 id="Apple实现的Autorelease"><a href="#Apple实现的Autorelease" class="headerlink" title="Apple实现的Autorelease"></a>Apple实现的Autorelease</h3><pre><code>class AutoreleasePoolPage {
+    static inline void *push() {
+        //生成或持有NSAutoreleasePool对象
+    }
+    static inline void pop(void *token) {
+        //废弃NSAutoreleasePool对象
+        releaseAll();
+    }
+    static inline id autorelease(id obj) {
+        //相当于NSAutoreleasePool的类方法addObject
+        AutoreleasePoolPage *autoreleasePoolPage = //获取当前的autoreleasePool;
+        autoreleasePoolPage-&gt;add(obj);
+    }
+    id *add(id obj) {
+        //添加对象到内部数组
+    }
+    void releaseAll() {
+        //对内部数组里的每一个对象调用release方法
+    }
+};
+void *objc_autoreleasePoolPush(void) {
+    return AutoreleasePoolPage::push();
+}
+void objc_autoreleasePoolPop(void *ctxt) {
+    AutoreleasePoolPage::pop(ctxt);
+}
+id objc_autorelease(id obj) {
+    return AutoreleasePoolPage::autorelease(obj);
+}
+</code></pre><p>使用<strong>extern void _objc_autoreleasePoolPrint()</strong>私有方法可以查看AutoreleasePool的状态。如果对AutoreleasePool对象进行autorelease的话，会产生<strong>NSInvalidArgumentException</strong>的异常。</p>
+<hr>
+<h3 id="所有权"><a href="#所有权" class="headerlink" title="所有权"></a>所有权</h3><p>ARC有效时，objc的对象类型必须附加所有权修饰符，一共有4种：</p>
+<p><strong>__strong</strong>表示对修饰的对象的“强引用”，持有强引用的变量在<strong>超出其作用域时失效</strong>，其引用的对象会被释放。默认情况下，缺省所有权声明的对象类型变量，都隐式声明为<strong>strong类型。通过遵循内存管理原则的</strong>strong修饰符，不必再依赖retain或release，也能正确管理内存。</p>
+<p><strong>__weak</strong>的设计主要是解决循环引用的问题。<strong>weak修饰符与</strong>strong相反，仅仅引用但不持有。同时__weak的另一个优点是，其所引用的对象如果被销毁，该变量将被<strong>自动安全地设置为nil</strong>，再也不会出现指向已经释放的对象内存块的野指针了。</p>
+<p><strong>__unsafe_unretained</strong>正如其名unsafe所示，是<strong>不安全</strong>的所有权修饰符。其基本与__weak表现一致，除了在引用对象销毁时不被自动设置为nil。</p>
+<p><strong>__autoreleasing</strong>修饰符的变量被某对象赋值时，就代表该对象在MRC时调用了autorelease的方法，即对象被注册到了AutoreleasePool里。同时，使用@autoreleasepool{}块代替NSAutoreleasePool的方法调用。</p>
+<h3 id="隐式使用-autoreleasing"><a href="#隐式使用-autoreleasing" class="headerlink" title="隐式使用__autoreleasing"></a>隐式使用__autoreleasing</h3><p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxm9s493j21aq0pwq7y.jpg" alt=""></p>
+<p>获取并持有非自己生成的对象时，该对象已经被注册到了autoreleasepool。这是由于编译器会检查方法名是否以alloc/new/copy/mutableCopy开头，如果不是则自动将方法返回的对象注册到autoreleasepool(当然init方法不会)。这些方法里，return使得对象变量超出其作用域，<strong>strong类型变量会释放其持有的对象，所以编译器会使用</strong>autorelease修饰符将对象注册到autoreleasePool延迟释放。</p>
+<pre><code>+ (id)array {
+    return [[NSArray alloc] init];
+}
+等价于
++ (id)arrya {
+    __autoreleasing obj = [[NSArray alloc] init];
+    return obj;
+}
+</code></pre><p>使用__weak类变量时，因为该变量只有引用并不持有，而在访问该变量的过程中有被销毁的可能性。如果把指向的对象注册到autoreleasePool中，那么在@autoreleasePool{}结束前都能保证期间对象存在。</p>
+<pre><code>id _weak obj = XXX;
+NSLog(@&quot;Class = %@&quot;, [obj class]);
+等价于
+id _weak obj = XXX;
+id __autoreleasing tmp = obj;
+NSLog(@&quot;Class = %@&quot;, [tmp class]);
+</code></pre><p>默认情况下，缺省所有权声明对象的指针变量，都隐式声明为__autoreleasing。因为编译器将alloc/new/copy/mutableCopy开头的方法产生的新对象看作自己生成并持有，其他情况下产生的新对象都应该看作非自己生成并持有。虽然strong类型变量也能够传递，但还是应该统一遵循内存管理原则。同时，<strong>对象指针的赋值操作时所有权修饰符必须一致</strong>否则编译不通过。</p>
+<pre><code>- (BOOL)doSomething:(NSError *)error {
+    //发生错误
+    *error = [[NSError alloc] init];
+    return NO;
+}
+NSError *error = nil;
+BOOL result = [self doSomething:&amp;error];
+等价于
+- (BOOL)doSomething:(__autoreleasing NSError *)error {
+    //发生错误
+    *error = [[NSError alloc] init];
+    return NO;
+}
+__autoreleasing NSError *error = nil;
+BOOL result = [self doSomething:&amp;error];
+</code></pre><p>另外，在显示地指定__autoreleasing修饰符时，必须注意修饰的对象要为<strong>自动变量</strong>(包括局部变量、方法参数)。</p>
+<h3 id="ARC使用规则"><a href="#ARC使用规则" class="headerlink" title="ARC使用规则"></a>ARC使用规则</h3><p>在ARC有效时必须要遵循以下规则：</p>
+<ul>
+<li>不能使用retain/release/retainCount/autorelease</li>
+<li>不能使用NSAllocateObject/NSDeallocateObject(分别实现了影响内存管理的alloc和dealloc)</li>
+<li>方法命名需遵循内存管理原则</li>
+<li>不再显示调用dealloc(遵循无法显示影响内存管理)</li>
+<li>使用@autoreleasepool{}代替NSAutoreleasePool</li>
+<li>不能使用NSZone</li>
+<li>objc对象类型变量不能作为C语言结构体(struct/union)的成员(没有方法管理C语言结构体成员的生命周期)</li>
+<li>id和void*之间转换需要显示指明所有权变化(C语言类型变量超出ARC对objc对象类型变量的管理范围，需手动指明所有权变化)</li>
+</ul>
+<p><strong>__bridge</strong>对象所有权不变，编译器继续自动管理；</p>
+<p><strong>__bridge_retained</strong>或<strong>CFBridgingRetain</strong>移交对象所有权从编译器到开发者，至此开发者需手动管理；</p>
+<p><strong>__bridge_transfer</strong>或<strong>CFBridgingRelease</strong>移交对象所有权从开发者到编译器，至此编译器能自动管理</p>
+<hr>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>Apple称ARC是“右边一起进行内存管理”的，但实际上只有编译器是无法完全胜任的，在此基础上还需要Runtime的支持。也就是说，ARC是由Clang(LLVM编译器)3.0＋和Objc Runtime493.9＋实现的。编译器选项“-S”运行clang，可以取得程序汇编输出。通过阅读汇编和objc4库源代码，可以模拟ARC是如何实现的。</p>
+<h5 id="strong修饰符"><a href="#strong修饰符" class="headerlink" title="__strong修饰符"></a>__strong修饰符</h5><pre><code>{
+    id __strong obj = [[NSObject alloc] init];
+}
+//编译器模拟代码
+{
+    id obj = objc_msgSend(NSObject, @selector(alloc));
+    objc_msgSend(obj, @selector(init));
+    objc_release(obj);
+}
+</code></pre><p>由此可知，对于自己生成并持有的对象，编译器自动地在作用域结束前插入release。</p>
+<pre><code>+ (id)array
+{
+    return [[NSMutableArray alloc] init];
+}
+
+{
+    id __strong obj = [NSMutableArray array];
+}
+//模拟器代码
++ (id)array
+{
+    id obj = objc_msgSend(NSMutableArray, @selector(alloc));
+    objc_msgSend(obj, @selector(init));
+    return objc_autoreleaseReturnValue(obj);
+}
+
+{
+    id obc = objc_msgSend(NSMutableArray, @selector(array));
+    objc_retainAutoreleasedReturnValue(obj);
+    objc_release(obj);
+}
+</code></pre><p>由此可知，对于非标准对象生成方法里，编译器自动地在作用域结束前插入<strong>objc_autoreleaseReturnValue</strong>方法(该方法将生成的对象autorelease－即注册到autorelresepool)。而对于非自己生成能持有的对象，和之前一样编译器自动地在作用域结束前插入release，同时在获取对象后，会插入<strong>objc_retainAutoreleasedReturnValue</strong>方法(该方法将持有返回得到的autoreleased对象)。</p>
+<p>不过，objc_autoreleaseReturnValue和objc_autorelase不同的是，前者是要用于最优化程序。objc_retainAutoreleasedReturnValue会检查调用方的执行命令列表(参见<a href="http://hllovesgithub.github.io/2015/11/15/2015-11-15[Autorelease]/">Autorelease</a>)，如果发现调用房在调用非标准对象生成方法(例如+array)后紧结着调用了objc_retainAutoreleasedReturnValue的话，那么就<strong>不</strong>将生成的对象autorelease－即注册到autorelresepool，而是直接返回。同理，且objc_retainAutoreleasedReturnValue和objc_retain不同的是，如果之前调用过objc_autoreleaseReturnValue，那么就<strong>不</strong>将返回的对象retain，而是直接使用。这两个方法共同协作，可以将生成的对象不注册到autoreleasepool中直接使用，省去了2次objc的msgSend方法，达到最优化。同时，也解决了非标准方法在ARC和MRC模块之间传递对象的问题。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxmjmwutj21v418atl5.jpg" alt=""></p>
+<h5 id="weak修饰符"><a href="#weak修饰符" class="headerlink" title="__weak修饰符"></a>__weak修饰符</h5><pre><code>{
+    id __weak obj = another;
+}
+//编译器模拟代码
+{
+    id obj = 0;
+    objc_initWeak(&amp;obj, another);
+    objc_destroyWeak(&amp;obj);
+}
+//等价于
+{
+    id obj = 0;
+    objc_storeWeak(&amp;obj, another);
+    objc_storeWeak(&amp;obj, 0);
+}
+</code></pre><p>objc_storeWeak方法将__weak修饰符变量的地址(即第1个参数)作为Value，将被引用的对象(即第2个参数)作为Key，注册到runtime维护的weak关系映射表(Hash散列表)中，当Key为0时，将Value从对应的weak关系映射表中删除。使用weak表，将销毁的对象进行检索，就能快速地获得weak引用它的所有变量的地址。对象的销毁过程：</p>
+<ul>
+<li>objc_release</li>
+<li>当引用计数为0时而执行dealloc</li>
+<li>_objc_rootDealloc</li>
+<li>object_dispose</li>
+<li>objc_destructInstance</li>
+<li>objc_clear_deallocating</li>
+</ul>
+<p>最后调用objc_clear_deallocating时，首先从weak表中获取销毁对象为Key的所有Value(即所有weak变量的地址)，然后通过指针将weak变量的值设为nil，再在weak表中删除销毁对象对应记录，最后把销毁对象也从计数表中删除对应记录。由此可知，如果有大量<strong>weak修饰符变量，则会在引用的对象被销毁时大量被设置为nil消耗CPU，所以应该尽可能在需要的地方使用</strong>weak。</p>
+<p>使用__weak修饰符变量即是使用autoreleased对象：</p>
+<pre><code>{
+    id __weak obj = another;
+    NSLog(@&quot;%@&quot;, obj);
+}
+//编译器模拟代码
+{
+    id obj = 0;
+    objc_initWeak(&amp;obj, another);
+    id tmp = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp);
+    NSLog(@&quot;%@&quot;, tmp);
+    objc_destroyWeak(&amp;obj);
+}
+</code></pre><p><strong>objc_loadWeakRetained</strong>取出<strong>weak修饰符变量引用的对象并持有，objc_autorelease将获取的对象注册到autoreleasepool中延迟释放。所以，</strong>weak引用的对象在@autoreleasepool{}期间都是有效的可以放心使用。但是，如果大量地使用<strong>weak变量，会产生大量的autoreleased对象，因为在使用</strong>weak变量时最好暂时赋值给一个<strong>strong变量再使用</strong>strong。</p>
+<pre><code>{
+    id __weak objc = another;
+    NSLog(@&quot;1 %@&quot;, obj);
+    NSLog(@&quot;2 %@&quot;, obj);
+    NSLog(@&quot;3 %@&quot;, obj);
+}
+//等价于
+{
+    id _weak objc = another;
+    id tmp1 = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp1);
+    NSLog(@&quot;1 %@&quot;, tmp1);
+    id tmp2 = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp2);
+    NSLog(@&quot;2 %@&quot;, tmp2);
+    id tmp3 = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp3);
+    NSLog(@&quot;3 %@&quot;, tmp3);
+}
+
+//使用__strong
+{
+    id __weak objc = another;
+    id __strong tmp = objc;
+    NSLog(@&quot;1 %@&quot;, tmp);
+    NSLog(@&quot;2 %@&quot;, tmp);
+    NSLog(@&quot;3 %@&quot;, tmp);
+}
+//等价于
+{
+    id _weak objc = another;
+    id tmp = objc_loadWeakRetained(&amp;ojc);
+    NSLog(@&quot;1 %@&quot;, tmp);
+    NSLog(@&quot;2 %@&quot;, tmp);
+    NSLog(@&quot;3 %@&quot;, tmp);
+    objc_release(tmp);
+}
+</code></pre><h5 id="autoreleasing修饰符"><a href="#autoreleasing修饰符" class="headerlink" title="__autoreleasing修饰符"></a>__autoreleasing修饰符</h5><pre><code>@autoreleasepool {
+    id __autoreleasing obj = [[NSObject alloc] init];
+}
+@autoreleasepool {
+    id __autoreleasing obj = [NSMutableArray array];
+}
+//等价于
+id pool = objc_autoreleasePoolPush();
+id obj = objc_msgSend(NSObject, @selector(alloc));
+objc_msgSend(obj, @selector(init));
+objc_autorelease(obj);
+objc_autoreleasePoolPop(pool);
+
+id pool = objc_autoreleasePoolPush();
+id obj = objc_msgSend(NSMutableArray, @selector(array));
+objc_retainAutoreleasedReturnValue(obj);
+objc_autorelease(obj);
+objc_autoreleasePoolPop(pool);
+</code></pre><hr>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>ARC虽然不能使用retainCount查看引用计数，但能参考<strong>extern uintptr_t _objc_rootRetainCount(id obj)</strong>私有方法查看。不过也不能够完全信任该方法。对于已经销毁的对象已经地址不正确的对象，有时候也返回“1”。另外，在多线程环境中使用时，因为存在静态条件的问题，所以取得的数值不一定完全可信。</p>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/12/06/2015-12-06[Objc高级编程之ARC-读书笔记]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/12/06/2015-12-06[Objc高级编程之ARC-读书笔记]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/12/06/2015-12-06[Objc高级编程之ARC-读书笔记]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-12-06T01:20:06.000Z"><a href="/2015/12/06/2015-11-29[Test]/">周日, 12月 6 2015, 9:20:06 上午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/12/06/2015-11-29[Test]/">Test</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h3><p>单元是应用的最小可测试部件。单元测试(又称为模块测试，Unit Testing)是针对程序模块(软件设计的最小单位)来进行正确性检验的测试工作。如果代码之间的耦合度很小，那么可以将其分解成多个小单元，从而更易于测试。TDD(Test-Driven Development测试驱动开发)要求开发者在编写功能前先将其测试代码写好，然后边编写实现代码边进行测试，从而保证实现尽早发现并修改问题，因此整个项目将由测试来驱动，有助于开发出高质量的代码。</p>
+<h3 id="黑盒测试"><a href="#黑盒测试" class="headerlink" title="黑盒测试"></a>黑盒测试</h3><p>黑盒测试是一种测试方法，盒子是指被测试的软件，黑是指盒子是不可视，测试者不清楚也不关心盒子内部的构造以及运作。白盒测试又称功能测试，它是以用户的角度，对外部进行测试，只检查功能是否能够按照需求正常使用。</p>
+<h3 id="白盒测试"><a href="#白盒测试" class="headerlink" title="白盒测试"></a>白盒测试</h3><p>白盒测试是一种测试方法，盒子是指被测试的软件，白是指盒子是可视的，测试者清楚盒子内部是如何构造以及如何运作。白盒测试又称结构测试，它是以实现者的角度，对内部进行测试，需检查功能是否能够按照需求正常实现。</p>
+<h3 id="懵懂认知"><a href="#懵懂认知" class="headerlink" title="懵懂认知"></a>懵懂认知</h3><p>刚工作时，我以为测试只是测试干的事，开发只要做完自己的工作，交给测试去测就行。后来发现，从前面定义来看，测试干的是黑盒测试。对于开发而言，为什么要进行白盒测试呢？</p>
+<ul>
+<li>黑盒测试测出的问题归根结底还是开发实现的问题。测试的确不清楚功能是如何实现的，也不想知道。白盒测试也只能由清楚实现的细节开发来完成，可以针对具体的功能实现进行细致全面地测试。</li>
+<li>黑盒测试一般由人工操作，会因为人的习惯、偏好、心情、态度而存在耗时耗力、范围局限、路径随意、深浅不均等等问题。而白盒测试一般都有工具辅助，只要了解细节的开发编写好全面的测试用例，就可以快速全面专注平均地测试。</li>
+<li>一般项目需要进行到一定程度，能够出现可测试的样品时，才可以进行黑盒测试。也就是说，问题的暴露从开发阶段推迟到测试阶段才被发现。而白盒测试可以脱离软件整体真对单独模块(比如framework、library、class、methods)在开发阶段就提前进行。</li>
+<li>黑盒测试需要有软件样品，对于每一次修改了测出的问题后，构建生成新的软件样品再进行黑盒测试不太现实。而脱离软件整体的白盒测试可以独立地对问题所涉及到的地方修改后进行多次快速地测试。</li>
+<li>接口设计好后，即接口功能、接口名称、参数个数、参数类型、返回类型都明确稳定后，白盒测试就可以开始编写测试用例并测试。这有助于实现在早期就能发现问题，为软件提供稳定健壮的组件。甚至对于实现的内部有任何改变，只要有一套完整的白盒测试用例，都可以快速检查是否修复旧问题是否产生新问题。</li>
+</ul>
+<p>所以，无论是自身充满好奇心，还是对自己严格要求，即使是测试，都会有助于培养良好习惯和提高编码水平。</p>
+<h3 id="Xcode测试"><a href="#Xcode测试" class="headerlink" title="Xcode测试"></a>Xcode测试</h3><p>由于Xcode5以后内嵌了XCTest(兼容iOS7+和OS X10.8+)这个测试框架，可以很方便地进行测试，且能满足一般测试需求，所以OCUnit和SenTest我目前就不再深入研究。</p>
+<p>Xcode里，目标(Target)通过构建(Build)生成产品(Production)。测试目标构建后会生成测试包。如果测试过程需要使用不同类型的数据(文件图片音频视频等)，可以把它们添加到测试包中，并在测试方法里使用[NSBundle bundleForClass:测试类]，在运行时获取正确的测试包，便可以取得正确的数据。</p>
+<p>快捷键Command+U是起动当前Scheme配置的测试包的测试任务。Scheme(方案)控制着构建(Build)、运行(Run)、测试(Test)、调试(Profile)、分析(Analyse)和归档(Archive)这些命令的行为。其中，可以通过添加或删除、启用或关闭，来控制测试范围。可以在测试导航栏找到所有的测试包、测试类、测试方法，可以分不同抽象级别进行测试。也可以在源文件测试整个类或者某个方法。</p>
+<h3 id="XCTestCase"><a href="#XCTestCase" class="headerlink" title="XCTestCase"></a>XCTestCase</h3><p>每一个创建的测试类都是基于XCTestCase的子类型。对于每个测试类，测试方法都是以test开头、没有参数、返回void、用于测试不同目的的实例方法。对于每个测试方法，其通用代码(比如打开关闭文件或者网络)可以写在setUp(测试开始前)和tearDown(测试结束后)里面。执行测试时，一个测试类会创建对应测试方法数量的该类实例，每个实例在setup后执行一个对应的测试方法接着tearDown。这样连续重复执行所有的测试方法，测完一个类，接着下个类。一直重复直到测完所有测试类的所有测试方法。</p>
+<h3 id="XCTest断言"><a href="#XCTest断言" class="headerlink" title="XCTest断言"></a>XCTest断言</h3><p>测试方法中，对测试的表达式进行预期判断。只有不符合预期判断的表达式才算是测试失败。XCTest提供了很多内建的预判断言。</p>
+<p><strong>无条件报错</strong></p>
+<ul>
+<li>XCTFail</li>
+</ul>
+<p><strong>等价测试</strong></p>
+<ul>
+<li>XCTAssertEqualObjects</li>
+<li>XCTAssertNotEqualObjects</li>
+<li>XCTAssertEqual</li>
+<li>XCTAssertNotEqual</li>
+<li>XCTAssertEqualWithAccuracy</li>
+<li>XCTAssertNotEqualWithAccuracy</li>
+</ul>
+<p><strong>nil测试</strong></p>
+<ul>
+<li>XCTAssertNil</li>
+<li>XCTAssertNotNil</li>
+</ul>
+<p><strong>布尔测试</strong></p>
+<ul>
+<li>XCTAssertTrue</li>
+<li>XCTAssert(与XCTAssertTrue同义)</li>
+<li>XCTAssertFalse</li>
+</ul>
+<p><strong>异常测试</strong></p>
+<ul>
+<li>XCTAssertThrows</li>
+<li>XCTAssertThrowsSpecific</li>
+<li>XCTAssertThrowsSpecificNamed</li>
+<li>XCTAssertNoThrow</li>
+<li>XCTAssertNoThrowSpecific</li>
+<li>XCTAssertNoThrowSpecificNamed(对AppKit和Foundation非常有用)</li>
+</ul>
+<h3 id="断点"><a href="#断点" class="headerlink" title="断点"></a>断点</h3><p>在断点导航栏中，通过Add Test Failure Breakpoint添加一个测试失败断点。当测试方法失败触发了失败端点时，这个断点会终止测试的执行，并停止在测试代码发生错误点，这可以快速找到问题发生的位置。测试时异常断点捕获异常也会终止测试执行，所以测试运行时通常会关闭异常断点以避免不适当的定位。当然，寻找一个特定问题并想终止测试来修复它时，也可以打开异常断点恢复捕获。</p>
+<h3 id="性能测试"><a href="#性能测试" class="headerlink" title="性能测试"></a>性能测试</h3><p>在Xcode6以后，Apple提供了内建的measureBlock以确定一个性能基准。可以使用它们，方便地在测试用例中确认重要的算法以及随着时间的推移程序保持高性能。</p>
+<pre><code>- (void)testPerformanceExample {
+    // This is an example of a performance test case.
+    [self measureBlock:^{
+        // Put the code you want to measure the time of here.
+    }];
+}
+</code></pre><h3 id="异步测试"><a href="#异步测试" class="headerlink" title="异步测试"></a>异步测试</h3><p>之前在介绍GCD的时候，曾经提到过可以使用GCD实现异步测试：</p>
+<pre><code>- (void)testAsyncWithGroup {
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_async(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        sleep(1);
+    });
+    XCTAssertEqual(0,         dispatch_group_wait(group,         dispatch_time(DISPATCH_TIME_NOW, 2         * NSEC_PER_SEC)));
+}
+- (void)testAsyncWithSemaphore {
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if (!dispatch_semaphore_wait(semaphore, DISPATCH_TIME_NOW)) {
+            sleep(1);
+            dispatch_semaphore_signal(semaphore);
+        }
+    });
+    long value = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC));
+    if (!value) {
+        dispatch_semaphore_signal(semaphore);
+    }
+    XCTAssertEqual(0, value);
+}
+</code></pre><p>在Xcode6以后，Apple提供了内建的XCTestExpectation(期望)以支持异步测试。首先使用expectationWithDescription:创建一个期望；然后在调用异步方法后使用waitForExpectationsWithTimeout，指定一个超时回调函数，如果在规定的时间内期望没有得到实现便会执行回调函数；最后在异步方法里使用fulfill完成实现。注意，如果一个测试用例里有多个期望，只有所有的期望都实现了才算等待成功。</p>
+<pre><code>- (void)testDocumentOpening {
+    XCTestExpectation *documentOpenExpectation = [self expectationWithDescription:@&quot;document open&quot;];
+    NSURL *URL = [[NSBundle bundleForClass:[self class]] URLForResource:@&quot;TestDocument&quot; withExtension:@&quot;mydoc&quot;];
+    UIDocument *doc = [[UIDocument alloc] initWithFileURL:URL];
+    [doc openWithCompletionHandler:^(BOOL success) {
+        XCTAssert(success);
+        [documentOpenExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:1 handler:^(NSError *error) {
+        [doc closeWithCompletionHandler:nil];
+    }];
+}
+</code></pre><h3 id="编码指南"><a href="#编码指南" class="headerlink" title="编码指南"></a>编码指南</h3><p>通过测试达到的稳定水平取决于编写测试的质量，而编写测试的难易程度也取决于编码方式。为测试设计的编码方式有助于减小编写难度，写出良好测试。</p>
+<ul>
+<li><strong>定义API：</strong>每个API是为了满足对应的需求而设计的。越早定义好API形成明确稳定的标准，就越好写测试代码，即使没有实现API。只要API的定义不变，实现有了变动也可以使用相同的测试代码进行测试。API的定义包括功能描述、输入范围、输出范围，异常抛出，使用条件和返回类型。</li>
+<li><strong>边写边测：</strong>每当设计和编写一个方法时，就可以编写对应的测试用例来确保API的正确性。因为此时是对该API最熟悉的时段，随着时间的流逝，回过头来重新为很久前写过的实现编写测试用例，会有理解偏差的风险和重新学习的成本。</li>
+<li><strong>测试边界：</strong>对超越方法输入范围外的输入值进行测试。</li>
+<li><strong>测试出错：</strong>对能使方法出错的条件进行测试，确保方法正面响应错误，比如抛出异常或返回错误代码。</li>
+<li><strong>测试全面：</strong>尽量编写全面复杂的测试代码(比如多线程环境)，测试实现在各个方面的表现，发现潜在问题。</li>
+<li><strong>测试Bug：</strong>每当修复完一个Bug，都需要重复对应的测试，来验证此次修复的有效性。</li>
+</ul>
+<h3 id="命令行测试"><a href="#命令行测试" class="headerlink" title="命令行测试"></a>命令行测试</h3><p>命令行工具xcodebuild的test可以进行测试，参数-destination指定不同的测试目的。</p>
+<p>在64位OSX测试：xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp -destination ‘platform=OS X,arch=x86_64’</p>
+<p>在一个iPod测试：xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp -destination ‘platform=iOS,name=iPod Name’</p>
+<p>在iOS模拟器测试：xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp -destination ‘platform=iOS Simulator,name=iPhone,0S=7.0’</p>
+<p>-destination参数可以被连接在一起，这样就可以多个目标共享同一个方案(scheme)：xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp</p>
+<p>-destination ‘platform=OS X,arch=x86_64’</p>
+<p>-destination ‘platform=iOS,name=iPod Name’</p>
+<p>-destination ‘platform=iOS Simulator,name=iPhone,0S=7.0’</p>
+<p>如果测试失败，xcodebuild将返回一个非零的退出代码。</p>
+<hr>
+<p>延伸阅读</p>
+<p><a href="https://developer.apple.com/library/prerelease/ios/documentation/DeveloperTools/Conceptual/testing_with_xcode/chapters/01-introduction.html" target="_blank" rel="noopener">Testing with Xcode</a></p>
+<p><a href="http://www.cocoachina.com/ios/20140805/9314.html" target="_blank" rel="noopener">Xcode 6单元测试</a></p>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/12/06/2015-11-29[Test]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/12/06/2015-11-29[Test]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/12/06/2015-11-29[Test]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-11-21T07:43:56.000Z"><a href="/2015/11/21/2015-11-21[NSNotification]/">周六, 11月 21 2015, 3:43:56 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/11/21/2015-11-21[NSNotification]/">NSNotification</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>NSNotificationCenter是Cocoa上实现观察者模式的中间桥梁，NSNotification抽象了观察者和被观察者之间的通信。因为观察者和被观察者没有类型限制的广播性，所以一般作为程序中用来解耦模块之间纵深通信的方法(MVC中主要用作M向C通信)。NSNotificationCenter是线程安全的，意味着可以在多线程中不用担心同步问题而轻松访问和使用，例如注册观察者，移除观察者，发送与执行等。</p>
+<h3 id="添加观察者"><a href="#添加观察者" class="headerlink" title="添加观察者"></a>添加观察者</h3><pre><code>// A
+- (void)addObserver:(id)notificationObserver
+           selector:(SEL)notificationSelector
+               name:(NSString *)notificationName
+             object:(id)notificationSender
+// B
+- (id&lt;NSObject&gt;)addObserverForName:(NSString *)name
+                            object:(id)obj
+                             queue:(NSOperationQueue *)queue
+                        usingBlock:(void (^)(NSNotification *note))block
+</code></pre><p>A是传统的方法，B是支持block之后的方法。需要注意的是，NSNotificationCenter<strong>不会retain</strong>方法A的观察者notificationObserver(目前看来也不是weak，我个人认为是为了更本质地暴露问题，而是unsafe_unretained类型的引用)，<strong>但会retain</strong>方法B的返回值id<nsobject>，都将作为记录观察者和被观察者之间映射关系。而且每次添加都会重新注册一次，即使同一对象监听同一消息，而不是去覆盖原来的监听。</nsobject></p>
+<p>在涉及到block的方法B中，需要注意到不要产生循环引用的内存问题。因为block参数为返回的观察对象(__NSObserver类型)拥有，如果观察对象是成员变量而block中又引用了类本身，就构成了循环引用。</p>
+<h3 id="移除观察者"><a href="#移除观察者" class="headerlink" title="移除观察者"></a>移除观察者</h3><pre><code>// A
+- (void)removeObserver:(id)notificationObserver
+                  name:(NSString *)notificationName
+                object:(id)notificationSender
+// B
+- (void)removeObserver:(id)
+</code></pre><p>方法A移除了观察者、被观察者和通知名都匹配的映射关系，方法B移除了匹配观察者的所有映射关系。良好的编码习惯，就像allloc和dealloc，open和close，需要添加和移除配对出现。否则，当观察者已经无效而被观察者继续发送通知时，通知中心中还记录者映射关系(此时为野指针)，调用方法A的观察者的处理方法就会crash；方法B虽然不会crash，但是block内部引用的对象永远不会释放。</p>
+<p>方法A适合于在阶段性周期性的方法中调用，以避免不知情的情况下移除了可视范围外其他与对象关联的映射关系，即具体地移除自己控制的映射关系。方法B适合于在终极性一次性的方法中调用，这样可以确保清除与对象关联的映射关系；</p>
+<h3 id="通知与执行"><a href="#通知与执行" class="headerlink" title="通知与执行"></a>通知与执行</h3><pre><code>- (void)postNotification:(NSNotification *)notification
+- (void)postNotificationName:(NSString *)notificationName
+                      object:(id)notificationSender
+- (void)postNotificationName:(NSString *)notificationName
+                      object:(id)notificationSender
+                    userInfo:(NSDictionary *)userInfo
+</code></pre><p>可以根据需要指定通知名(notificationName)、发送者(notificationSender)和额外信息(userInfo)，所有这些信息封装在一个NSNotification中，由postNotification:发送，其中参数notification不能为空，否则会引发异常。添加观察者的方法A和B都会<strong>同步地</strong>通知观察者并等待其执行完毕，只不过A在通知发生当前的线程中，而B则是在注册时指定队列的线程中。</p>
+<p>但是，当有通知发送时，NSNotificationCenter是通过遍历所有的观察者映射关系，来找到每一个需要通知的观察者的。所以一旦注册到NSNotificationCenter的观察者过多，那么整个发送到响应通知的过程的效率就比较低，也不是什么需求都通过通知来解决，还是需要仔细思考适不适合。如果的确适合，也尽可能晚地注册，不再使用时也尽可能早地移除，这样使得内部的映射关系保持在最低量。</p>
+<h3 id="通知重定向"><a href="#通知重定向" class="headerlink" title="通知重定向"></a>通知重定向</h3><p>添加观察者的方法B已经很好地解决了这个问题，如果有需要尽量采用方法B，不过实现的原理还是值得研究一下的。下面的方法针对方法A(有可能方法B就是这么在NSNotificationCenter内部实现的)。Apple的<a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Notifications/Articles/Threading.html#//apple_ref/doc/uid/20001289-CEGJFDFG" target="_blank" rel="noopener">官方文档</a>这么说的：</p>
+<blockquote>
+<p>For example, if an object running in a background thread is listening for notifications from the user interface, such as a window closing, you would like to receive the notifications in the background thread instead of the main thread. In these cases, you must capture the notifications as they are delivered on the default thread and redirect them to the appropriate thread.</p>
+</blockquote>
+<p>思路是自定义一个缓存需要重定向NSNotification的集合(比如数组)。当通知来了时，先检查发送这个通知的线程是不是期望的线程，如果不是，则将这个通知缓存到集合中，并告诉期望的线程有通知需要处理。期望的线程得知后，从集合中移除通知，并进行处理。</p>
+<pre><code>@interface AppDelegate () &lt;NSMachPortDelegate&gt;
+@property (nonatomic,readwrite,strong) NSMutableArray *notifications;
+@property (nonatomic,readwrite,strong) NSThread *notificationThread;
+@property (nonatomic,readwrite,strong) NSLock *notificationLock;
+@property (nonatomic,readwrite,strong) NSMachPort *notificationPort;
+@end
+
+@implementation AppDelegate
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    NSLog(@&quot;current thread = %@&quot;, [NSThread currentThread]);
+    self.notifications = [[NSMutableArray alloc] init];
+    self.notificationLock = [[NSLock alloc] init];
+
+    self.notificationThread = [NSThread currentThread];
+    self.notificationPort = [[NSMachPort alloc] init];
+    self.notificationPort.delegate = self;
+
+    [[NSRunLoop currentRunLoop] addPort:self.notificationPort forMode:(__bridge NSString *)kCFRunLoopCommonModes];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(processNotification:) name:@&quot;TestNotification&quot; object:nil];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@&quot;TestNotification&quot; object:nil userInfo:nil];
+    });
+}
+- (void)handleMachMessage:(void *)msg {
+    [self.notificationLock lock];
+    while ([self.notifications count]) {
+        NSNotification *notification = [self.notifications objectAtIndex:0];
+        [self.notifications removeObjectAtIndex:0];
+        [self.notificationLock unlock];
+        [self processNotification:notification];
+        [self.notificationLock lock];
+    };
+    [self.notificationLock unlock];
+}
+- (void)processNotification:(NSNotification *)notification {
+    if ([NSThread currentThread] != _notificationThread) {
+        [self.notificationLock lock];
+        [self.notifications addObject:notification];
+        [self.notificationLock unlock];
+        [self.notificationPort sendBeforeDate:[NSDate date] components:nil from:nil reserved:0];
+    } else {
+        NSLog(@&quot;current thread = %@&quot;, [NSThread currentThread]);
+        NSLog(@&quot;process notification&quot;);
+    }
+}
+@end
+</code></pre><h3 id="多线程安全"><a href="#多线程安全" class="headerlink" title="多线程安全"></a>多线程安全</h3><p>NSNotificationCenter之所以在同一个线程中同步发送和执行通知，应该是Apple出于线程安全的原因，但是并不代表没有线程安全的问题。因为通知的发送和执行没有限制必须在某一个线程(例如主线程)，所以在线程A执行通知的期间，会有线程B释放观察者的可能性。如果观察者的执行方法里访问了观察者自己，那么这种情况下就会因访问野指针而crash：</p>
+<pre><code>@interface Poster : NSObject
+@end
+@implementation Poster
+- (instancetype)init {
+    self = [super init];
+    if (self){
+        [self performSelectorInBackground:@selector(postNotification) withObject:nil];
+    }
+    return self;
+}
+- (void)postNotification {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@&quot;Test&quot; object:nil];
+}
+@end
+
+@interface Observer : NSObject {
+    Poster  *_poster;
+}
+@property (nonatomic, assign) NSInteger i;
+@end
+@implementation Observer
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@&quot;Test&quot; object:nil];
+        _poster = [[Poster alloc] init];
+    }
+    return self;
+}
+- (void)handleNotification:(NSNotification *)notification {
+    NSLog(@&quot;handle notification begin&quot;);
+    sleep(1);
+    self.i = 10;
+    NSLog(@&quot;handle notification end&quot;);
+}
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSLog(@&quot;Observer dealloc&quot;);
+}
+@end
+
+@implementation AppDelegate
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    __autoreleasing Observer *observer = [[Observer alloc] init];
+}
+@end
+</code></pre><p>总之一句话，如何才能保证方法所有涉及到的对象，在方法执行期间有效？不过这类问题已经很典型了，在方法开始时确保所有对象的有效性后再执行，ARC下使用strong，MRC下使用retain+autorelease。今天写这篇文章的时候(XCode7.1.1)，我检测了引用文章的例子，惊奇的是已经<strong>没有问题</strong>了。我认为Apple解决了这个问题，应该是在执行通知方法前，内部strong或者retain+autorelease观察者。这能做到通知方法<strong>执行期间</strong>至少不会产生观察者都无效，如果执行前观察者都已经无效就会直接crash。引用文的例子是方法A，我认为方法B本身就不会有问题，因为它是个block对象，内部strong了观察者，而__NSObserver必须通过NSNotificationCenter的removeObserver方法才能移除。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://southpeak.github.io/blog/2015/03/20/cocoa-foundation-nsnotificationcenter/" target="_blank" rel="noopener">Foundation: NSNotificationCenter</a></li>
+<li><a href="http://southpeak.github.io/blog/2015/03/14/nsnotificationyu-duo-xian-cheng/" target="_blank" rel="noopener">Notification与多线程</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/11/21/2015-11-21[NSNotification]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/11/21/2015-11-21[NSNotification]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/11/21/2015-11-21[NSNotification]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-11-15T03:59:57.000Z"><a href="/2015/11/15/2015-11-15[Autorelease]/">周日, 11月 15 2015, 11:59:57 中午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/11/15/2015-11-15[Autorelease]/">Autorelease</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="它的意义"><a href="#它的意义" class="headerlink" title="它的意义"></a>它的意义</h3><p>对于Apple开发而言，ARC已经没有MRC容易内存出错了。在MRC的年代，一切都需要手动写，而计算机永远不会犯错，犯错的总是人，说不定在某个时刻大脑短路了或者打了一下哈欠，忘记少加了或者无意多加了个retain或者release，或者在业务逻辑交错复杂，或者在代码量显著增加，都有可能出一点小错。虽然MRC的年代已经有Static Analyse的工具，但是也不能确保是万能的。</p>
+<p>我在MRC年代学习Autorelease时，觉得它的意义是方便内存使用：</p>
+<pre><code>- (void)foo {
+    id objc1 = [[NSObject alloc] init];
+    // 逻辑1
+    return;
+
+    // 逻辑2
+    if (flag1) {
+        id objc2 = [[NSObject alloc] init];
+        // ...
+        return;
+    }
+
+    // 逻辑3
+    while (flag2) {
+        // ...
+    }
+}
+</code></pre><p>在一个方法中，根据业务逻辑很可能出现多个分支，而有的分支会提前返回(对于方法返回的出口本身就是个值得研究且有争议的话题，我个人认为出口尽量越少越好)。对于MRC而言，如果有多个分支，就要做到在该分支结束返回前，把所有经过该分支上手动生成的内存全部手动释放掉。但是，所有这些因素都会引起方法中内存管理出错：</p>
+<ul>
+<li>业务逻辑波动可能性大导致分支结构不稳定。</li>
+<li>方法可能过长导致追溯检查生成对象很麻烦。</li>
+<li>多个分支出有相同对象释放会引诱代码拷贝。</li>
+</ul>
+<h3 id="良好习惯"><a href="#良好习惯" class="headerlink" title="良好习惯"></a>良好习惯</h3><p>代码也是给人看的，代码是由人写的，养成良好的编码习惯，避免问题远比解决问题更有意义。比如打开关闭文件，好的习惯是open和close一起写，然后再在中间写其他逻辑。成对写好open和close后，大脑就可以放下文件管理的问题，不用在写中间逻辑时提心吊胆地不断提醒自己不要忘记close文件(往往还就真容易忘记)。这个确保了大脑逻辑最简单最清晰的时候，最安全可靠地尽早完成该完成的任务。</p>
+<p>对于Coder，概念越抽象越好，规则越简单越好，牵挂越稀少越好。所以，反观和文件管理一样的内存管理，Autorelease(在机制上是<strong>延迟释放</strong>内存，所以内存管理还是平衡的)就能做到，在你生成对象内存的时候，就提前相应做好释放对象内存，而不用在以后的任何地方再去操心内存释放问题。有了[[[Class alloc] init] autorelease]之后，你想怎么飞就怎么飞，不用管何时返回，不用管分支有多少，不用管业务逻辑怎么变化。</p>
+<p>同样的良好习惯的应用，还有<a href="https://github.com/jspahrsummers/libextobjc" target="_blank" rel="noopener">libextobjc</a>中的@onExit功能(用到了GCC编译的功能，设置了方法返回后的调用)，在方法开头就写好返回收尾的工作，确保了安全工作就可以任性地飞，这个库以后再介绍。</p>
+<h3 id="言归正传"><a href="#言归正传" class="headerlink" title="言归正传"></a>言归正传</h3><p>autorelease的主要作用是，和其他语言能够返回创建的临时对象一样，返回方法创建的对象。</p>
+<ul>
+<li>MRC：方法内部栈上变量会在方法返回后被回收，而objc对象都在堆上，不存在返回后对象被释放。</li>
+<li>ARC：方法内部所有strong指向的对象都会在{}作用域结束时被释放。</li>
+</ul>
+<p>当然，无论MRC还是ARC，autorelease都保证对象延迟释放，方法的调用者不用操心获返回对象的内存管理，放心的使用。而延迟释放的时机就在<a href="http://hllovesgithub.github.io/2015/10/01/2015-10-01[Thread-Runloop]/">Runloop</a>。主线程会自动创建Runloop，每有一个系统事件时，Runloop都会调用一次对应的处理方法，但是进行任何处理之前会先创建autoreleasepool，在所有所有处理结束后，会drain掉autoreleasepool里所有的对象。所以能够保证，autorelease的对象在使用期间保证有效，使用之后也安全销毁。使用autorelease一般遇到的问题是，大量延迟释放的对象需要尽早销毁而不是等到Runloop这一次处理结束，从而让内存消耗平滑，常见于大量循环内部。不过，很简单，在需要的地方内嵌autoreleasepool即可。另外，Apple很多带有block的API都默认有局部autoreleasepool。</p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><p>ARC中使用@autoreleasepool{}来使用autoreleasepool，编译器将它编译成如下：</p>
+<pre><code>void *context = objc_autoreleasePoolPush();
+// {}中的代码
+objc_autoreleasePoolPop(context);
+</code></pre><p>这2个方法都试对AutoreleasePoolPage(一个C++实现的类)的简单封装。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ey1kylimp0j20f109m3zl.jpg" alt=""></p>
+<ul>
+<li>AutoreleasePool由多个AutoreleasePoolPage组合的双向链表(parent和child)</li>
+<li>AutoreleasePool和线程一一对应(每个Page中thread的值都相同)</li>
+<li>AutoreleasePoolPage每个对象会开辟4096字节内存(虚拟内存一页的大小)，低地址空间存放以上成员变量，其余全部储存注册的autorelease对象地址</li>
+<li>next指针指向存放下一个add进来autorelease对象地址的位置</li>
+<li>当一个Page空间被占满时，再新建一个Page并设好以前关系，以后add的autorelease对象将在新page中</li>
+</ul>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ey1kyxf74jj20dy0cx756.jpg" alt=""></p>
+<p>每当调用objc_autoreleasePoolPush时，runtime向当前的Page中add进一个<strong>哨兵对象</strong>，值为0(=nil)，其方法的返回值正是哨兵对象的地址，在调用objc_autoreleasePoolPop时作为内存释放的目的位置：</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ey1kz6ifh1j20ji0dewff.jpg" alt=""></p>
+<p>释放时，将整个双向链表中从最新的Page起到哨兵对象所处的Page，所有晚于哨兵的autorelease对象都发送一次release消息，并移动next到正确位置：</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ey1kzc7yvdj20dz0bqdgi.jpg" alt=""></p>
+<p>嵌套的AutoreleasePool就非常简单了，pop的时候总会释放到上次push的位置为止，多层的pool就是多个哨兵对象。</p>
+<h3 id="ARC"><a href="#ARC" class="headerlink" title="ARC"></a>ARC</h3><p><strong>Thread Local Storage</strong>(TLS)线程局部存储，将一块内存作为线程专有存储，以key-value形式进行读写，比如在非arm架构下，使用pthread提供的方法实现：</p>
+<pre><code>void* pthread_getspecific(pthread_key_t);
+int pthread_setspecific(pthread_key_t , const void *);
+</code></pre><p>ARC对autorelease返回值有优化：</p>
+<pre><code>// 编译前
++ (instancetype)createSark {
+    return [self new]; 
+}
+// caller
+Sark *sark = [Sark createSark];
+
+// 编译后
++ (instancetype)createSark {
+    id tmp = [self new];
+    return objc_autoreleaseReturnValue(tmp); // 代替我们调用autorelease
+}
+// caller
+id tmp = objc_retainAutoreleasedReturnValue([Sark createSark]) // 代替我们调用retain
+Sark *sark = tmp;
+objc_storeStrong(&amp;sark, nil); // 相当于代替我们调用了release
+</code></pre><p>编译后的代码使用<strong>objc_autoreleaseReturnValue</strong>和<strong>objc_retainAutoreleasedReturnValue</strong>代替原来将对象放入AutoreleasePool中。其中objc_autoreleaseReturnValue将返回对象储存在TLS中，然后直接返回这个object(不调用autorelease)。外部接收返回值的objc_retainAutoreleasedReturnValue发现TLS中正好存了这个对象，那么直接返回这个object(不调用retain)。</p>
+<p>但调用方不是ARC呢？通过<strong>__builtin_return_address</strong>得到方法的返回地址。加上偏移量能够定位到调用方在调用方法后的代码，根据代码判断调用方是否为ARC。如果是，则按照此优化处理，否则按照原来autorelease方法处理。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://blog.sunnyxx.com/2014/10/15/behind-autorelease/" target="_blank" rel="noopener">黑幕背后的Autorelease</a></li>
+<li>《Objective-C高级编程 iOS与OS X多线程和内存管理》</li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/11/15/2015-11-15[Autorelease]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/11/15/2015-11-15[Autorelease]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/11/15/2015-11-15[Autorelease]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-11-07T01:21:03.000Z"><a href="/2015/11/07/2015-11-07[Runtime应用]/">周六, 11月 7 2015, 9:21:03 上午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/11/07/2015-11-07[Runtime应用]/">Runtime应用</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>Runtime的能力很强大，有很多优秀的第三方库基于Runtime实现了不可思议的功能。Apple也有原生框架使用Runtime使得奇妙的技术得以被自然合理地使用。这里介绍4种：Associated Object、Method Swizzling(Aspect Oriented Programming)、KVO和NSZombie。</p>
+<h3 id="Associated-Objects"><a href="#Associated-Objects" class="headerlink" title="Associated Objects"></a>Associated Objects</h3><p>对象关联(或称为关联引用)是Runtime2.0(起始于OSX10.5和iOS4)的一个特性，它允许你在运行时向对象动态赋值关联、获取关联和删除关联：</p>
+<ul>
+<li>objc_setAssociatedObject</li>
+<li>objc_getAssociatedObject</li>
+<li>objc_removeAssociatedObjects</li>
+</ul>
+<p>这意味着可以对已经存在的类在Category中添加自定义属性，这几乎弥补了Objc最大的缺点。对于第2个参数key而言，通常应该是常量、唯一的、在适用范围内用getter和setter访问到的：</p>
+<pre><code>static char kAssociatedObjectKey;
+objc_getAssociatedObject(self, &amp;kAssociatedObjectKey);
+</code></pre><p>但是，因为SEL被编译器确保了其是常量又是唯一的，所以更简单的方式是用SEL实现：</p>
+<pre><code>@interface NSObject (AssociatedObject)
+@property (nonatomic, strong) id associatedObject;
+@end
+@implementation NSObject (AssociatedObject)
+@dynamic associatedObject;
+- (void)setAssociatedObject:(id)object {
+    objc_setAssociatedObject(self, @selector(associatedObject), object, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+- (id)associatedObject {
+    return objc_getAssociatedObject(self, @selector(associatedObject));
+}
+@end
+</code></pre><p>而对象的关联策略由类型objc_AssociationPolicy指定：</p>
+<ul>
+<li>OBJC_ASSOCIATION_ASSIGN ＝ @property(assign)或者@property(unsafe_unretained)</li>
+<li>OBJC_ASSOCIATION_RETAIN_NONATOMIC = @property (nonatomic,strong)</li>
+<li>OBJC_ASSOCIATION_COPY_NONATOMIC = @property (nonatomic, copy)</li>
+<li>OBJC_ASSOCIATION_RETAIN = @property (atomic, strong)</li>
+<li>OBJC_ASSOCIATION_COPY = @property (atomic, copy)</li>
+</ul>
+<p>删除关联时，根据文档描述不要使用objc_removeAssociatedObjects，因为这样是删除所有关联，也许别的关联使用者添加过你不知道的关联过早被一起删除了。正确的方法是使用objc_setAssociatedObject将对应的关联设置为nil。</p>
+<p>无论是帮助内部实现的私有属性，还是帮助外部调用的公有属性，在已有类需要属性时能实现这种需求。但是关联不是万能药，再有适合需求更好的实现时(比如Delegate，NSNotification，KVO或者Subclass)，关联应该被视为最后的选择。</p>
+<h3 id="Method-Swizzling-Aspect-Oriented-Programming"><a href="#Method-Swizzling-Aspect-Oriented-Programming" class="headerlink" title="Method Swizzling(Aspect Oriented Programming)"></a>Method Swizzling(Aspect Oriented Programming)</h3><p>类(Class)维护一张调度表(dispatch table)在运行时解析消息；表中每项(entry)都是一个方法(Method)，其key是一个唯一的名字选择器(SEL)-字符串，对应着一个方法实现(IMP)-指向标准C函数的指针。Method swizzling通过Runtime，改变类调度表里选择器与方法实现之间的映射关系，从而让消息解析时从一个选择器对应到另外一个的实现：</p>
+<ul>
+<li>class_addMethod</li>
+<li>class_replaceMethod</li>
+<li>method_exchangeImplementations</li>
+</ul>
+<p>举个例子：</p>
+<pre><code>#import &lt;objc/runtime.h&gt;
+@implementation UIViewController (Tracking)
++ (void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        Class class = [self class];
+
+        // When swizzling a class method, use the following:
+        // Class class = object_getClass((id)self);
+
+        SEL originalSelector = @selector(viewWillAppear:);
+        SEL swizzledSelector = @selector(xxx_viewWillAppear:);
+
+        Method originalMethod = class_getInstanceMethod(class, originalSelector);
+        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+
+        BOOL didAddMethod =
+        class_addMethod(class,
+                        originalSelector,
+                        method_getImplementation(swizzledMethod),
+                        method_getTypeEncoding(swizzledMethod));
+
+        if (didAddMethod) {
+            class_replaceMethod(class,
+                                swizzledSelector,
+                                method_getImplementation(originalMethod),
+                                method_getTypeEncoding(originalMethod));
+        } else {
+            method_exchangeImplementations(originalMethod, swizzledMethod);
+        }
+    });
+}
+- (void)xxx_viewWillAppear:(BOOL)animated {
+    [self xxx_viewWillAppear:animated]; 
+    NSLog(@&quot;viewWillAppear: %@&quot;, self); 
+}
+@end
+</code></pre><p>因为Method Swizzling影响全局，所以减少冒险情况就很重要。+load能够保证类初始化时就被调用，这为改变系统行为提供了统一性。而+initialize并不能保证在何时被调用直到第一次调用类的方法，这使得不同类之间没有统一性。所以Swizzling应该在+load方法中实现。同时，为了确保Swizzling即使在多线程时也只被执行一次，Swizzling应该在dispatch_once中实现。</p>
+<p>乱用Swizzling容易导致不可预料的行为和结果，在没有足够的沟通的前提下，很容易造成看似理所当然实则莫名其妙的问题。除了显示说明和沟通以外，应用时始终调用原始实现能够保证至少正常API功能，同时给替换方法添加前缀避免和其他地方的代码产生冲突。</p>
+<blockquote>
+<p>An aspect can alter the behavior of the base code by applying advice (additional behavior) at various join points (points in a program) specified in a quantification or query called a pointcut (that detects whether a given join point matches).   —Wikipedia</p>
+</blockquote>
+<p>AOP是对OOP的一个补充，利用Runtime和AOP，可以把琐碎事务逻辑从主逻辑中分离出来，作为单独模块。有很多方式可以实现AOP，Method Swizzling就是其中之一。<a href="https://github.com/steipete/Aspects" target="_blank" rel="noopener">Aspects</a>就是一个不错的AOP库。</p>
+<h3 id="KVO"><a href="#KVO" class="headerlink" title="KVO"></a>KVO</h3><p>KVO是观察者模式在Objc的实现，是MVC中解耦MC通信的方法，是实现Cocoa Bindings的基础。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1extbrpbvxvj213r0m8aex.jpg" alt=""></p>
+<p>KVO的优美在于，使用时的自然合理是建立在Runtime底层一系列复杂处理换来的。简单来说，当某个对象第一次被观察时，Runtime会创建一个新的原类子类，重写所有被观察key的setter方法，并将该对象isa指向子类变成子类的实例。被重写的方法实现了如何通知观察者。有趣的是，Apple甚至也重写了-class方法，使得子类依旧返回原类，让使用者看起来什么都没发生一样。举个例子：</p>
+<pre><code>#import &lt;Foundation/Foundation.h&gt;
+#import &lt;objc/runtime.h&gt;
+
+@interface TestClass : NSObject
+@property int x;
+@property int y;
+@property int z;
+@end
+@implementation TestClass
+@end
+
+static NSArray *ClassMethodNames(Class c) {
+    NSMutableArray *array = [NSMutableArray array];
+    unsigned int methodCount = 0;
+    Method *methodList = class_copyMethodList(c, &amp;methodCount);
+    for(unsigned int i = 0; i &lt; methodCount; i++) {
+        [array addObject: NSStringFromSelector(method_getName(methodList[i]))];
+    }
+    free(methodList);
+    return array;
+}
+
+static void PrintDescription(NSString *name, id obj) {
+    NSString *str = [NSString stringWithFormat:
+                     @&quot;%@: %@\n\tNSObject class %s\n\tlibobjc class %s\n\timplements methods &lt;%@&gt;&quot;,
+                     name,
+                     obj,
+                     class_getName([obj class]),
+                     class_getName(object_getClass(obj)),
+                     [ClassMethodNames(object_getClass(obj)) componentsJoinedByString:@&quot;, &quot;]];
+    printf(&quot;%s\n&quot;, [str UTF8String]);
+}
+
+int main(int argc, char **argv) {
+    [NSAutoreleasePool new];
+
+    TestClass *x = [[TestClass alloc] init];
+    TestClass *y = [[TestClass alloc] init];
+    TestClass *xy = [[TestClass alloc] init];
+    TestClass *control = [[TestClass alloc] init];
+
+    [x addObserver:x forKeyPath:@&quot;x&quot; options:0 context:NULL];
+    [xy addObserver:xy forKeyPath:@&quot;x&quot; options:0 context:NULL];
+    [y addObserver:y forKeyPath:@&quot;y&quot; options:0 context:NULL];
+    [xy addObserver:xy forKeyPath:@&quot;y&quot; options:0 context:NULL];
+
+    PrintDescription(@&quot;control&quot;, control);
+    PrintDescription(@&quot;x&quot;, x);
+    PrintDescription(@&quot;y&quot;, y);
+    PrintDescription(@&quot;xy&quot;, xy);
+
+    SEL setX = @selector(setX:);
+    printf(&quot;Using NSObject methods, normal setX: is %p, overridden setX: is %p\n&quot;,
+           [control methodForSelector:setX], [x methodForSelector:setX]);
+    printf(&quot;Using libobjc functions, normal setX: is %p, overridden setX: is %p\n&quot;,
+           method_getImplementation(class_getInstanceMethod(object_getClass(control), setX)),
+           method_getImplementation(class_getInstanceMethod(object_getClass(x), setX)));
+
+    return 0;
+}
+</code></pre><p>执行结果为(测试结果在撰写原文和本文时不一样，本文的methodForSelector:结果没有隐藏修改，但是为了阐述KVO知识，我还是引用原文的结果)：</p>
+<pre><code>control: &lt;TestClass: 0x104b20&gt;
+    NSObject class TestClass
+    libobjc class TestClass
+    implements methods &lt;setX:, x, setY:, y, setZ:, z&gt;
+x: &lt;TestClass: 0x103280&gt;
+    NSObject class TestClass
+    libobjc class NSKVONotifying_TestClass
+    implements methods &lt;setY:, setX:, class, dealloc, _isKVOA&gt;
+y: &lt;TestClass: 0x104b00&gt;
+    NSObject class TestClass
+    libobjc class NSKVONotifying_TestClass
+    implements methods &lt;setY:, setX:, class, dealloc, _isKVOA&gt;
+xy: &lt;TestClass: 0x104b10&gt;
+    NSObject class TestClass
+    libobjc class NSKVONotifying_TestClass
+    implements methods &lt;setY:, setX:, class, dealloc, _isKVOA&gt;
+Using NSObject methods, normal setX: is 0x195e, overridden setX: is 0x195e
+Using libobjc functions, normal setX: is 0x195e, overridden setX: is 0x96a1a550
+</code></pre><p>可以看出，没有被Observer过的对象control它的信息没有改变，无论是类型还是方法。被观察过的对象，无论被观察的property有多少，类型都会被动态地修改为另一个动态创建的子类NSKVONotifying_TestClass。这个子类重写了所有被观察property的setter方法，其内部除了调用父类实现以外，还通知观察者。</p>
+<pre><code>(lldb)p (IMP)0x96a1a550
+$1 = 0x96a1a550 (Foundation`_NSSetIntValueAndNotify)
+</code></pre><p>所以，子类内部应该会有一份维护property映射观察者们的数据结构(根据文档，观察者和被观察者都没有内存retain，只是简单的映射关系。比如add不remove且观察者已经release，再有property变化时就会crash)，也需要重写dealloc方法至少清理该数据结构。而class的重写是为了封装变化，让使用者感到自然。_isKVOA看起来像是一个私有方法。NSObject的addObserver和removeObserver内部除了动态创建NSKVONotifying_Class子类以外，应该还有添加和删除观察者到子类中。</p>
+<p>另外，Foundation中有一系列这样的函数：</p>
+<pre><code>__NSSetBoolValueAndNotify
+__NSSetCharValueAndNotify
+__NSSetDoubleValueAndNotify
+__NSSetFloatValueAndNotify
+__NSSetIntValueAndNotify
+__NSSetLongLongValueAndNotify
+__NSSetLongValueAndNotify
+__NSSetObjectValueAndNotify
+__NSSetPointValueAndNotify
+__NSSetRangeValueAndNotify
+__NSSetRectValueAndNotify
+__NSSetShortValueAndNotify
+__NSSetSizeValueAndNotify
+__NSSetUnsignedCharValueAndNotify
+__NSSetUnsignedIntValueAndNotify
+__NSSetUnsignedLongLongValueAndNotify
+__NSSetUnsignedLongValueAndNotify
+__NSSetUnsignedShortValueAndNotify
+</code></pre><p>Apple为每一种primitive type都写了对应的实现。object会用到的其实只有__NSSetObjectValueAndNotify，但看起来也没有实现完全，比如long dobule或通用指针类型(generic pointer type)提供方法。所以，不在这个方法列表里的属性其实是不支持KVO的。</p>
+<h3 id="NSZombie"><a href="#NSZombie" class="headerlink" title="NSZombie"></a>NSZombie</h3><p>僵尸对象(NSZombie)用于调试内存管理问题的时相当有用，具体是当发送消息到已经释放的对象时，僵尸对象就能检测到。一个比较常见的就是”use after free”错误。</p>
+<p>通常情况下，对象释放后，其内存内容或者被重写或者不变。无论是哪种结果，都是无效会引发冲突。如果说这段内存恰好重写成一个新对象，那么消息可能就会发送给与原来风马牛不相及的对象，而且往往会由于无法识别选择器而抛出异常，假如这个错误的对象恰好也有该方法的话，那么就会发生更奇怪的问题。如果对象没有被重写尚未改变，处于将被销毁的状态，那么这会引起更匪夷所思的错误，比如多次调用释放占有的资源。</p>
+<p>而僵尸对象会与对象的dealloc挂钩，最后一步不是真正释放所占内存，而是将其动态改为一个僵尸类对象，并拦截所有发送给该对象的消息。这样，再有任何消息发给该对象时都会检测到，而不是像正常调试下那样出现五花八门的状况。</p>
+<p><strong>如何拦截信息？</strong></p>
+<p>一个空的对象什么方法都不实现，对它发送消息后，Runtime会启动消息转发机制，所以重写forwardInvocation:是拦截消息的最佳位置。而与其对应的，需要实现methodSignatureForSelector:。</p>
+<p><strong>如何保留类型？</strong></p>
+<p>通过动态创建Zombie类型，指明其类名和原类产生映射，比如NSZombie_Class，这样保持原始大小，Zombie类不用额外的空间保留原类型引用。</p>
+<p><strong>如何改变类型？</strong></p>
+<p>Zombie主要是检测错误向已释放对象发送消息的问题，所以在原类型对象的dealloc处最适合动态修改对象类型。而重写所有对象的dealloc，需要用到上面的Method Swizzling。</p>
+<p>总而言之，对于类型系统中原本没有的Zombie类型，通过Swizzling修改NSObject的dealloc方法，使得在运行期间任意类型对象dealloc时，动态创建和注册包含该类名信息的Zombie子类，动态添加methodSignatureForSelector:和forwardInvocation:的实现，再将原本要释放的对象的类型设置为Zombie子类。这样如果还有消息发送给本已无效的僵尸对象时，都会根据Runtime的消息转发机制最终找不到实现而产生异常(可观察释放对象信息)不至于直接crash。</p>
+<pre><code>#import &lt;Foundation/Foundation.h&gt;
+#import &lt;objc/runtime.h&gt;
+
+void EmptyIMP(id obj, SEL _cmd) {}
+
+NSMethodSignature *ZombieMethodSignatureForSelector(id obj, SEL _cmd, SEL selector) {
+    Class class = object_getClass(obj);
+    NSString *className = NSStringFromClass(class);
+    className = [className substringFromIndex: [@&quot;MAZombie_&quot; length]];
+    NSLog(@&quot;Selector %@ sent to deallocated instance %p of class %@&quot;, NSStringFromSelector(selector), obj, className);
+    abort();
+}
+
+Class ZombifyClass(Class class) {
+    NSString *className = NSStringFromClass(class);
+    NSString *zombieClassName = [@&quot;MAZombie_&quot; stringByAppendingString: className];
+    Class zombieClass = NSClassFromString(zombieClassName);
+    if(zombieClass) return zombieClass;
+    zombieClass = objc_allocateClassPair(nil, [zombieClassName UTF8String], 0);
+    class_addMethod(zombieClass, @selector(methodSignatureForSelector:), (IMP)ZombieMethodSignatureForSelector, &quot;@@::&quot;);
+    class_addMethod(object_getClass(zombieClass), @selector(initialize), (IMP)EmptyIMP, &quot;v@:&quot;);
+    objc_registerClassPair(zombieClass);
+    return zombieClass;
+}
+
+void ZombieDealloc(id obj, SEL _cmd) {
+    Class c = ZombifyClass(object_getClass(obj));
+    object_setClass(obj, c);
+}
+
+void EnableZombies(void) {
+    Method m = class_getInstanceMethod([NSObject class], @selector(dealloc));
+    method_setImplementation(m, (IMP)ZombieDealloc);
+}
+
+int main(int argc, const char * argv[]) {
+    EnableZombies();
+    NSObject *test = [[NSObject alloc] init];
+    [test release];
+    [test description];
+    return 0;
+}
+</code></pre><p>每个类及其子类在被第一次发送消息前都会先调用+initialize，从而使其能够初始化本身。如果Runtime发现该类没有实现+initialize方法，就会将消息转发。如果在此让消息转发的话，Zombie类也就没什么用了。所以需要添加一个空的+initialize方法来避免这个问题。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://nshipster.cn/associated-objects/" target="_blank" rel="noopener">Associated Objects</a></li>
+<li><a href="http://nshipster.com/method-swizzling/" target="_blank" rel="noopener">Method Swizzling</a></li>
+<li><a href="https://www.mikeash.com/pyblog/friday-qa-2009-01-23.html" target="_blank" rel="noopener">How KVO is actually implemented</a></li>
+<li><a href="https://mikeash.com/pyblog/friday-qa-2011-05-20-the-inner-life-of-zombies.html" target="_blank" rel="noopener">The Inner Life of Zombies</a></li>
+<li><a href="https://mikeash.com/pyblog/friday-qa-2014-11-07-lets-build-nszombie.html" target="_blank" rel="noopener">Let’s Build NSZombie</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/11/07/2015-11-07[Runtime应用]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/11/07/2015-11-07[Runtime应用]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/11/07/2015-11-07[Runtime应用]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-31T06:46:08.000Z"><a href="/2015/10/31/2015-11-01[Block]/">周六, 10月 31 2015, 2:46:08 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/10/31/2015-11-01[Block]/">Block</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>尝试自己写了篇介绍block，由于文章写得太少加上技术沉淀不够，阅读起来不够舒服，所以基本知识就转载<a href="http://blog.devtang.com/blog/2013/07/28/a-look-inside-blocks/" target="_blank" rel="noopener">谈Objective-C Block的实现</a>了，再额外加点自己的理解。</p>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p>在我看来，block有以下几个特点：</p>
+<ul>
+<li>匿名性：减少函数命名冲突</li>
+<li>闭包性：使上下文持续有效</li>
+<li>闭包性：增强抵抗参数变化</li>
+<li>直观性：代码逻辑连贯紧凑</li>
+<li>抽象性：分离变化解耦结构</li>
+</ul>
+<p><strong>匿名性</strong>：block块之所以能够像函数一样调用，是因为block是闭包在objc中的实现。而闭包简而言之就是，一个函数及其持有的变量环境。根据clang的-rewrite-objc查看到的代码，很清楚block是一个struct类型(当然其第一个参数是个void＊类型，可以看作为一个objc对象)，其内部有一个函数指针，刚刚好指向了由编译器根据block包涵代码编译的C静态函数(同时保证了函数的访问安全性)，而函数的命名规则目前来看是：<strong>所在的类名</strong>所在的函数名__block_func_索引值(区分同一类中同一函数里多个block)。命名本身是非常讲究的事儿，良好的命名(不管是函数，而是编程过程所有的概念对象：类、属性、方法、参数等等等等)能够帮助一目了然地理解和维护。而block在编译器的帮助下，coder不需要关心block的实现函数怎么命名，只需要给block起个有意义的名字即可(如果有必要的话)。</p>
+<p><strong>闭包性</strong>：实现block的struc类型其内部会保留所引用到的外部变量(稍后讲到)，而函数同步执行完后栈会回收跳转到另一个函数继续重新使用栈，这就使得在函数异步执行前不用手动保存所需要的栈上变量，延长了局部变量的生命周期。block能够灵活地保留引用变量并和参数变量隔离开来，参数变量应设计为对block稳定的影响，引用变量应设计为对block变化的影响。举个例子：</p>
+<pre><code>- (BOOL)isName:(NSString *)name in:(NSArray *)names {
+    __block BOOL flag = NO;
+    name = [name copy];
+    [names enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isMemberOfClass:[NSString class]]) {
+            NSString *str = (NSString *)obj;
+            flag = [str isEqualToString:name];
+            *stop = flag;
+        }
+    }];
+    return flag;
+}
+</code></pre><p>block抽象的是逻辑。对带有block的API的设计，其参数变量是稳定的，block的逻辑因业务需求的变化而变化，这个变化就可以通过改变block的引用变脸来实现，隔离了变化对API参数的影响。</p>
+<p><strong>直观性</strong>：block分解地来看，其实还是对函数的调用。更详细一点，是对回调函数的调用。而无论是Targer-Action，Delegate，Notification还是block，其本质都是回调函数。只不过是面向不同层级的抽象，以淡化类型污染，分离结构耦合。block能做到的事儿，delegate都能做到。是的，比方说用到多少个block就写多少个对应的回调。但是，不仅delegate获取的变量固定有限不能相迎变化的参数需求，而且有函数名竞争和潜在函数名写错的风险，最主要的是，查看delegate声明和实现需要多个文件之间来回跳转，逻辑容易中断(特别是异步调用)。而block，作为objc能够FP(Functional Programming)的基础，能够当作参数传递，使得多个不同的代码块能够写在一起，阅读维护时风格简单直观逻辑清晰连贯。业务的不同层级交互可以写在一个地方，不用污染功能模块。举个例子：</p>
+<pre><code>RACSignal *networkRequest = [RACSignal createSignal:^(id&lt;RACSubscriber&gt; subscriber) {
+    AFHTTPRequestOperation *operation = [client
+        HTTPRequestOperationWithRequest:request
+        success:^(AFHTTPRequestOperation *operation, id response) {
+            [subscriber sendNext:response];
+            [subscriber sendCompleted];
+        }
+        failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            [subscriber sendError:error];
+        }];
+
+    [client enqueueHTTPRequestOperation:operation];
+    return [RACDisposable disposableWithBlock:^{
+        [operation cancel];
+    }];
+}];
+</code></pre><p><strong>抽象性</strong>：</p>
+<p>block抽象的是一段，公开了可以影响执行结果的参数接口的，执行逻辑。因为block可以作为参数传递，所以可以将变化的逻辑作为功能的参数暴露出来，而稳定的逻辑写在函数里面。分离外部变化和内部实现，最大限度地维护代码稳定。功能调用者不用关心内部实现是什么，只用关心外部业务是什么。</p>
+<pre><code>- (Result)processBussness:(Change (^)(Steady a, Steady b, Steady c))external {
+    // PreProcess Steady
+    Steady a = ...
+    Steady b = ...
+    Steady c = ...
+    // Get The Change
+    Change change = external(a, b, c);
+    // PostProcess Result Using Steady And Change
+    Result result = ...
+}
+- (void)bussnessA {
+    [self processBussness:^(Steady a, Steady b, Steady c){
+        // Make Change By Rule A
+        return changeA
+    }];
+}
+- (void)bussnessB {
+    [self processBussness:^(Steady a, Steady b, Steady c){
+        // Make Change By Rule B
+        return changeB
+    }];
+}
+- (void)bussnessC {
+    [self processBussness:^(Steady a, Steady b, Steady c){
+        // Make Change By Rule C
+        return changeC
+    }];
+}
+</code></pre><h3 id="保留引用变量"><a href="#保留引用变量" class="headerlink" title="保留引用变量"></a>保留引用变量</h3><pre><code>#import &lt;Foundation/Foundation.h&gt;
+int main(int argc, const char * argv[]) {
+    NSInteger intN = 123;
+    __block NSInteger intY = 321;
+    NSMutableArray *aryN = [[NSMutableArray alloc] initWithArray:@[@(123)]];
+    __block NSMutableArray *aryY = [[NSMutableArray alloc] initWithArray:@[@(321)]];
+    NSLog(@&quot;IntN:%p   AryN:%p   IntY:%p   AryY:%p&quot;, &amp;intN, &amp;aryN, &amp;intY, &amp;aryY);
+    dispatch_block_t block = ^(void){
+        NSLog(@&quot;IntN:%p   AryN:%p   IntY:%p   AryY:%p&quot;, &amp;intN, &amp;aryN, &amp;intY, &amp;aryY);
+    };
+    block();
+    dispatch_block_t blockCopy = [block copy];
+    blockCopy();
+    return 0;
+}
+MRC
+原本：IntN:0x7fff5fbff840   AryN:0x7fff5fbff818   IntY:0x7fff5fbff838   AryY:0x7fff5fbff800
+栈上：IntN:0x7fff5fbff7c8   AryN:0x7fff5fbff7b0   IntY:0x7fff5fbff838   AryY:0x7fff5fbff800
+堆上：IntN:0x000100600948   AryN:0x000100600930   IntY:0x000100600968   AryY:0x000100600328
+ARC
+原本：IntN:0x7fff5fbff840   AryN:0x7fff5fbff818   IntY:0x7fff5fbff838   AryY:0x7fff5fbff800
+栈上：IntN:0x000100500848   AryN:0x000100500830   IntY:0x000100500868   AryY:0x000100500028
+堆上：IntN:0x000100500848   AryN:0x000100500830   IntY:0x000100500868   AryY:0x000100500028
+</code></pre><ul>
+<li>类型维度：基本类型和对象类型</li>
+<li>读写维度：默认只读和__block可写</li>
+<li>堆栈维度：栈和堆</li>
+<li>ARC维度：MRC和ARC</li>
+</ul>
+<p><strong>类型维度</strong>：基本类型可在栈或堆上，而对象类型一直都在堆上。</p>
+<p><strong>读写维度</strong>：对于__block符号，无则引用的是原类型(基本类型变量或者对象类型指针)，有则引用的是新类型(包含原类型信息的结构体指针)，并且在结构体内分别有2个函数负责管理包含的对象的内存：</p>
+<pre><code>void (*__Block_byref_id_object_copy)(void*, void*);
+void (*__Block_byref_id_object_dispose)(void*);
+</code></pre><p>结构体在创建后调用Block_byref_id_object_copy函数来retain对象，结构体在释放前调用Block_byref_id_object_dispose函数来release对象。使得新类型结构体在有效期间内，包含的对象始终有效。</p>
+<p><strong>ARC维度</strong>：MRC有3种类型的block(_NSConcreteGlobalBlock，_NSConcreteStackBlock和_NSConcreteMallocBlock)，而ARC用_NSConcreteMallocBlock替换了_NSConcreteStackBlock，即ARC下不会再在栈上临时分配block，而是把所有block(除了编译期间就能确定实现的_NSConcreteGlobalBlock全局block)都创建在堆上。</p>
+<p><strong>堆栈维度</strong>：当block从栈copy到堆时，会调用_Block_object_assign函数来retain所有新类型结构体。当block从堆中释放时，会调用_Block_object_dispose函数来release所有新类型结构体。使得block对象在有效期间，包含的所有__block新类型结构体都有效。</p>
+<p><strong>总结</strong>：(其中ARC和MRC的堆情况一致)</p>
+<ul>
+<li>栈上只读基本类型变量：栈上block有一个栈上原变量新副本，变量值不受栈上原变量改变影响。</li>
+<li>栈上可写基本类型变量：变成一个新类型结构体(内部有个等值变量)，栈上block有一个指向栈上结构体指针，block内外都能通过指针影响栈上结构体内部变量值。</li>
+<li>栈上只读对象类型指针：栈上block有一个栈上原对象指针新副本，指向对象不受栈上原指针改变影响，但指向对象的信息可被改变。</li>
+<li>栈上可读对象类型指针：变成一个新类型结构体(内部有个等值指针)，栈上block有一个指向栈上结构体指针，block内外都能通过指针影响栈上结构体内部指向对象，且指向对象的信息可被改变。</li>
+<li>堆上只读基本类型变量：堆上block有一个堆上原变量新拷贝，变量值不受栈上原变量改变影响。</li>
+<li>堆上可写基本类型变量：变成一个新类型结构体(内部有个等值变量)，堆上block有一个指向堆上结构体指针，栈上结构体重定向到堆上结构体，block内外都能通过指针影响堆上结构体内部变量值。</li>
+<li>堆上只读对象类型指针：堆上block有一个堆上原对象指针新拷贝，指向对象不受栈上原指针改变影响，但指向对象的信息可被改变。</li>
+<li>堆上可写对象类型指针：变成一个新类型结构体(内部有个等值指针)，堆上block有一个指向堆上结构体指针，栈上结构体重定向到堆上结构体，block内外都能通过指针影响堆上结构体内部指向对象，且指向对象的信息可被改变。</li>
+</ul>
+<p>我认为，ARC用_NSConcreteMallocBlock替换_NSConcreteStackBlock，第一是统一类型方便管理内存，第二是减少MRC时潜在问题。比如对于带有block的API设计，如果API是同步执行，block在调用时所引用的外部变量都还在栈中有效，如果API是异步执行，而API实现者在内部没有或者忘记对block进行copy到堆中，那么block执行的时候就会出错。MRC时Apple所有带有block的API内部默认应该都是有拷贝过的，但不能保证Coder自己构造API时不会出错。所以ARC统一block的类型为_NSConcreteMallocBlock保证了都至少在堆上存在有效。</p>
+<h3 id="类型声明"><a href="#类型声明" class="headerlink" title="类型声明"></a>类型声明</h3><p>block的类型声明并没有什么需要特别注意的，除了参数类型为()代表的不是(void)，而是缺省类型。在某些时候，是可以做到跟id或者协议一样范型编程的：</p>
+<pre><code>typedef void(^BLOCK)();
+int main(int argc, const char * argv[]) {
+    BLOCK blk0 = ^(void){
+        NSLog(@&quot;No Value&quot;);
+    };
+    BLOCK blk1 = ^(NSString *str){
+        NSLog(@&quot;Value is %@&quot;, str);
+    };
+    BLOCK blk2 = ^(NSInteger a, CGFloat b){
+        NSLog(@&quot;Valus are %ld and %f&quot;, a, b);
+    };
+    blk0();
+    blk1(@&quot;Test&quot;);
+    blk2(1,2.3);
+    return 0;
+}
+</code></pre><h3 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h3><p>block的实现里指明了reference的作用，将栈上的结构体重定向到堆上结构体，从而访问正确的引用。在ARC下已经没有栈上结构体了所以不要紧，在MRC下也只有出现堆上block后还执行栈上block的情况下才有真正起到作用：</p>
+<pre><code>#import &lt;Foundation/Foundation.h&gt;
+int main(int argc, const char * argv[]) {
+    __block NSInteger intN = 123;
+    dispatch_block_t blockN = ^(void){
+        intN = 0;
+    };
+    blockN();
+    [blockN copy];
+
+    __block NSInteger intY = 123;
+    dispatch_block_t blockY = ^(void){
+        intY = 0;
+    };
+    [blockY copy];
+    blockY();
+
+    return 0;
+}
+</code></pre><h3 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h3><p>循环引用循环是使用block的一个最主要的内存问题。因为block是个对象也会保留引用的对象，所以如果被引用的对象恰好也保留了该block，那么就构成了循环引用。其实此类问题基本性质都是一样的，只是犹豫block的匿名性导致不太注意而引起。原则就是：block不要直接引用拥有block的对象。对于GCD的block，没有对象引用它，所以可以大胆地写，但是作为对象的属性或者API的参数，都需要注意该对象和调用者之间的拥有关系<a href="http://tanqisen.github.io/blog/2013/04/19/gcd-block-cycle-retain/" target="_blank" rel="noopener">正确使用Block避免Cycle Retain和Crash</a>。这里介绍一个优秀库<a href="https://github.com/jspahrsummers/libextobjc" target="_blank" rel="noopener">libextobjc</a>，其定义了<strong>@weakify</strong>，<strong>@unsafeify</strong>，<strong>@strongify</strong>语法糖，优雅地解决了block循环引用问题，下次专门写篇blog来介绍它。</p>
+<h3 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h3><p>block作为objc的闭包实现，为FP(Functional Programming)打下坚实的基础。BlocksKit就是结合block实现的对象函数式扩展。ReactiveCocoa就是利用block实现的响应函数式编程。不过，如果block嵌套较多后，很容易出错也很难调试。函数式编程又是另一个庞大复杂的课题了，我也学习了一段时间，也觉得是将来的发展方向，以后慢慢花时间写点东西。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://www.devtang.com/blog/2013/07/28/a-look-inside-blocks/" target="_blank" rel="noopener">谈Objective-C Block的实现</a></li>
+<li><a href="http://chun.tips/blog/2014/11/13/hei-mu-bei-hou-de-blockxiu-shi-fu/" target="_blank" rel="noopener">黑幕背后的__block修饰符</a></li>
+<li><a href="http://tanqisen.github.io/blog/2013/04/19/gcd-block-cycle-retain/" target="_blank" rel="noopener">正确使用Block避免Cycle Retain和Crash</a></li>
+<li><a href="http://tech.meituan.com/block-in-Meituan-iOS.html" target="_blank" rel="noopener">block在美团iOS的实践</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/10/31/2015-11-01[Block]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/10/31/2015-11-01[Block]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/31/2015-11-01[Block]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-25T01:48:31.000Z"><a href="/2015/10/25/2015-10-25[GCD 扩展]/">周日, 10月 25 2015, 9:48:31 上午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/10/25/2015-10-25[GCD 扩展]/">GCD 扩展</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="调度源"><a href="#调度源" class="headerlink" title="调度源"></a>调度源</h3><p>GCD提供一些调度源接口来监测底层系统对象(比如Unix文件描述符、Mach端口、Unix信号、Unix虚拟文件系统节点、自定义源等等)的活动。不像阻塞等待事件发生或者反复轮询查看那样浪费资源也无法度量，调度源像<a href="https://en.wikipedia.org/wiki/Kqueue" target="_blank" rel="noopener">kquque</a>一样自动异步地提交任务到指定调度队列响应处理。</p>
+<ul>
+<li><strong>dispatch_source_create</strong>：创建一个新的调度源来检测底层系统对象，并响应事件自动提交事件回调任务到指定队列执行。调度源开始都是暂停状态，需要使用<strong>dispatch_resume</strong>启动。不再使用时需要调用<strong>dispatch_release</strong>释放资源。</li>
+<li><strong>dispatch_source_set_registration_handler</strong>：调度源底层的事件发送策略是异步设置的。在调度源完全设置好并准备开始发送事件时，注册回调任务就会被提交到指定队列执行。在调度源暂停或者正在执行回调任务期间，如果事件到达，事件会合并在一起，等到调度源启动或者回调任务执行完再发送。</li>
+<li><strong>dispatch_source_set_event_handler</strong>：监测的事件发生时，事件回调任务响应并被提交到指定队列执行。其中使用<strong>dispatch_source_get_data</strong>获取调度源等待处理的数据，其代表意义因调度源类型的不同而不同。</li>
+<li><strong>dispatch_source_set_cancel_handler</strong>：当系统释放了所有对调度源的引用时，取消回调任务响应并被提交到指定队列执行。通常用于清理占用的资源，例如打开的文件或者套接字。</li>
+<li><strong>dispatch_source_cancel</strong>：异步地取消调度源，阻止事件回调任务继续执行。</li>
+</ul>
+<p>dispatch_source_t <strong>dispatch_source_create</strong>(dispatch_source_type_t type, uintptr_t handle, unsigned long mask, dispatch_queue_t queue)中，type是最重要的参数，因为它决定了handle和mask参数将会是什么。</p>
+<ul>
+<li>DISPATCH_SOURCE_TYPE_DATA_ADD监测自定义源逻辑Add数据合并，handle和mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_DATA_OR监测自定义源逻辑Or数据合并，handle和mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_MACH_RECV监测Mach端口接收，handle代表<strong>Mach端口号</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_MACH_SEND监测Mach端口发送，handle代表<strong>Mach端口号</strong>，mask代表<strong>发送事件标识</strong>。</li>
+<li>DISPATCH_SOURCE_TYPE_PROC监测进程，handle代表<strong>进程号</strong>，mask代表<strong>进程事件标识</strong>。</li>
+<li>DISPATCH_SOURCE_TYPE_READ监测文件描述符读，handle代表<strong>文件描述符</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_SIGNAL监测信号，handle代表<strong>信号量</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_TIMER监测定时器，handle和mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_VNODE监测虚拟文件系统节点，handle代表<strong>文件描述符</strong>，mask代表<strong>节点事件标识</strong>。</li>
+<li>DISPATCH_SOURCE_TYPE_WRITE监测文件描述符写，handle代表<strong>文件描述符</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_MEMORYPRESSURE监测内存压力，handle未使用，mask代表<strong>压力事件标识</strong>。</li>
+</ul>
+<p><strong>自定义源</strong>：通过<strong>dispatch_source_merge_data</strong>主动发送信号产生系统事件。其函数名的来由是，如果当前比较繁忙，GCD会在执行响应方法前，会多次自动联结事件，最终只执行一次响应方法。</p>
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+__block unsigned long data = 0;
+dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, mainQueue);
+dispatch_source_set_event_handler(source, ^{
+    unsigned long delta = dispatch_source_get_data(source);
+    data += delta;
+});
+dispatch_resume(source);
+
+dispatch_apply(100, globalQueue, ^(size_t index) {
+    dispatch_source_merge_data(source, 1);
+});
+</code></pre><p><strong>文件描述符</strong>：使用GCD监测文件描述符读写。</p>
+<pre><code>dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_source_t stdinSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, STDIN_FILENO, 0, globalQueue);
+dispatch_source_set_event_handler(stdinSource, ^{
+    char buf[1024];
+    long len = read(STDIN_FILENO, buf, sizeof(buf));
+    if(len &gt; 0)
+        NSLog(@&quot;Got data from stdin: %s&quot;, buf);
+});
+dispatch_resume(stdinSource);    
+</code></pre><p><strong>进程</strong>：使用GCD监测进程事件，包括进程退出、进程分叉、进程执行和进程信号。</p>
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+NSArray *runningApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:@&quot;com.apple.mail&quot;];
+NSRunningApplication *mail = [runningApps count]
+? runningApps[0]
+: nil;
+if (mail) {
+    pid_t const pid = mail.processIdentifier;
+    dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_PROC, pid, DISPATCH_PROC_EXIT, mainQueue);
+    dispatch_source_set_event_handler(source, ^(){
+        NSLog(@&quot;Mail Quit&quot;);
+    });
+    dispatch_resume(source);
+}
+</code></pre><p><strong>文件系统节点</strong>：使用GCD监测文件系统节点事件，包括节点删除、节点内容写入、节点大小变化、节点属性变化、节点链接数变化、节点名字变化和节点被删除。</p>
+<pre><code>NSURL *directoryURL; // assume this is set to a directory
+int const fd = open([[directoryURL path] fileSystemRepresentation], O_EVTONLY);
+if (fd &lt; 0) {
+    char buffer[80];
+    strerror_r(errno, buffer, sizeof(buffer));
+    NSLog(@&quot;Unable to open \&quot;%@\&quot;: %s (%d)&quot;, [directoryURL path], buffer, errno);
+    return;
+}
+dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, fd, DISPATCH_VNODE_WRITE | DISPATCH_VNODE_DELETE, DISPATCH_TARGET_QUEUE_DEFAULT);
+dispatch_source_set_event_handler(source, ^(){
+    unsigned long const data = dispatch_source_get_data(source);
+    if (data &amp; DISPATCH_VNODE_WRITE) {
+        NSLog(@&quot;The directory changed.&quot;);
+    }
+    if (data &amp; DISPATCH_VNODE_DELETE) {
+        NSLog(@&quot;The directory has been deleted.&quot;);
+    }
+});
+dispatch_source_set_cancel_handler(source, ^(){
+    close(fd);
+});
+dispatch_resume(source);
+</code></pre><p><strong>信号</strong>：使用GCD监测信号，这些信号可在signal.h中找到。比如，信号SIGSTOP将会在进程接收到一个无法回避的暂停指令时被发出。LLDB调试器调试应用时使用的也是这个信号。</p>
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+__typeof(self) __weak weakSelf = self;
+
+static dispatch_source_t source = nil;
+static dispatch_once_t onceToken;
+dispatch_once(&amp;onceToken, ^{
+    source = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGSTOP, 0, mainQueue);
+    if (source) {
+        dispatch_source_set_event_handler(source, ^{
+            NSLog(@&quot;Hi, I am: %@&quot;, weakSelf);
+        });
+        dispatch_resume(source);
+    }
+});
+</code></pre><p><strong>定时器</strong>：使用GCD监测定时器。GCD不保证计时器100%精准触发，由参数leeway决定了触发精准度。其意义是为了降低资源消耗，因为系统可以让CPU休息足够长的时间，尽量每次醒来时执行一个任务集合，而不是不断醒来只执行一个任务，这样效率更高。比如较大的leeway允许系统拖延计时器触发，尽量拖延到与其他任务一起执行。</p>
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, DISPATCH_TARGET_QUEUE_DEFAULT);
+dispatch_source_set_timer(source, DISPATCH_TIME_NOW, 1ull * NSEC_PER_SEC, 0);
+dispatch_source_set_event_handler(source, ^(){
+    NSLog(@&quot;Time flies.&quot;);
+});
+dispatch_resume(source);
+</code></pre><h3 id="调度I-O管道"><a href="#调度I-O管道" class="headerlink" title="调度I/O管道"></a>调度I/O管道</h3><p>调度I/O通道提供了一种与读写文件描述符不同的方式。有流和随机存取两种类型的管道。比如，硬盘文件可以创建一个随机存取管道(因为文件描述符是可寻址的)，套接字可以创建一个流管道。和文件描述符一样，I/O管道也拥有读写操作，但这些操作都是以非阻塞，异步I/O的形式高效实现的。I/O管道也有同步读写操作的屏障操作，还可以设置最高和最低字节数限制，操作周期。</p>
+<h3 id="调度缓冲区"><a href="#调度缓冲区" class="headerlink" title="调度缓冲区"></a>调度缓冲区</h3><p>以往处理多个小而散的缓冲区数据时，通常会将它们组合成大缓冲区再进行处理，但这样不仅会复制大量数据，而且大量I/O操作会在降低性能占用更多资源。很多旧C的API有个问题是，缓冲区没有所有权的概念，所以不得不将数据再次拷贝以保证使用期间有效。GCD的dispatch_data_t，在某种程度上和Objc的NSData很相似，但是必须记住GCD只是纯C的API不能使用Objc对象。dispatch_data_t(基于栈或基于栈)使得对应的缓冲区有了所有权的概念能确保有效性不产生拷贝操作，而且其相当独特的是可以基于多个零碎的内存区域抽象成一个连续的内存区域来提供使用。</p>
+<ul>
+<li><strong>dispatch_data_create</strong>：创建调度缓冲区对象，指定析构回调任务和执行队列。</li>
+<li><strong>dispatch_data_create_map</strong>：返回一个拷贝原缓冲区对象内容且内存连续分布的新缓冲区对象。</li>
+<li><strong>dispatch_data_create_concat</strong>：返回一完整引用了两个缓冲区对象的新缓冲区对象。</li>
+<li><strong>dispatch_data_create_subrange</strong>：返回一个引用原缓冲区对象部分的新缓冲区对象。</li>
+<li><strong>dispatch_data_apply</strong>：贯穿整个缓冲区对象每一个子区域并执行方法。</li>
+<li><strong>dispatch_data_copy_region</strong>：返回一个拷贝原缓冲区对象部分内容的新缓冲区对象。</li>
+</ul>
+<h3 id="基准测试"><a href="#基准测试" class="headerlink" title="基准测试"></a>基准测试</h3><p>GCD有一个适合优化代码的灵巧小工具：uint64_t <strong>dispatch_benchmark</strong>(size_t count, void (^block)(void));文件头部声明该函数类型，就能够测量测试代码执行的平均纳秒数：</p>
+<pre><code>size_t const objectCount = 100;
+uint64_t n = dispatch_benchmark(1000, ^{
+    @autoreleasepool {
+        id obj = @42;
+        NSMutableArray *array = [NSMutableArray array];
+        for (size_t i = 0; i &lt; objectCount; ++i) {
+            [array addObject:obj];
+        }
+    }
+});
+NSLog(@&quot;-[NSMutableArray addObject:] : %llu ns&quot;, n);
+</code></pre><hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://www.anselz.com/2014/04/20/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart12/" target="_blank" rel="noopener">深入了解GCD：Part 1/2</a></li>
+<li><a href="http://www.anselz.com/2014/05/05/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart-22/" target="_blank" rel="noopener">深入了解GCD：Part 2/2</a></li>
+<li><a href="http://objccn.io/issue-2-1/#priority_inversion" target="_blank" rel="noopener">并发编程：API 及挑战</a></li>
+<li><a href="http://objccn.io/issue-2-3/" target="_blank" rel="noopener">底层并发 API</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/10/25/2015-10-25[GCD 扩展]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/10/25/2015-10-25[GCD 扩展]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/25/2015-10-25[GCD 扩展]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-18T05:49:48.000Z"><a href="/2015/10/18/2015-10-18[GCD 基本]/">周日, 10月 18 2015, 1:49:48 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/10/18/2015-10-18[GCD 基本]/">GCD 基本</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>中央调度(GCD)由语言特征、运行时库和系统改善组成，对运行iOS和OSX系统的多核硬件并行执行代码提供了系统的、全面的支持。BSD子系统，CoreFoundation和Cocoa的API都已扩展来使用这项改善技术来帮助系统和应用程序运行得更快速更有效更响应。考虑到一个应用程序能够有效地使用多核是多么的困难，更不用说在有不同核数的计算设备里和其他应用程序竞争。在系统级工作的GCD可以根据所有正在运行的程序，以最平衡的的方式分配它们有效的系统资源。GCD不光支持在Unix类操作系统的同步异步执行代码，还可以与文件描述符、Mach端口、Unix信号和定时器工作。</p>
+<p>在使用Objc编译器构建App时，所有的dispatch objects(调度对象)都是Objc对象。所以，当ARC(Automatic reference counting)开启时，dispatch objects会像Objc对象一样被编译器自动在适当的地方retain和release。当ARC关闭时，使用dispatch_retain和dispatch_release(而不是retain和release)管理内存。</p>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><ul>
+<li><strong>串行并行(Serial &amp; Concurrent)</strong>串行是指同一时间只执行一个任务，并行是指同一时间能执行多个任务。串行执行完前一个任务后才能开始执行后一个任务，严格保证任务之间的执行顺序。并行开始执行一个任务和其他并行任务无关，任务之间的执行顺序也是任意随机。</li>
+<li><strong>同步异步(Synchronize &amp; Asynchronize)</strong>同步异步是为了描述任务发起者和任务执行者之间的等待关系。同步是指，任务发起者必须要等到任务执行者执行完任务之后再继续做自己的事儿。异步是指，任务发起者不用等到任务执行者执行完任务之后就可以继续做自己的事儿。线程上的表现，同步就是阻塞挂起休眠，异步就是返回继续执行。</li>
+<li><strong>临界区(Critical Area)</strong>临界区是指一个不能同时被多个线程访问、当有线程进入执行其他线程必须等待的代码块。</li>
+<li><strong>竞态条件(Race Condition)</strong>静态条件是某任务不能屏蔽被多线程无序执行带来的副作用(执行结果对顺序敏感)。</li>
+<li><strong>死锁(Dead Lock)</strong>死锁是指多线程由于竞争造成所有相关线程都被阻塞而程序无法继续执行。</li>
+</ul>
+<h3 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h3><p>宏观上并发与并行都是同时执行。微观上并发同一时间只执行一个任务，但执行适当时间后暂停当前任务，切换到新任务再执行适当时间；并行确实真真正正的同一时间都在执行多个任务。其差别在于，系统能够使用的核数目。单核的确只能执行一个任务为了支持多线程才用并发，多核就能够执行多个任务便可以并行。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4cb94oqj20go09gq31.jpg" alt=""></p>
+<h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><p>dispatch queues(调度队列)是GCD提供用来提交任务并执行的轻量级对象。dispatch queues以FIFO(First In First Out)的顺序开始执行任务。系统管理线程池用来处理分配线程执行提交到dispatch queues的任务。所有dispatch queues都是线程安全的，可以在多线程中访问。GCD提供1个串行队列(主队列)和4个并行队列(全局队列：高、默认<br>低、后台)，也可以创建自定义的串行或者并行队列。</p>
+<p><strong>串行队列(Serial Queue)</strong>的任务串行执行(以FIFO开始和结束)，因此不会出现竞争资源的临界区访问。</p>
+<ul>
+<li>dispatch_get_main_queue()主队列由系统自动创建并和主线程关联唯一能访问UI的队列</li>
+<li>dispatch_queue_create(“Serial”,DISPATCH_QUEUE_SERIAL)</li>
+</ul>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4cn7yl6j20dc07k3zb.jpg" alt=""></p>
+<p><strong>并行队列(Concurrent Queue)</strong>的任务并行执行(以FIFO开始)。旧任务何时完成，新任务何时开始，某时刻多少个任务在执行完全取决于GCD。</p>
+<ul>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0)</li>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0)</li>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW,0)</li>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0)</li>
+<li>dispatch_queue_create(“Concurrent”,DISPATCH_QUEUE_CONCURRENT)</li>
+</ul>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1exc4cto4zaj20dc07k0te.jpg" alt=""></p>
+<p><strong>dispatch_queue_create</strong>自定义队列创建时可以用字符串当标签用来在XCode调试、Instruments检测，Crash报告中标识自己。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1exk1qtr512j20hg0a33zf.jpg" alt=""></p>
+<p><strong>dispatch_set_target_queue</strong>一个对象的目标队列决定了最终在那个队列里处理该对象(调度队列Dispatch Queue、调度源Dispatch Sources、调度I/O管道)。对调度队列而言，如果有目标队列，则其优先级继承自目标队列。使用目标队列可以实现很多满足特定需求的队列体系。动态改变任务优先级，动态改变任务同异步。比如任务组里的任务要同步，且与其他任务组的任务也同步：</p>
+<pre><code>dispatch_queue_t targetQueue = dispatch_queue_create(&quot;com.Banana.Demo&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queue_t serial1 = dispatch_queue_create(&quot;Serial1&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queue_t serial2 = dispatch_queue_create(&quot;Serial2&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queue_t serial3 = dispatch_queue_create(&quot;Serial3&quot;, DISPATCH_QUEUE_SERIAL);
+
+dispatch_set_target_queue(serial1, targetQueue);
+dispatch_set_target_queue(serial2, targetQueue);
+dispatch_set_target_queue(serial3, targetQueue);
+
+dispatch_async(serial1, ^{
+    // Task 1_1
+});
+dispatch_async(serial1, ^{
+    // Task 1_2
+});
+
+dispatch_async(serial2, ^{
+    // Task 2_1
+});
+dispatch_async(serial2, ^{
+    // Task 2_2
+});
+
+dispatch_async(serial3, ^{
+    // Task 3_1
+});
+dispatch_async(serial3, ^{
+    // Task 3_2
+});
+</code></pre><h3 id="管理调度对象"><a href="#管理调度对象" class="headerlink" title="管理调度对象"></a>管理调度对象</h3><p>GCD提供调度对象接口让程序管理诸如内存管理、暂停恢复、定义语境和记录日志的功能。</p>
+<p>内存管理：dispatch_retain和dispatch_release(ARC不用)，dispatch_set_finalizer_f(调度对象销毁前用于释放相关连的资源)。<br>暂停恢复：dispatch_resume和dispatch_suspend。<br>定义语境：dispatch_set_context和dispatch_get_context。<br>记录日志：dispatch_debug。</p>
+<p><strong>dispatch_set_context</strong>参数context是一个可以指向任意的void＊，为队列设置任意类型数据，在合适时取出使用。GCD是主要用C编写的底层库，对于C开辟的内存和Cpp创建的对象本身有Coder自己管理内存，但Objc在ARC环境中就需要接管Objc对象的内存管理以免在获取context时已经释放。</p>
+<pre><code>typedef struct TestC {
+    int number;
+}TestC;
+void finalizerC(void *context) {
+    TestC *testC = (TestC *)context;
+    NSLog(@&quot;End C: %d&quot;, testC-&gt;number);
+    free(testC);
+}
+
+@interface TestObjC : NSObject
+@property(assign, nonatomic) int number;
+@end
+@implementation TestObjC
+- (void)dealloc {
+    NSLog(@&quot;%@&quot;, NSStringFromSelector(_cmd));
+}
+@end
+void finalizerObjC(void *context) {
+    TestObjC *testObjC = (__bridge_transfer TestObjC *)(context);
+    NSLog(@&quot;End ObjC: %d&quot;, testObjC.number);
+}
+
+- (void)test {
+    dispatch_queue_t queueC = dispatch_queue_create(&quot;com.Banana.TestC&quot;, DISPATCH_QUEUE_SERIAL);
+    dispatch_set_context(queueC, malloc(sizeof(TestC)));
+    dispatch_set_finalizer_f(queueC, finalizerC);
+    dispatch_async(queueC, ^{
+        TestC *testC = dispatch_get_context(queueC);
+        NSLog(@&quot;Start C: %d&quot;, testC-&gt;number);
+        testC-&gt;number = 1;
+    });
+
+    dispatch_queue_t queueObjC = dispatch_queue_create(&quot;com.Banana.TestObjC&quot;, DISPATCH_QUEUE_SERIAL);
+    dispatch_set_context(queueObjC, (__bridge_retained void *)[[TestObjC alloc] init]);
+    dispatch_set_finalizer_f(queueObjC, finalizerObjC);
+    dispatch_async(queueObjC, ^{
+        TestObjC *testObjC = (__bridge TestObjC *)dispatch_get_context(queueObjC);
+        NSLog(@&quot;Start ObjC: %d&quot;, testObjC.number);
+        testObjC.number = 1;
+    });
+}
+</code></pre><ul>
+<li><strong>__bridge</strong>:只转换类型(Ojbc<->CF)，不改所有权；</-></li>
+<li><strong>__bridge_retained</strong>(即CFBridgingRetain)转换类型(Ojbc-&gt;CF)，并从ARC获取所有权，后续负责管理对象内存；</li>
+<li><strong>__bridge_transfer</strong>(即CFBridgingRelease)转换类型(CF-&gt;Objc)，并移交所有权到ARC，不再负责管理对象内存。</li>
+</ul>
+<h3 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h3><ul>
+<li><strong>sync</strong>所有的dispatch-sync方法同步提交任务到队列并阻塞直到任务结束。</li>
+<li><strong>async</strong>所有的dispatch-async方法异步提交任务到队列并立即返回继续执行。</li>
+<li><strong>dispatch_after</strong>异步提交定时任务并立即返回继续执行。</li>
+<li><strong>dispatch_apply</strong>同步提交多个任务并阻塞直到所有任务结束。任务间根据目标队列(Target Queue)同步(意义不大)或者异步执行。</li>
+<li><strong>dispatch_group_wait</strong>阻塞当前线程直到所有提交的任务结束或者超时。</li>
+<li><strong>dispatch_semaphore_wait</strong>阻塞当前线程直到获取一个信号量。</li>
+<li><strong>dispatch_barrier_sync</strong>同步提交一个屏障任务并阻塞直到任务结束。</li>
+</ul>
+<p>以上方法中所有的同步方法在使用时都需要认真考虑以避免出现死锁。串行队列就很容易出戏：</p>
+<pre><code>SyncMethodA(SerialQueue, ^{
+    SyncMethodB(SerialQueue, ^{
+        // The Task
+    });
+});
+</code></pre><p>Sync为什么比较容易出现死锁？我个人认为因为封装。方法封装了操作，调用时(该方法，没有源代码，没有API说明，或者Coder根本就没注意或者懒得注意或者开始注意后来不小心忘记)不知道方法里面(或者里面的里面的里面)是否嵌套了同步，如果继续同步调用该方法就很有可能死锁(即使不是在同一个队列)。比较保险的方法就是在符合语义的情况下尽可能使用异步方法，对于在异步部分之后需要同步的内容可以写在异步任务里顺序执行。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4d3mb87j20jg08c40h.jpg" alt=""></p>
+<h3 id="单例"><a href="#单例" class="headerlink" title="单例"></a>单例</h3><p>单例模式的常见问题是，单例常常在多线程中同时被多个对象访问而线程不安全。<strong>dispatch_once</strong>整个程序生命周期里，以线程安全的方式执行且仅执行一次任务，很适合单例初始化:</p>
+<pre><code>+ (instancetype)sharedname {
+    static class *_sharedname = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        _sharedname = initializer;
+    });
+
+    return _sharedname;
+}
+</code></pre><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4dbhlxhj20dc07mq4a.jpg" alt=""></p>
+<h3 id="组"><a href="#组" class="headerlink" title="组"></a>组</h3><p>程序可以提交多个任务(任务可以是同步也能是异步，即使在不同队列中)到调度组并跟踪它们直到都结束或者超时。提交到任务组有2种方式：</p>
+<ul>
+<li>dispatch_group_async</li>
+<li>dispatch_group_enter和dispatch_group_leave(必须成对调用)</li>
+</ul>
+<p>任务组结束的通知任务也有同步dispatch_group_wait和异步dispatch_group_notify2种方式。</p>
+<pre><code>dispatch_group_t group = dispatch_group_create();
+dispatch_queue_t mainQueue = dispatch_get_main_queue();
+dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_group_async(group, globalQueue, ^{
+    // Task1
+});
+dispatch_group_enter(group);
+// Task 2
+dispatch_group_leave(group);
+
+dispatch_group_notify(group, mainQueue, ^{
+    // Async Notify
+});
+
+dispatch_time_t then = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC));
+dispatch_group_wait(group, then);
+// Sync Notify
+</code></pre><h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3><p>调度信号量是传统计数信号量的有效实现。调度信号量只在调用线程需要被阻塞时才产生内核调用。dispatch_semaphore_signal创建并设置初始信号量，dispatch_semaphore_signal产生一个信号量并唤醒等待信号量的线程，dispatch_semaphore_wait等待阻塞线程直到有一个信号量消耗并恢复执行。</p>
+<pre><code>dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
+dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_time_t then = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));
+dispatch_async(queue, ^{
+    // Task1
+    if (!dispatch_semaphore_wait(semaphore, then)) {
+        NSLog(@&quot;YES 1&quot;);
+        sleep(1.0);
+        dispatch_semaphore_signal(semaphore);
+    } else {
+        NSLog(@&quot;NO 1&quot;);
+    }
+});
+dispatch_async(queue, ^{
+    // Task1
+    if (!dispatch_semaphore_wait(semaphore, then)) {
+        NSLog(@&quot;YES 2&quot;);
+        sleep(1.0);
+        dispatch_semaphore_signal(semaphore);
+    } else {
+        NSLog(@&quot;NO 2&quot;);
+    }
+});
+dispatch_async(queue, ^{
+    // Task1
+    if (!dispatch_semaphore_wait(semaphore, then)) {
+        NSLog(@&quot;YES 3&quot;);
+        sleep(1.0);
+        dispatch_semaphore_signal(semaphore);
+    } else {
+        NSLog(@&quot;NO 3&quot;);
+    }
+});
+</code></pre><h3 id="屏障"><a href="#屏障" class="headerlink" title="屏障"></a>屏障</h3><p>在线程同步技术中提到过内存屏障同步内存读写操作，GCD使用队列屏障在并行队列里创建一个同步机会，等待已提交的任务执行结束，禁止没提交的任务开始执行。使得执行队列屏障任务时不会有其他任务执行，一旦执行完成，并行队列恢复之前的状态和行为。GCD支持同步提交dispatch_barrier_sync和异步dispatch_barrier_async提交2种方式。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1exc4di0ogrj20dc07kmxy.jpg" alt=""></p>
+<pre><code>- (void)setSafeObject:(id)object forKey:(NSString *)key {
+    key = [key copy];
+    dispatch_barrier_async(self.ioQueue, ^{
+        if (key &amp;&amp; object) {
+            [_dic setObject:object forKey:key];
+        }
+    });
+    [key release];
+}
+
+- (id)getSafeObjectForKey:(NSString *)key {
+    __block id result = nil;
+    dispatch_sync(self.ioQueue, ^{
+        result = [_dic objectForKey:key];
+    });
+    return result;
+}
+</code></pre><hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://www.anselz.com/2014/04/20/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart12/" target="_blank" rel="noopener">深入了解GCD：Part 1/2</a></li>
+<li><a href="http://www.anselz.com/2014/05/05/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart-22/" target="_blank" rel="noopener">深入了解GCD：Part 2/2</a></li>
+<li><a href="http://objccn.io/issue-2-1/#priority_inversion" target="_blank" rel="noopener">并发编程：API 及挑战</a></li>
+<li><a href="http://objccn.io/issue-2-3/" target="_blank" rel="noopener">底层并发 API</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/10/18/2015-10-18[GCD 基本]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/10/18/2015-10-18[GCD 基本]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/18/2015-10-18[GCD 基本]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-07T05:55:11.000Z"><a href="/2015/10/07/2015-10-07[Runtime]/">周三, 10月 7 2015, 1:55:11 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/10/07/2015-10-07[Runtime]/">Runtime</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p><em>Message-Passing is the important part of Smalltalk (from which Objective-C derives), not objects. - Alan Kay</em></p>
+<p>Runtime是一个实现Objc动态特性的C库(<a href="http://www.opensource.apple.com/source/objc4/" target="_blank" rel="noopener">Apple</a>和<a href="http://ftp.gnu.org/gnu/objective-c.README" target="_blank" rel="noopener">GNU</a>分别维护并开源自己的实现)，不像C++那样在编译期间就必须严格确定函数与对象之间的关系，Objc在运行期间才能确定具体的执行函数。可以说Runtime就是对象生成的规范(<strong>内存模型</strong>)和消息执行的判断(<strong>动态绑定</strong>)。程序运行的时候，类型系统可以动态删减，对象父类可以动态改变，对象类型可以动态改变，对象方法可以动态改变，对象方法可以动态删减，对象成员可以动态删减，对象能力可以动态自省。看起来好像一切，都能够改变，都可以改变，因为如此灵活，很多第三方库使用Runtime实现了强大的功能。但是，如果没有深刻的理解和经验的积累，语言的灵活性往往会成为程序的不稳定，所以在不得已的情况下请<strong>谨慎使用</strong>Runtime。</p>
+<h4 id="SEL"><a href="#SEL" class="headerlink" title="SEL"></a>SEL</h4><pre><code>//objc_selector未给出定义
+typedef struct objc_selector *SEL;
+
+SEL sel1 = @selector(test);
+NSLog(@&quot;%s %p&quot;, (char *)sel1, sel1);
+SEL sel2 = sel_registerName([@&quot;test&quot; UTF8String]);
+NSLog(@&quot;%s %p&quot;, (char *)sel2, sel2);
+
+//输出如下:
+2015-10-05 17:20:26.195 Demo[1840:142119] test 0x7fff90c12140
+2015-10-05 17:20:26.195 Demo[1840:142119] test 0x7fff90c12140
+</code></pre><p>编译Objective-C时，编译器根据方法名生成唯一一个表示该方法的ID。<strong>方法名与ID一一对应</strong>。所有方法的SEL构成一个集合，查找某个方法时只需要去找到对应SEL就可以。SEL指向的机构里面应该就存储着一个字符串。</p>
+<h4 id="id"><a href="#id" class="headerlink" title="id"></a>id</h4><pre><code>typedef struct objc_object *id;
+
+struct objc_object { 
+    Class isa;
+};
+</code></pre><p>id指向结构体objc_object，结构体有一个指向Class的指针isa，Runtime根据对象的isa找到它的类型信息。甚至可以这么说，一个结构体，不管里面有没有数据，有多少数据，只要<strong>第一个变量是Class指针</strong>且能通过它找到对应的类型信息，那么这个结构体就<strong>可以看做是一个对象</strong>(当然结构体的数据布局要和类型要求的一样才合法)。isa即是一个，代表抽象关系：一只猫是一个动物，一个对象是一个类。动物提供了猫的基本的信息(脑身腿脚)和抽象的行为(吃喝玩睡)。</p>
+<h4 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h4><pre><code>typedef struct objc_class *Class;
+
+struct objc_class {
+Class isa  OBJC_ISA_AVAILABILITY;
+#if !__OBJC2__
+    Class super_class                                        OBJC2_UNAVAILABLE;
+    const char *name                                         OBJC2_UNAVAILABLE;
+    long version                                             OBJC2_UNAVAILABLE;
+    long info                                                OBJC2_UNAVAILABLE;
+    long instance_size                                       OBJC2_UNAVAILABLE;
+    struct objc_ivar_list *ivars                             OBJC2_UNAVAILABLE;
+    struct objc_method_list **methodLists                    OBJC2_UNAVAILABLE;
+    struct objc_cache *cache                                 OBJC2_UNAVAILABLE;
+    struct objc_protocol_list *protocols                     OBJC2_UNAVAILABLE;
+#endif
+} OBJC2_UNAVAILABLE;
+</code></pre><p>objc_class结构体里存储着父类结构体指针，名称，版本，实例大小，成员变量列表，方法列表，方法缓存，协议列表。因为objc_class结构体里还有isa，由此可见<strong>类也是一个”对象”</strong>，Runtime称之为类对象，而类对象的抽象Runtime称之为<strong>元类(MetaClass)</strong>，而元类的抽象Runtime称之为<strong>根元类(Root Meta Class)</strong>，他们都属于”对象”。对象其实是由类对象的实例方法－对象的类方法－创建出来的。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewradq1at2j20fa0fzdi5.jpg" alt=""></p>
+<h4 id="Ivar"><a href="#Ivar" class="headerlink" title="Ivar"></a>Ivar</h4><pre><code>typedef struct objc_ivar *Ivar;
+
+struct objc_ivar {
+    char *ivar_name                                          OBJC2_UNAVAILABLE;
+    char *ivar_type                                          OBJC2_UNAVAILABLE;
+    int ivar_offset                                          OBJC2_UNAVAILABLE;
+#ifdef __LP64__
+    int space                                                OBJC2_UNAVAILABLE;
+#endif
+} OBJC2_UNAVAILABLE;
+
+//objc_class
+struct objc_ivar_list {
+    int ivar_count                                           OBJC2_UNAVAILABLE;
+#ifdef __LP64__
+    int space                                                OBJC2_UNAVAILABLE;
+#endif
+    /* variable length structure */
+    struct objc_ivar ivar_list[1]                            OBJC2_UNAVAILABLE;
+} OBJC2_UNAVAILABLE;
+</code></pre><p>Ivar是一个指向objc_ivar结构体的指针，objc_ivar结构体存储着变量名、变量类型编码和变量在该类中的字节偏移量，objc_class结构体(也就是类对象)里的objc_ivar_list存储着该类所有的变量。</p>
+<h4 id="健壮性实例变量-Non-Fragile-ivars"><a href="#健壮性实例变量-Non-Fragile-ivars" class="headerlink" title="健壮性实例变量(Non Fragile ivars)"></a>健壮性实例变量(Non Fragile ivars)</h4><p>Runtime目前有Modern和Legacy两个版本。Modern运行在OSX10.5之后和iOS的64位程序中，Legacy运行在OSX10.5之前的32位程序中。最大区别在于更改类的实例变量布局时，Legacy需要重新编译子类，Modern不需要。当一个类被编译时，该类会生成一个ivar布局，<strong>从isa开始</strong>依次根据实例变量大小产生位移，先是<strong>父类布局接着子类布局</strong>。访问变量的ivar地址＝对象地址＋ivar偏移字节。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewragyao98j20cc0393yt.jpg" alt=""></p>
+<p>但有个问题，当父类增加了ivar，原来的布局就出错了，在脆弱性实例变量(Fragile ivars)环境中不得不重新编译子类调整ivar布局。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrah4fqv3j20cf03c3yy.jpg" alt=""></p>
+<p>在健壮性实例变量(Non Fragile ivars)环境中，编译器生成的子类实例变量布局跟以前一样，但程序启动后，如果Runtime检测到子类与父类布局有冲突便会调整子类布局。这样子类的成员变量就被保护起来了，以后不管父类变不变、怎么变都不会影响子类。<strong>访问变量的ivar地址＝对象地址＋基类大小+ivar偏移字节</strong>。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrahb72tgj20ci04rjs3.jpg" alt=""></p>
+<h4 id="Property"><a href="#Property" class="headerlink" title="Property"></a>Property</h4><p>编译时，编译器将Property转换成Ivar，并且添加Setter和Getter。Runtime函数property_getAttributes能获取objc_property的名称和@encode类型字符串：</p>
+<pre><code>//objc_property未给出定义
+typedef struct objc_property *objc_property_t;
+
+typedef struct {
+    const char *name;           /**&lt; The name of the attribute */
+    const char *value;          /**&lt; The value of the attribute (usually empty) */
+} objc_property_attribute_t;
+</code></pre><h4 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h4><pre><code>typedef struct objc_method *Method;
+
+struct objc_method {
+    SEL method_name                                          OBJC2_UNAVAILABLE;
+    char *method_types                                       OBJC2_UNAVAILABLE;
+    IMP method_imp                                           OBJC2_UNAVAILABLE;
+} OBJC2_UNAVAILABLE;
+
+//objc_class
+struct objc_method_list {
+    struct objc_method_list *obsolete                        OBJC2_UNAVAILABLE;
+    int method_count                                         OBJC2_UNAVAILABLE;
+#ifdef __LP64__
+    int space                                                OBJC2_UNAVAILABLE;
+#endif
+    /* variable length structure */
+    struct objc_method method_list[1]                        OBJC2_UNAVAILABLE;
+}
+</code></pre><p>Method代表类中某个方法，它是一个指向objc_method结构体的指针。objc_method结构体存储着一个SEL类型的名字，一个参数和返回值的类型信息，一个真正实现方法的函数地址。objc_class结构体(也就是类对象)的objc_method_list存储着该类所有的方法。</p>
+<h4 id="IMP"><a href="#IMP" class="headerlink" title="IMP"></a>IMP</h4><pre><code>typedef id (*IMP)(id, SEL, ...);
+</code></pre><p>IMP是一个编译器编译生成的函数指针，该函数包含一个接收消息的对象id，对应映射的名字SEL，方法参数，返回值id。<strong>Objc函数都会编译成C函数</strong>，ObjC对象接收消息变成普通C函数调用一样。</p>
+<h4 id="Cache"><a href="#Cache" class="headerlink" title="Cache"></a>Cache</h4><pre><code>typedef struct objc_cache *Cache
+
+//objc_class
+struct objc_cache {
+    unsigned int mask /* total = mask + 1 */                 OBJC2_UNAVAILABLE;
+    unsigned int occupied                                    OBJC2_UNAVAILABLE;
+    Method buckets[1]                                        OBJC2_UNAVAILABLE;
+} OBJC2_UNAVAILABLE;
+</code></pre><p>每次调用方法后，<strong>Runtime会更新cache，根据算法留住最常用的方法</strong>，以提高代码执行效率。mask表示总共缓冲槽(Cache Bucket)数目。occupied表示有效缓冲槽数目。buckets表示缓冲槽，数目可能不超过mask+1，某槽可能为NULL(表示这个槽无效)，有效槽们也可能是不连续的，缓冲槽可能会动态增加。</p>
+<h4 id="Protocol"><a href="#Protocol" class="headerlink" title="Protocol"></a>Protocol</h4><pre><code>typedef struct objc_object *Protocol;
+
+//objc_class
+struct objc_protocol_list {
+    struct objc_protocol_list *next;
+    long count;
+    Protocol *list[1];
+};
+</code></pre><p>Protocol其实是一个对象结构体。类对象的Protocol列表里还有下一个列表的指针，从而让Protocol列表有了继承的能力。</p>
+<h4 id="Category"><a href="#Category" class="headerlink" title="Category"></a>Category</h4><pre><code>typedef struct objc_category *Category;
+
+//A
+struct objc_category {
+    char *category_name                          OBJC2_UNAVAILABLE;
+    char *class_name                             OBJC2_UNAVAILABLE;
+    struct objc_method_list *instance_methods    OBJC2_UNAVAILABLE;
+    struct objc_method_list *class_methods       OBJC2_UNAVAILABLE;
+    struct objc_protocol_list *protocols         OBJC2_UNAVAILABLE;
+} OBJC2_UNAVAILABLE;
+</code></pre><p>objc_category存储了分类名、扩展的类、实例方法、类方法和协议列表。分类的实例方法列表是类的实例方法列表的子集，分类的类方法列表是类的类方法列表的子集。不过在objc-runtime-new.h的定义中：</p>
+<pre><code>//B
+struct category_t {
+    const char *name;
+    classref_t cls;
+    struct method_list_t *instanceMethods;
+    struct method_list_t *classMethods;
+    struct protocol_list_t *protocols;
+    struct property_list_t *instanceProperties;
+};
+</code></pre><p>名字name是要扩展的类名而不是分类名。扩展的类cls<strong>不是在编译期而是在运行期</strong>赋值，由Runtime<strong>通过类名name找到对应的类</strong>。属性列表instanceProperties表示分类所有的properties，这就是可以增减关联变量的原因，不过分类的关联变量和类的实例变量是不一样的。</p>
+<p>程序启动时，libSystem调用_objc_init(objc-os.mm)加载并初始化Runtime，map_images(objc-runtime-new.mm)加载map到内存，_read_images开始初始化map并加载所有Class，Protocol和Category(NSObject的+load在这时调用)，Category的实例方法加入Class的方法列表，Category的类方法加入Meta Class的方法列表。</p>
+<h4 id="receiver-message"><a href="#receiver-message" class="headerlink" title="[receiver message]"></a>[receiver message]</h4><p>编译器会根据语义和返回值选择objc_msgSend, objc_msgSend_stret(<strong>st</strong>ruc <strong>ret</strong>urn), objc_msgSendSuper, objc_msgSendSuper_stret四个中的一个。<strong>传给父类</strong>的消息用带有<strong>Super</strong>的函数；<strong>返回值是数据结构不是简单类型</strong>的消息用带有<strong>stret</strong>的函数。objc_msgSend_fpret(<strong>f</strong>loating <strong>p</strong>oint <strong>ret</strong>urn)在i386平台代替返回类型为浮点数时使用的objc_msgSend，因为返回类型为浮点数的函数ABI(Application Binary Interface)与返回整型的函数ABI不兼容。</p>
+<p>当objc_msgSend找到方法的实现后，Runtime将填充消息接收者receiver到第一位self，填充方法名字message到第二位_cmd，再依次将消息中所有参数按顺序填充。Objc发送的消息直到运行的时候才会动态绑定具体的实现：</p>
+<ul>
+<li>检测这个selector是否可以忽略。MacOSX有垃圾回收的话就不理会retain,release这些selector。</li>
+<li>检测这个target如果是nil则忽略。Objc允许对nil发送任何消息且不Crash。</li>
+<li>如果上面都通过便进入类中查询信息。先从cache里所有Method，找到相等selector匹配的IMP后执行。</li>
+<li>如果cache没找到，再查询方法列表所有Method，找到相等selector匹配的IMP后执行。</li>
+<li>如果方法列表没找到，再到父类以同样的过程找，直到找到NSObject为止。</li>
+<li>如果还没找到，就进入动态方法解析和消息转发的机制。</li>
+</ul>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewraj25j6sg20980f4mx7.gif" alt=""></p>
+<h4 id="消息转发机制"><a href="#消息转发机制" class="headerlink" title="消息转发机制"></a>消息转发机制</h4><p>不能确定对象是否能接收某个消息时，可以自省判断。</p>
+<pre><code>if ([reciver respondsToSelector:@selector(message)]) {
+    [reciver performSelector:@selector(message)];
+}
+</code></pre><p>对象接收到无法接收的消息时，进入消息转发机制，告诉对象如何处理未知的消息。默认情况下，对象接收未知消息后，会触发NSObject的doesNotRecognizeSelector方法抛出异常导致程序崩溃。消息转发机制分为以下几步：</p>
+<p><strong>动态方法解析</strong>  对象接收未知消息时，首先会根据消息的类型调用+resolveInstanceMethod:(实例方法)或者+resolveClassMethod:(类方法)。通过Runtime函数class_addMethod动态添加能够接收未知消息的方法到类里，来实现接收该未知消息(主要用在实现@dynamic)：</p>
+<pre><code>void methodForUnknownMessage(id self, SEL _cmd) {
+   NSLog(@&quot;%@, %p&quot;, self, _cmd);
+}
+
++ (BOOL)resolveInstanceMethod:(SEL)sel {
+    if ([NSStringFromSelector(sel) isEqualToString:@&quot;methodForUnknownMessage&quot;]) {
+        class_addMethod(self.class, sel, (IMP)methodForUnknownMessage, &quot;@:&quot;);
+        return YES;
+    }
+    return [super resolveInstanceMethod:sel];
+}
+</code></pre><p><strong>备用接收对象</strong>  动态方法解析没能处理未知消息时，Runtime会继续调用forwardingTargetForSelector:返回备用接收对象去接收未知消息。</p>
+<pre><code>- (id)forwardingTargetForSelector:(SEL)aSelector {
+    if(aSelector == @selector(helperCanRespond:)){
+        return helper;
+    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+</code></pre><p><strong>完整转发</strong>  如果没有备用接受对象(返回nil)，Runtime会先用methodSignatureForSelector:获得未知消息的方法签名。</p>
+<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    NSMethodSignature *signature = [super methodSignatureForSelector:aSelector];
+    if (!signature) {
+        if ([Helper instancesRespondToSelector:aSelector]) {
+            signature = [Helper instanceMethodSignatureForSelector:aSelector];
+        }
+    }
+    return signature;
+}
+</code></pre><p>Runtime再创建一个封装了全部细节(消息的接收对象target、消息的名字selector和消息附带的参数)的NSInvocation，调用forwardInvocation:(其中可以修改消息内容实现复杂功能，比如修改参数等)选择转发给其它对象。处理完未知消息后NSInvocation会保留结果，Runtime会提取结果并发送给原始接收对象。NSObject的forwardInvocation:只是简单调用doesNotRecognizeSelector:引发异常导致崩溃。</p>
+<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    NSMethodSignature *signature = [super methodSignatureForSelector:aSelector];
+    if (!signature) {
+        if ([SUTRuntimeMethodHelper instancesRespondToSelector:aSelector]) {
+            signature = [SUTRuntimeMethodHelper instanceMethodSignatureForSelector:aSelector];
+        }
+    }
+    return signature;
+}
+
+- (void)forwardInvocation:(NSInvocation *)anInvocation {
+    if ([SUTRuntimeMethodHelper instancesRespondToSelector:anInvocation.selector]) {
+        [anInvocation invokeWithTarget:_helper];
+    }
+}
+</code></pre><p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewrf8dufpfj20j60adjs5.jpg" alt=""></p>
+<h4 id="消息转发和多继承"><a href="#消息转发和多继承" class="headerlink" title="消息转发和多继承"></a>消息转发和多继承</h4><p>转发可以允许一个对象<strong>通过依赖其他对象去处理未知消息</strong>，让该对象表面上有处理未知消息的能力。虽然转发能模拟多继承让对象“继承”其它对象的能力，但区别在于多继承会让对象越来越大，转发只是建立对象间联系。虽然转发类似于继承，但Runtime对两者自省判断不一样，respondsToSelector:和isKindOfClass:和conformsToProtocol:能识别继承，不识别转发。如果想让消息转发看起来像继承，需要重写这些方法。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrajxx1xsg20ag06pdfq.gif" alt=""></p>
+<h4 id="Runtime的应用"><a href="#Runtime的应用" class="headerlink" title="Runtime的应用"></a>Runtime的应用</h4><p>Category Ass</p>
+<p>Methods Swizzling</p>
+<p>KVO</p>
+<p>NSZombie</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://yulingtianxia.com/blog/2014/11/05/objective-c-runtime/#jtss-tsina" target="_blank" rel="noopener">Objective-C Runtime</a></li>
+<li><a href="http://southpeak.github.io/blog/2014/10/25/objective-c-runtime-yun-xing-shi-zhi-lei-yu-dui-xiang/" target="_blank" rel="noopener">Objective-C Runtime 运行时系列</a></li>
+<li>&lt;a href=<a href="http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective%5Bnil%5Dc-runtime(1)%5Bnil%5D-self-and-super/&gt;刨根问底Objective－C" target="_blank" rel="noopener">http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective%5Bnil%5Dc-runtime(1)%5Bnil%5D-self-and-super/&gt;刨根问底Objective－C</a> Runtime系列</li>
+<li><a href="http://springox.w18.net/2015/09/03/objectivecruntime/" target="_blank" rel="noopener">Objective-C与Runtime</a></li>
+<li><a href="http://blog.sunnyxx.com/2015/09/13/class-ivar-layout/" target="_blank" rel="noopener">Objective-C Class Ivar Layout 探索</a></li>
+<li><a href="http://www.cocoachina.com/industry/20140106/7658.html" target="_blank" rel="noopener">详解Objective-C runtime</a></li>
+<li><a href="http://tech.meituan.com/DiveIntoMethodCache.html" target="_blank" rel="noopener">深入理解Objective-C：方法缓存</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/10/07/2015-10-07[Runtime]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/10/07/2015-10-07[Runtime]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/07/2015-10-07[Runtime]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+<nav id="pagination">
+  
+    <a href="/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>上一页</a>
+  
+  
+    <a href="/page/3/" class="alignright next">下一页<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+
+<script src="/js/jquery.anystretch.min.js"></script>
+<script src="/js/cover.js"></script>
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2018 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

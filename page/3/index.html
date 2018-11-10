@@ -1,0 +1,1303 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>第 3 页 | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <div id="cover">
+	<div id="profile" alt="http://ww3.sinaimg.cn/large/9460be12gw1eodo2zufbnj21kw0yshdt.jpg">
+		<a href="/">
+			<div class="logo">
+				<img src="/logo.png" alt="Profile Picture">
+			</div>
+			<div id="title">Game Curiosity Development</div>
+		</a>
+
+		
+			<div id="subtitle">一步一脚印，一花一世界。</div>
+		
+		 <ul class="my-socials">
+  
+  <li>
+  	<a href="https://github.com/hllovesgithub" class="github" target="_blank">
+  		<i class="fa fa-github"></i>
+  	</a>
+  </li>
+  
+  <li>
+  	<a href="http://weibo.com/2489368082/profile?topnav=1&wvr=6" class="weibo" target="_blank">
+  		<i class="fa fa-weibo"></i>
+  	</a>
+  </li>
+  
+  <li>
+  	<a href="https://twitter.com/hllovestt" class="twitter" target="_blank">
+  		<i class="fa fa-twitter"></i>
+  	</a>
+  </li>
+  
+  <li>
+  	<a href="https://www.facebook.com/profile.php?id=100007623375387" class="facebook" target="_blank">
+  		<i class="fa fa-facebook"></i>
+  	</a>
+  </li>
+  
+ 
+</ul>
+	</div>
+</div>
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-04T12:34:55.000Z"><a href="/2015/10/04/2015-10-04[Thread-同步]/">周日, 10月 4 2015, 8:34:55 晚上</a></time>
+
+  
+    <h1 class="title"><a href="/2015/10/04/2015-10-04[Thread-同步]/">Thread 同步</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="同步工具"><a href="#同步工具" class="headerlink" title="同步工具"></a>同步工具</h3><p>涉及线程安全时，一个好的设计是最好的保护。避免共享资源，减少线程交互，这样可以缩小线程间干扰，但是一个完全没有干扰的设计是不可能的，就需要使用同步技术来确保安全。</p>
+<h3 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h3><p>原子操作是同步<strong>简单数据类型</strong>一个非常简单的形式，其优势是<strong>不阻塞线程竞争</strong>。对于简单的操作，比如递增一个计数器，原子操作比锁更有性能优势。MacOSX和iOS包含了许多32位和64位执行基本的数学运算和逻辑运算(比较-交换，测试-设值，测试-清理)的原子操作(/usr/include/libkern/OSAtomic.h)。</p>
+<h3 id="内存屏障和Volatile变量"><a href="#内存屏障和Volatile变量" class="headerlink" title="内存屏障和Volatile变量"></a>内存屏障和Volatile变量</h3><p>编译器优化代码时会<strong>重新排序汇编指令</strong>，来使处理器流水线执行指令以达到最佳性能。其中就可能对访问内存的指令进行(其认为可能不产生错误)重新排序，但事实上编译器几乎不可能检测到所有依赖内存的操作。如果看似独立的变量却是相互影响的，那么优化就可能打乱这些变量内存访问指令的顺序，导致潜在问题。</p>
+<p><strong>内存屏障</strong>(Memory Barrier)是一个确保内存操作按照正确顺序工作、非阻塞的同步工具(OSMemoryBarrier系列函数)。内存屏障就像一个栅栏，处理器<strong>必须先完成障碍前所有的内存读取操作，才能执行屏障后的内存读取操作</strong>，这样内存屏障就能确保一个线程的内存操作总是按照预定顺序执行。</p>
+<p><strong>Volatile</strong>是适用于独立变量的另一种内存限制形式。编译器通过把变量的值加载到寄存器(寄存器的访问速度比内存访问速度快)来实现优化。对于非线程竞争的变量不会有问题，反之则会。volatile变量会<strong>强制编译器每次使用变量时都从内存而非寄存器读取</strong>。如果一个变量的值有编译器无法检测更改的可能，那么可以把它声明为volatile。</p>
+<p>内存屏障和volatile变量降低了编译器优化的程度，因此只在的确需要并确保正确的前提下谨慎使用。</p>
+<h3 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h3><p>锁是保护<strong>临界区(Critical Section)</strong>关键代码在同一个时间只被一个线程访问的最常用同步工具。MacOSX和iOS提供了常使用的锁：</p>
+<p><strong>￼Mutex￼(互斥锁)</strong> 互斥锁扮演着资源保护屏障的角色。如果一个线程尝试获取一个已经被获取的互斥锁，那么该线程会阻塞一直到拥有互斥锁的线程释放互斥锁。如果有多个线程竞争获取互斥锁，每次只有一个能成功。</p>
+<p><strong>Recursive lock(递归锁)</strong> 递归锁是互斥锁的变种。一个递归锁允许同一个线程释放前多次获取，其他线程保持阻塞直到拥有递归锁的线程释放同样次数后。递归锁用在递归语句中，也可用在同一线程的多个需要单独获取递归锁的方法里。</p>
+<p><strong>Read-write lock(读写锁)</strong> 读写锁也被称为共享互斥锁。通常用在大规模操作(经常读偶尔写)保护数据中显着提高性能。一般多个线程可以同时读数据，当有另一个线程要写数据时，写线程阻塞直到所有读线程释放后再获取读写锁，进行写操作。当一个写线程在等待锁时，新来的读线程会阻塞直到写线程结束。系统只对POSIX线程支持读写锁。</p>
+<p><strong>Distributed lock(分布锁)</strong> 一个分布锁提供进程间的互斥访问。和互斥锁不一样的是，分布锁不会阻塞进程或阻止进程运行。它只是简单地在尝试获取已被获取的分布锁时通知进程并让其自己决定如何处理。</p>
+<p><strong>Spin lock(自旋锁)</strong> 一个自旋锁会反复查询其锁定条件直到条件成为真。自旋锁通常用在获取锁预期时间很小的多核系统里。这种情况下，切换上下文和更新线程数据通常比阻塞线程更有效率。系统因为自旋锁特性而没有提供支持，但是在一些特别的情况下很容易实现它。</p>
+<p><strong>Double-checked lock(双重检查锁)</strong> 双重检查锁是一种，通过获锁前测试其标准来减少获取过程开销的尝试。因为双重检查锁是潜在不安全的，系统对该锁没有显式的实现并且不鼓励使用。</p>
+<h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><p>条件是另一种当判断为真时允许线程间互相发送信号的同步工具。条件通常用来<strong>确认资源可以性或者确保任务以特定的顺序执行</strong>。当一个线程测试条件时，它阻塞直到其他线程显式地改变该条件为真。条件和互斥锁虽然都只允许多个线程中的一个通过，但互斥锁是随机选择，条件可以根据指定判断选择。系统用不同的技术对条件提供支持，条件的正确使用需要仔细思考。</p>
+<h3 id="同步的开销和性能"><a href="#同步的开销和性能" class="headerlink" title="同步的开销和性能"></a>同步的开销和性能</h3><p>同步确保正确性，但同时会牺牲性能(甚至在无竞争时)。<strong>锁和原子操作通常使用内存屏障和内核级同步机制来确保关键代码被正确保护</strong>。同步虽然使关键代码安全，但过多同步的多线程程序和单线程程序相比反而可能会降低性能。安全和性能之间寻找平衡需要大量经验累积。在无竞争时互斥锁和原子操作的近似开销：</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewoxcqtqfcj21600jetjg.jpg" alt=""></p>
+<h3 id="完全避免同步"><a href="#完全避免同步" class="headerlink" title="完全避免同步"></a>完全避免同步</h3><p>设计代码结构和数据结构来避免使用同步是很好的解决办法。如果整体设计导致特定资源的高竞争，可能设计本身就存在问题。实现并发最好的方法是减少并发任务之间的交互和依赖。如果每个任务在它自己的数据集上面操作，则不需要使用同步来保护这些数据。</p>
+<h3 id="注意正确地同步"><a href="#注意正确地同步" class="headerlink" title="注意正确地同步"></a>注意正确地同步</h3><pre><code>// Code 1
+NSLock* arrayLock = GetArrayLock();
+NSMutableArray* myArray = GetSharedArray();
+id anObject;
+[arrayLock lock];
+anObject = [myArray objectAtIndex:0];
+[arrayLock unlock];
+[anObject doSomething];
+
+// Code 2￼￼
+NSLock* arrayLock = GetArrayLock();
+NSMutableArray* myArray = GetSharedArray();
+id anObject;
+[arrayLock lock];
+￼￼￼anObject = [myArray objectAtIndex:0];
+[anObject doSomething];
+[arrayLock unlock];
+￼￼
+// Code 3
+NSLock* arrayLock = GetArrayLock();
+NSMutableArray* myArray = GetSharedArray();
+id anObject;
+[arrayLock lock];
+anObject = [myArray objectAtIndex:0];
+[anObject retain];
+[arrayLock unlock];
+[anObject doSomething];
+</code></pre><p>Code1中anObject在执行doSomething时有野指针的可能。Code2中确保anObject有效，但是doSomething可能耗时很长，引起其他线程长时间等锁释放。Code3才是正确的写法。尽管这个示例很简单，但说明了非常重要的一点，当同步涉及到正确性时，不仅仅需要考虑问题的表面，内存管理和其他因素都有可能因为多线程而受到影响。此外，应该假设编译器总是出现最坏的情况。这种意识和警惕性，可以帮避免潜在问题，确保关键代码正确运行。</p>
+<h3 id="正确使用Volatile"><a href="#正确使用Volatile" class="headerlink" title="正确使用Volatile"></a>正确使用Volatile</h3><p>使用一个互斥锁来保护一段关键代码后，并不还需要用volatile来保护关键代码段里的重要变量。一个互斥锁包含了内存屏障来确保内存读写操作能正确顺序执行。一个临界区里volatile变量会强制每次读写都在内存。这种同步组合在一些特定区域是必要的，但是同样会导致显著的性能损失。如果互斥锁已经可以保护变量，那么不使用volatile同样很重要。通常情况下，互斥锁和其他同步工具比volatile更好。</p>
+<h3 id="使用原子操作"><a href="#使用原子操作" class="headerlink" title="使用原子操作"></a>使用原子操作</h3><p>原子操作以非阻塞方式执行某些简单类型的同步操作且避免锁的开销。尽管锁是同步线程很好的工具，但即使在无竞争状态下，获取一个锁都相对昂贵。相比而言，许多原子操作花费更少时间也能达到和锁一样的效果。原子操作(/usr/include/libkern/OSAtomic.h)在32位或64位处理器上执行简单的数学运算和逻辑运算，<strong>保证执行的操作在被影响内存再次读写前已经完成</strong>。可以使用原子操作和内存屏障组合使用，来保证多线程间内存正确同步。大部分原子操作行为都如其简单明了的函数名所理解那样。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewp9wuo4z4j20uq0j6gqz.jpg" alt=""></p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewp9xuqolzj20um148tqq.jpg" alt=""></p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewp9yb4innj20uo0c6450.jpg" alt=""></p>
+<h3 id="使用POSIX互斥锁"><a href="#使用POSIX互斥锁" class="headerlink" title="使用POSIX互斥锁"></a>使用POSIX互斥锁</h3><pre><code>pthread_mutex_t mutex;
+void MyInitFunction() {
+    pthread_mutex_init(&amp;mutex， NULL);
+}
+void MyLockingFunction() {
+    pthread_mutex_lock(&amp;mutex);
+    // Do work
+    pthread_mutex_unlock(&amp;mutex);
+}
+void MyReleaseFunction() {
+    pthread_mutex_destroy(metex);
+}
+</code></pre><p>以上代码只是简单地展示了POSIX线程互斥锁的过程，应该还要检查函数错误码并做适当处理。</p>
+<h3 id="使用NSLock"><a href="#使用NSLock" class="headerlink" title="使用NSLock"></a>使用NSLock</h3><p><strong>Cocoa所有锁(包括NSLock)都是遵循NSLocking协议(定义了lock和unlock)来获取和释放</strong>。NSLock类除此之外还有tryLock(尝试获取一个锁并马上返回结果)和lockBeforeDate:(尝试获取一个锁，在规定时间内阻塞，最后返回结果)。</p>
+<pre><code>NSLock *theLock = [[NSLock alloc] init];
+while (YES) {
+    if ([theLock tryLock]) {
+        // Do work
+        [theLock unlock];
+        break;
+    }
+}
+</code></pre><h3 id="使用-synchronized"><a href="#使用-synchronized" class="headerlink" title="使用@synchronized"></a>使用@synchronized</h3><p>在Objc代码中，@synchronized是一个非常方便创建互斥锁的方法。@synchronized做和其他互斥锁一样的工作，只是不需要直接创建锁对象。只需要简单使用任意Objc对象作为区别临界区的唯一标志符。</p>
+<pre><code>@synchronized(token) {
+    // Do work
+}
+</code></pre><p>作为预防措施，@synchronized会<strong>隐式地添加一个异常处理代码</strong>起保护作用。该代码会在异常抛出时自动释放互斥锁。这意味着使用@synchronized就必须启用异常处理。如果不想要隐式异常处理代码带来的额外开销，应该考虑使用锁。</p>
+<h3 id="使用NSRecursiveLock"><a href="#使用NSRecursiveLock" class="headerlink" title="使用NSRecursiveLock"></a>使用NSRecursiveLock</h3><p>NSRecursiveLock在同一线程多次获取不造成死锁。一个递归锁会自己统计成功获取次数。只有<strong>获取和释放操作次数平衡时，才可以真正被释放给其他线程获取</strong>。这类锁通常用在递归(也可以是类似的非递归)函数里防止递归造成线程阻塞。因为递归锁直到获取和释放操作平衡后才会被释放，而长时间持有一个锁将会导致其他线程阻塞直到递归完成，所以必须仔细权衡使用递归锁对性能的潜在影响。如果重构代码可以消除递归或者消除使用递归锁，那可能会有更好的性能。</p>
+<pre><code>NSRecursiveLock *theLock = [[NSRecursiveLock alloc] init];
+void MyRecursiveFunction(int value) {
+    [theLock lock];
+    if (value != 0) {
+        --value;
+        MyRecursiveFunction(value);
+    }
+    [theLock unlock];
+}
+MyRecursiveFunction(5);
+</code></pre><h3 id="使用NSConditionLock"><a href="#使用NSConditionLock" class="headerlink" title="使用NSConditionLock"></a>使用NSConditionLock</h3><p>NSConditionLock是一个<strong>使用特定值来获取和释放</strong>的互斥锁，其行为和NSCondition有点类似，但实现非常不同。通常多线程用NSConditionLock实现以特定顺序执行任务，比如生产者消费者模式。NSConditionLock的获取和释放方法可以任意组合：lock和unlockWithCondition:，lockWhenCondition:和unlock 。</p>
+<pre><code>id condLock = [[NSConditionLock alloc] initWithCondition:NO_DATA];
+
+// Thread A
+while(true) {
+    [condLock lock];
+    // Add data to the queue
+    [condLock unlockWithCondition:HAS_DATA];
+}
+
+// Thread B
+while (true) {
+    [condLock lockWhenCondition:HAS_DATA];
+    // Remove data from the queue
+    [condLock unlockWithCondition:(isEmpty ? NO_DATA : HAS_DATA)];
+    // Process the data locally
+}
+</code></pre><h3 id="使用NSCondition"><a href="#使用NSCondition" class="headerlink" title="使用NSCondition"></a>使用NSCondition</h3><p>NSCondition类不仅提供了POSIX条件相同的语义，但又封装互斥锁和条件数据。<strong>可以像互斥锁一样获取和释放它，又可以像条件一样等待它</strong>。可以作为NSLock解决多线程之间的同步问题，但设计出NSCondition更重要的目的是解决线程之间的调度问题（也必须获取锁和释放锁）。某线程调用wait使其阻塞处于等待状态(<strong>其他线程就可以继续进入临界区。这和标准锁不同，标准锁被获取后无论什么情况，只要拥有线程没有释放，其他线程就无法进入临界区</strong>)，直到其他线程调用signal(唤醒多个等待线程中任意一个)或者broadcast(唤醒所有等待线程)才能继续运行。</p>
+<pre><code>// Thread A
+[cocoaCondition lock];
+while (timeToDoWork &lt;= 0)
+    [cocoaCondition wait];
+timeToDoWork--;
+// Do work.
+[cocoaCondition unlock];
+
+// Thread B
+[cocoaCondition lock];
+timeToDoWork++;
+[cocoaCondition signal];
+[cocoaCondition unlock];
+</code></pre><h3 id="Cocoa多线程指南"><a href="#Cocoa多线程指南" class="headerlink" title="Cocoa多线程指南"></a>Cocoa多线程指南</h3><p>Immutable对象一般都是线程安全的，Mutable对象一般不是线程安全的，在多线程中需要同步。对于线程不安全的对象，只要保证同一时间只有一个线程使用，那么整个程序总体而言还是线程安全的。如果使用多线程绘画视图，绘画代码应放在NSView的lockFocusIfCanDraw和unlockFocus之间。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="https://developer.apple.com/library/prerelease/ios/documentation/Cocoa/Conceptual/Multithreading/ThreadSafety/ThreadSafety.html#//apple_ref/doc/uid/10000057i-CH8-SW1" target="_blank" rel="noopener">Synchronization</a></li>
+<li><a href="http://southpeak.github.io/blog/2014/10/17/osatomicyuan-zi-cao-zuo/" target="_blank" rel="noopener">OSAtomic原子操作</a></li>
+<li><a href="http://www.cnblogs.com/kenshincui/p/3983982.html#synchronized" target="_blank" rel="noopener">iOS开发系列–并行开发其实很容易</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/10/04/2015-10-04[Thread-同步]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/10/04/2015-10-04[Thread-同步]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/04/2015-10-04[Thread-同步]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-01T07:53:46.000Z"><a href="/2015/10/01/2015-10-01[Thread-Runloop]/">周四, 10月 1 2015, 3:53:46 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/10/01/2015-10-01[Thread-Runloop]/">Thread RunLoop</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>一般一个线程一次只执行一个任务，执行完成后就会退出。如果需要一个机制，<strong>让线程能随时响应处理新的任务并长时间存在不退出</strong>，那么它就是RunLoop。</p>
+<p>RunLoop就是一个<strong>不断调度工作和处理事件的事件处理循环</strong>，对事件处理过程进行了更好的抽象和封装，让客户代码不用关心底层琐碎的消息处理实现的同时，能够轻松动态地添加删除执行任务。目的是<strong>让线程有任务时忙碌工作，没任务时休眠节能</strong>。</p>
+<p>RunLoop不是完全自动的。需要给线程设定代码在合适的时候启动并响应事件。Cocoa和Core Foundation都提供了runloop objects帮助配置和管理线程的RunLoop。每个线程都有关联的RunLoop，主线程启动时自动启动，子线程需要显式地启动。</p>
+<h3 id="RunLoop剖析"><a href="#RunLoop剖析" class="headerlink" title="RunLoop剖析"></a>RunLoop剖析</h3><p>RunLoop接收两种不同输入事件：输入源(<em>input source</em>)传递异步事件，通常来自于其他线程或程序。定时源(<em>timer source</em>)传递同步事件，发生在特定时间或者重复的时间间隔。这两种源事件到达时都使用对应回调函数处理。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewmvfz9j1nj20zc0gmgph.jpg" alt=""></p>
+<h5 id="RunLoop模式"><a href="#RunLoop模式" class="headerlink" title="RunLoop模式"></a>RunLoop模式</h5><p>RunLoop<strong>模式</strong>是所有<strong>输入源定时源和观察者(CFRunLoopObserverRef实例)的集合</strong>。RunLoop每次只以某个模式运行，只有相关的源才会被监视、传递、处理事件，只有相关的观察者会被通知。否则，不相关的源不被监视，不相关观察者不被通知。Cocoa和Core Foundation定了一个默认模式和几个常用模式:</p>
+<ul>
+<li><strong>Default</strong>(NSDefaultRunLoopMode-Cocoa ， kCFRunLoopDefaultMode-CoreFoundation) 默认模式是最常用的模式。大部分时间你应该用这种模式启动RunLoop配置事件源。</li>
+<li><strong>Connection</strong>(NSConnectionReplyMode-Cocoa) Cocoa用这个模式结合NSConnection对象来检测网络响应。你自己很少会用到这个模式。</li>
+<li><strong>Modal</strong>(NSModalPanelRunLoopMode-Cocoa) Cocoa用这个模式辨别出模态界面想要的事件。</li>
+<li><strong>Event tracking</strong>(NSEventTrackingRunLoopMode-Cocoa) Cocoa用这个模式在MouseDrag循环中和其他需要跟踪用户的界面循环中限制事件输入。</li>
+<li><strong>Common modes</strong>(NSRunLoopCommonModes-Cocoa， kCFRunLoopCommonModes-CoreFoundation) 这是一个常用模式的可配置组合。关联常用模式就是关联组合里每个模式。Cocoa程序里常用模式默认包括default<br>，modal，event tracking。Core Foundation只有default。你可以用CFRunLoopAddCommonMode添加自定义模式到常用模式中。</li>
+</ul>
+<p>创建自定义模式<strong>必须添加至少一个事件源或者观察者</strong>，否则无效。使用特定模式可以过滤事件。比如大多数时间运行在默认模式上，模态界面运行在”Modal”模式下，此时只有模态模式相关信息能传递给线程。</p>
+<h4 id="输入源"><a href="#输入源" class="headerlink" title="输入源"></a>输入源</h4><p>输入源异步发送消息到线程。事件来源取决于种类：<strong>端口源</strong>和<strong>自定义源</strong>。端口源监听程序相应端口，自定义源监听自定义事件源。区别在于如何触发：<strong>端口源由内核自动发送，自定义源则需要手动从其他线程发送</strong>。</p>
+<h4 id="基于端口的输入源"><a href="#基于端口的输入源" class="headerlink" title="基于端口的输入源"></a>基于端口的输入源</h4><p>Cocoa不需要直接创建输入源，只需要创建NSPort对象并添加到RunLoop，它会自己处理创建和配置属于远。Core Foundation必须手动创建端口和输入源用CFMachPortRef，CFMessagePortRef，FSocketRef来创建合适的对象。</p>
+<h4 id="自定义输入源"><a href="#自定义输入源" class="headerlink" title="自定义输入源"></a>自定义输入源</h4><p>创建自定义输入源使用CFRunLoopSourceRef，使用回调函数来进行配置。Core Foundation会在配置、处理、移除调用回调函数。</p>
+<h4 id="Cocoa执行Selector源"><a href="#Cocoa执行Selector源" class="headerlink" title="Cocoa执行Selector源"></a>Cocoa执行Selector源</h4><p>Cocoa定义了允许你在任何线程执行selector的自定义输入源。和端口源一样，执行selector的请求在目标线程上串行排列，避免许多线程上多个方法一起运行引起的同步问题。不像端口源，<strong>一个selector源执行完后会自动从RunLoop里面移除</strong>。RunLoop每次循环处理所有(而不是一个)排列的selector的调用。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewmy1wfdtgj215w0go47f.jpg" alt=""></p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewmy2ah70rj21620lmwpj.jpg" alt=""></p>
+<h4 id="RunLoop观察者"><a href="#RunLoop观察者" class="headerlink" title="RunLoop观察者"></a>RunLoop观察者</h4><pre><code>typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
+    kCFRunLoopEntry         = (1UL &lt;&lt; 0), // 即将进入Loop
+    kCFRunLoopBeforeTimers  = (1UL &lt;&lt; 1), // 即将处理Timer
+    kCFRunLoopBeforeSources = (1UL &lt;&lt; 2), // 即将处理Source
+    kCFRunLoopBeforeWaiting = (1UL &lt;&lt; 5), // 即将进入休眠
+    kCFRunLoopAfterWaiting  = (1UL &lt;&lt; 6), // 刚从休眠中唤醒
+    kCFRunLoopExit          = (1UL &lt;&lt; 7), // 即将退出Loop
+};
+</code></pre><p>通过使用Core Foundation注册为RunLoop的观察者来接收RunLoop行为的通知。和同步或异步事件发生时才触发的事件源不同，RunLoop观察者是在RunLoop本身运行的特定时刻候触发。和定时器类似，RunLoop观察者(在创建时指定)可以只用一次(RunLoop启动后，观察者会从RunLoop里移除)或循环使用。</p>
+<h4 id="RunLoop事件队列"><a href="#RunLoop事件队列" class="headerlink" title="RunLoop事件队列"></a>RunLoop事件队列</h4><p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewn43j8dc5j21jy168tub.jpg" alt=""></p>
+<h4 id="何时使用RunLoop"><a href="#何时使用RunLoop" class="headerlink" title="何时使用RunLoop"></a>何时使用RunLoop</h4><p>不需要在任何情况下都启动线程的RunLoop。比如，用线程处理一个预先定义的长时间(虽然长)任务就不用。RunLoop只在需更多交互时才需要：</p>
+<ul>
+<li>使用<strong>端口或自定义输入源</strong>来和其他线程<strong>通信</strong></li>
+<li>使用线程的<strong>定时器</strong></li>
+<li>Cocoa中使用任何<strong>performSelector</strong>方法</li>
+<li>使线程<strong>周期性工作</strong></li>
+</ul>
+<h4 id="获得RunLoop对象"><a href="#获得RunLoop对象" class="headerlink" title="获得RunLoop对象"></a>获得RunLoop对象</h4><pre><code>//Cocoa
+NSRunLoop cocoa = [NSRunLoop currentRunLoop];
+
+//Core Foundation
+CFRunLoopRef coreFoundation = CFRunLoopGetCurrent();
+</code></pre><h4 id="配置RunLoop"><a href="#配置RunLoop" class="headerlink" title="配置RunLoop"></a>配置RunLoop</h4><p>子线程运行RunLoop前，<strong>必须添加至少一个事件源</strong>。如果没有任何事件源，RunLoop会在启动之际立马退出。使用CFRunLoopAddObserver将观察者添加到RunLoop:</p>
+<pre><code>- (void)threadMain {
+    NSRunLoop* myRunLoop = [NSRunLoop currentRunLoop];
+    CFRunLoopObserverContext context = {0， self， NULL， NULL， NULL}; 
+    CFRunLoopObserverRef observer = CFRunLoopObserverCreate(kCFAllocatorDefault，kCFRunLoopAllActivities， YES， 0， &amp;myRunLoopObserver， &amp;context);
+    if (observer) {
+        CFRunLoopRef cfLoop = [myRunLoop getCFRunLoop];
+        CFRunLoopAddObserver(cfLoop， observer， kCFRunLoopDefaultMode);
+    }
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(doFireTimer:) userInfo:nil repeats:YES];
+    NSInteger loopCount = 10;
+    do {
+        [myRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+        loopCount--;            ￼￼￼￼
+    } while (loopCount);
+}
+</code></pre><h4 id="启动RunLoop"><a href="#启动RunLoop" class="headerlink" title="启动RunLoop"></a>启动RunLoop</h4><p><strong>无条件的</strong>启动RunLoop最简单的，但也最不推荐。因为这会使线程永久循环，失去控制。虽然可以添加或删除事件源，但是退出RunLoop的唯一方法是杀死它，也没有任何办法可以让RunLoop运行在自定义模式下。</p>
+<p>更好的办法是用<strong>设置超时时间</strong>来启动RunLoop，这样RunLoop运作直到事件到达或者规定时间超时。如果是事件到达，RunLoop会传递消息给相应的处理方法然后退出。如果是规定时间超时直接退出。重新启动RunLoop进行下一次循环。</p>
+<p><strong>特定模式</strong>启动RunLoop可以限制传递给RunLoop的事件源的类型。</p>
+<pre><code>- (void)skeletonThreadMain {
+    BOOL done = NO;
+    do {
+        SInt32 result = CFRunLoopRunInMode(kCFRunLoopDefaultMode， 10， YES);
+        if ((result == kCFRunLoopRunStopped) || (result == kCFRunLoopRunFinished)) {
+            done = YES;
+        }
+    } while (!done);
+}
+</code></pre><h4 id="退出RunLoop"><a href="#退出RunLoop" class="headerlink" title="退出RunLoop"></a>退出RunLoop</h4><p>如果可以，尽量使用<strong>设置超时时</strong>，它让RunLoop退出前完成所有正常操作，包括通知观察者。<strong>显式停止</strong>(CFRunLoopStop)和超时结果相似，Runloop把所有剩余的通知发送出去再退出。与设置超时的不同的是，显式停止可以在无条件启动的Runloop里面使用。</p>
+<p>尽管移除所有事件源也能导致RunLoop退出，但这并不可靠。系统会添加输入源来处理所需事件。因为移除事件源未必会考虑到这些输入源，可能导致无法退出RunLoop。</p>
+<h4 id="线程安全和RunLoop对象"><a href="#线程安全和RunLoop对象" class="headerlink" title="线程安全和RunLoop对象"></a>线程安全和RunLoop对象</h4><p>线程的否安全取决于API操纵RunLoop的API。<strong>Core Foundation的函数是线程安全的</strong>，可以被任意线程调用。修改RunLoop配置并执行操作，<strong>最好在RunLoop所属线程完成</strong>。</p>
+<p><strong>Cocoa的NSRunLoop则不具有线程安全性</strong>。 如果使用NSRunLoop来修改RunLoop，<strong>应该在RunLoop所属线程完成</strong>。给其他线程的RunLoop添加事件源可能导致崩溃或产生不可预知的行为。</p>
+<h4 id="创建配置自定义输入源"><a href="#创建配置自定义输入源" class="headerlink" title="创建配置自定义输入源"></a>创建配置自定义输入源</h4><ul>
+<li>输入源要处理的信息。</li>
+<li>一个联系客户代码和输入源的调度方法。</li>
+<li>一个处理客户代码请求的执行方法。</li>
+<li>一个使输入源无效的取消方法。</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewntcgsy3aj20yk0f0whi.jpg" alt=""></p>
+<p>主线程给子线程分发任务时，主线程给命令缓冲区填充命令和信息(主线程和拥有输入源的子线程必须同步访问命令缓冲区)，然后通知(会唤醒)子线程RunLoop开始工作，子线程RunLoop会调用输入源处理函数来执行命令缓冲区中相应的命令。</p>
+<pre><code>// These are the CFRunLoopSourceRef callback functions.
+void RunLoopSourceScheduleRoutine (void *info， CFRunLoopRef rl， CFStringRef mode);
+void RunLoopSourceCancelRoutine (void *info， CFRunLoopRef rl， CFStringRef mode);
+void RunLoopSourcePerformRoutine (void *info);
+
+@interface RunLoopSource : NSObject
+- (instancetype)init;
+- (void)addToCurrentRunLoop;
+- (void)invalidate;
+- (void)sourceFired;
+- (void)addCommand:(NSInteger)command withData:(id)data;
+- (void)fireCommandsOnRunLoop:(CFRunLoopRef)runloop;
+@end
+@implementation RunLoopSource {
+    CFRunLoopSourceRef _runLoopSource;
+    NSMutableArray *_commands;
+}
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        CFRunLoopSourceContext context = {
+            0，
+            (__bridge void *)(self)，
+            NULL，
+            NULL，
+            NULL，
+            NULL，
+            NULL，
+            RunLoopSourceScheduleRoutine，
+            RunLoopSourceCancelRoutine，
+            RunLoopSourcePerformRoutine
+        };
+        _runLoopSource = CFRunLoopSourceCreate(NULL， 0， &amp;context);
+        _commands = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+- (void)addToCurrentRunLoop {
+    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+    CFRunLoopAddSource(runLoop， _runLoopSource， kCFRunLoopDefaultMode);
+}
+- (void)invalidate {}
+- (void)sourceFired {}
+- (void)addCommand:(NSInteger)command withData:(id)data {}
+- (void)fireCommandsOnRunLoop:(CFRunLoopRef)runloop {
+    CFRunLoopSourceSignal(_runLoopSource);
+    CFRunLoopWakeUp(runloop);
+}
+@end
+
+@interface RunLoopContext : NSObject
+@property (readonly) CFRunLoopRef runLoop;
+@property (readonly) RunLoopSource* source;
+- (instancetype)initWithSource:(RunLoopSource *)src andLoop:(CFRunLoopRef)loop;
+@end
+@implementation RunLoopContext {
+    RunLoopSource *_source;
+    CFRunLoopRef _runLoop;
+}
+- (instancetype)initWithSource:(RunLoopSource *)src andLoop:(CFRunLoopRef)loop {
+    self = [super init];
+    if (self) {
+        _source = src;
+        _runLoop = loop;
+    }
+    return self;
+}
+@end
+
+void RunLoopSourceScheduleRoutine (void *info， CFRunLoopRef rl， CFStringRef mode) {
+    id appDelegate = [[NSApplication sharedApplication] delegate];
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    RunLoopContext *theContext = [[RunLoopContext alloc] initWithSource:obj andLoop:rl];
+    [appDelegate performSelectorOnMainThread:@selector(registerSource:) withObject:theContext waitUntilDone:NO];
+}
+void RunLoopSourceCancelRoutine (void *info， CFRunLoopRef rl， CFStringRef mode) {
+    id del = [[NSApplication sharedApplication] delegate];
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    RunLoopContext *theContext = [[RunLoopContext alloc] initWithSource:obj andLoop:rl];
+    [del performSelectorOnMainThread:@selector(removeSource:) withObject:theContext waitUntilDone:YES];
+}
+void RunLoopSourcePerformRoutine (void *info) {
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    [obj sourceFired];
+}
+</code></pre><h4 id="配置定时源"><a href="#配置定时源" class="headerlink" title="配置定时源"></a>配置定时源</h4><pre><code>//Cocoa
+- (void)addTimer {
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(timeFeedback:) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+}
+- (void)timeFeedback:(NSTimer *)timer {}
+
+//Core Foundation
+- (void)addTimer {
+    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+    CFRunLoopTimerContext context = {0， NULL， NULL， NULL， NULL};
+    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault， CFAbsoluteTimeGetCurrent()， 0.3， 0， 0， &amp;myCFTimerCallback， &amp;context);
+    CFRunLoopAddTimer(runLoop， timer， kCFRunLoopCommonModes);
+}
+myCFTimerCallback(CFRunLoopTimerRef timer， void *info) {}
+</code></pre><hr>
+<h4 id="RunLoop与线程"><a href="#RunLoop与线程" class="headerlink" title="RunLoop与线程"></a>RunLoop与线程</h4><p>Apple不允许直接创建RunLoop，只提供了两个自动获取API：CFRunLoopGetMain()和CFRunLoopGetCurrent()，大致如下：</p>
+<pre><code>static CFMutableDictionaryRef loopsDic;
+static CFSpinLock_t loopsLock;
+
+CFRunLoopRef _CFRunLoopGet(pthread_t thread) {
+    OSSpinLockLock(&amp;loopsLock);
+    if (!loopsDic) {
+        loopsDic = CFDictionaryCreateMutable();
+        CFRunLoopRef mainLoop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, pthread_main_thread_np(), mainLoop);
+    }
+
+    CFRunLoopRef loop = CFDictionaryGetValue(loopsDic, thread));
+    if (!loop) {
+        loop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, thread, loop);
+        //注册回调在线程销毁的时候销毁RunLoop
+        _CFSetTSD(..., thread, loop, __CFFinalizeRunLoop);
+    }        
+    OSSpinLockUnLock(&amp;loopsLock);
+    return loop;
+}
+
+CFRunLoopRef CFRun    LoopGetMain() {
+    return _CFRunLoopGet(pthread_main_thread_np());
+}
+CFRunLoopRef CFRunLoopGetCurrent() {
+    return _CFRunLoopGet(pthread_self());
+}
+</code></pre><p>从代码看出，线程和RunLoop是一一对应的，映射关系保存在一个全局的Dictionary里。线程的RunLoop不自动创建，只有线程主动获取时才创建(第一次调用会确保主线程的RunLoop创建)，在对应线程销毁时销毁。</p>
+<h4 id="RunLoop的Public-API"><a href="#RunLoop的Public-API" class="headerlink" title="RunLoop的Public API"></a>RunLoop的Public API</h4><p>CoreFoundation有5个类：</p>
+<ul>
+<li>CFRunLoopRef</li>
+<li>CFRunLoopModeRef</li>
+<li>CFRunLoopSourceRef</li>
+<li>CFRunLoopTimerRef</li>
+<li>CFRunLoopObserverRef</li>
+</ul>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewo1cebznfj20pa0ju75l.jpg" alt=""></p>
+<p>一个RunLoop有若干个Mode，一个Mode有若干个Source|Timer|Observer(统称为<strong>Mode Item</strong>)。RunLoop每次只能运行在一个Mode中。切换Mode必须先退出运行，再以Mode进入。</p>
+<p>CFRunLoopSourceRef分Source0和Source1：<strong>Source0只有一个回调函数</strong>。需要先CFRunLoopSourceSignal(source)标记带处理，再CFRunLoopWakeUp(runloop)唤醒runloop，以此实现自定义输入源。<strong>Source1有一个mach_port和一个回调函数</strong>，以此实现基于端口的输入源。</p>
+<h4 id="RunLoop的Mode"><a href="#RunLoop的Mode" class="headerlink" title="RunLoop的Mode"></a>RunLoop的Mode</h4><p>CFRunLoopMode和CFRunLoop的大致结构：</p>
+<pre><code>struct __CFRunLoopMode {
+    CFStringRef _name;            // Mode Name, 例如 @&quot;kCFRunLoopDefaultMode&quot;
+    CFMutableSetRef _sources0;    // Set&lt;CFRunLoopSourceRef&gt;
+    CFMutableSetRef _sources1;    // Set&lt;CFRunLoopSourceRef&gt;
+    CFMutableArrayRef _observers; // Array&lt;CFRunLoopObserverRef&gt;
+    CFMutableArrayRef _timers;    // Array&lt;CFRunLoopTimerRef&gt;
+    ...
+};
+
+struct __CFRunLoop {
+    CFMutableSetRef _commonModes;     // Set&lt;CFStringRef&gt;
+    CFMutableSetRef _commonModeItems; // Set&lt;Source/Observer/Timer&gt;
+    CFRunLoopModeRef _currentMode;    // Current Runloop Mode
+    CFMutableSetRef _modes;           // Set&lt;CFRunLoopModeRef&gt;
+    ...
+};
+</code></pre><p>通过将Mode的_name添加到RunLoop的_commonModes中使其成为commonMode。<strong>当RunLoop内容变化时，RunLoop都会自动将_commonModeItems里的ModeItem同步到所有Common Mode里</strong>。</p>
+<h4 id="App启动后RunLoop的状态："><a href="#App启动后RunLoop的状态：" class="headerlink" title="App启动后RunLoop的状态："></a>App启动后RunLoop的状态：</h4><pre><code>CFRunLoop {
+    current mode = kCFRunLoopDefaultMode
+    common modes = {
+        UITrackingRunLoopMode
+        kCFRunLoopDefaultMode
+    }
+
+    common mode items = {
+
+        // source0 (manual)
+        CFRunLoopSource {order =-1, {
+            callout = _UIApplicationHandleEventQueue}}
+        CFRunLoopSource {order =-1, {
+            callout = PurpleEventSignalCallback }}
+        CFRunLoopSource {order = 0, {
+            callout = FBSSerialQueueRunLoopSourceHandler}}
+
+        // source1 (mach port)
+        CFRunLoopSource {order = 0,  {port = 17923}}
+        CFRunLoopSource {order = 0,  {port = 12039}}
+        CFRunLoopSource {order = 0,  {port = 16647}}
+        CFRunLoopSource {order =-1, {
+            callout = PurpleEventCallback}}
+        CFRunLoopSource {order = 0, {port = 2407,
+            callout = _ZL20notify_port_callbackP12__CFMachPortPvlS1_}}
+        CFRunLoopSource {order = 0, {port = 1c03,
+            callout = __IOHIDEventSystemClientAvailabilityCallback}}
+        CFRunLoopSource {order = 0, {port = 1b03,
+            callout = __IOHIDEventSystemClientQueueCallback}}
+        CFRunLoopSource {order = 1, {port = 1903,
+            callout = __IOMIGMachPortPortCallback}}
+
+        // Ovserver
+        CFRunLoopObserver {order = -2147483647, activities = 0x1, // Entry
+            callout = _wrapRunLoopWithAutoreleasePoolHandler}
+        CFRunLoopObserver {order = 0, activities = 0x20,          // BeforeWaiting
+            callout = _UIGestureRecognizerUpdateObserver}
+        CFRunLoopObserver {order = 1999000, activities = 0xa0,    // BeforeWaiting | Exit
+            callout = _afterCACommitHandler}
+        CFRunLoopObserver {order = 2000000, activities = 0xa0,    // BeforeWaiting | Exit
+            callout = _ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv}
+        CFRunLoopObserver {order = 2147483647, activities = 0xa0, // BeforeWaiting | Exit
+            callout = _wrapRunLoopWithAutoreleasePoolHandler}
+
+        // Timer
+        CFRunLoopTimer {firing = No, interval = 3.1536e+09, tolerance = 0,
+            next fire date = 453098071 (-4421.76019 @ 96223387169499),
+            callout = _ZN2CAL14timer_callbackEP16__CFRunLoopTimerPv (QuartzCore.framework)}
+    },
+
+    modes ＝ {
+        CFRunLoopMode  {
+            sources0 =  { /* same as &apos;common mode items&apos; */ },
+            sources1 =  { /* same as &apos;common mode items&apos; */ },
+            observers = { /* same as &apos;common mode items&apos; */ },
+            timers =    { /* same as &apos;common mode items&apos; */ },
+        },
+
+        CFRunLoopMode  {
+            sources0 =  { /* same as &apos;common mode items&apos; */ },
+            sources1 =  { /* same as &apos;common mode items&apos; */ },
+            observers = { /* same as &apos;common mode items&apos; */ },
+            timers =    { /* same as &apos;common mode items&apos; */ },
+        },
+
+        CFRunLoopMode  {
+            sources0 = {
+                CFRunLoopSource {order = 0, {
+                    callout = FBSSerialQueueRunLoopSourceHandler}}
+            },
+            sources1 = (null),
+            observers = {
+                CFRunLoopObserver &gt;{activities = 0xa0, order = 2000000,
+                    callout = _ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv}
+            )},
+            timers = (null),
+        },
+
+        CFRunLoopMode  {
+            sources0 = {
+                CFRunLoopSource {order = -1, {
+                    callout = PurpleEventSignalCallback}}
+            },
+            sources1 = {
+                CFRunLoopSource {order = -1, {
+                    callout = PurpleEventCallback}}
+            },
+            observers = (null),
+            timers = (null),
+        },
+
+        CFRunLoopMode  {
+            sources0 = (null),
+            sources1 = (null),
+            observers = (null),
+            timers = (null),
+        }
+    }
+}
+</code></pre><h4 id="AutoreleasePool"><a href="#AutoreleasePool" class="headerlink" title="AutoreleasePool"></a>AutoreleasePool</h4><p>App启动后，Apple在主线程RunLoop里注册了两个Observer，其回调都是_wrapRunLoopWithAutoreleasePoolHandler()。第一个Observer监视Entry(即将进入Loop)，其回调内会调用_objc_autoreleasePoolPush()创建自动释放池。<strong>其优先级最高，保证创建行为发生在其他所有回调之前</strong>。第二个Observer监视了两个事件：BeforeWaiting(即将进入休眠)时调用_objc_autoreleasePoolPop()和_objc_autoreleasePoolPush()从而释放旧池创建新池；Exit(即将退出Loop) 时调用_objc_autoreleasePoolPop()来释放旧池。<strong>其优先级最低，保证释放行为生在其他所有回调之后</strong>。RunLoop处理事件过程中的代码被自动释放池的创建和释放环绕着，所以不会出现内存泄漏。</p>
+<h4 id="事件响应"><a href="#事件响应" class="headerlink" title="事件响应"></a>事件响应</h4><p>App启动后，Apple在主线程RunLoop里注册了一个Source1(基于mach port的)用来接收系统事件，其回调函数为__IOHIDEventSystemClientQueueCallback()。当一个硬件事件(触摸/锁屏/摇晃等)发生后，首先IOKit.framework生成一个IOHIDEvent事件，发送给SpringBoard(接收按键(锁屏/静音等)，触摸，加速，接近传感器等几种Event)，SpringBoard再用mach port转发给对应的App。随后该Source1会被触发并回调_UIApplicationHandleEventQueue()，把IOHIDEvent处理封装成UIEvent分发给UIWindow等。</p>
+<h4 id="手势识别"><a href="#手势识别" class="headerlink" title="手势识别"></a>手势识别</h4><p>当_UIApplicationHandleEventQueue()识别了一个手势时，其首先会调用Cancel打断当前touchesBegin/Move/End，随后将对应UIGestureRecognizer标记为待处理。App启动后，Apple在主线程RunLoop注册了一个Observer监测BeforeWaiting(即将进入休眠)，其回调内会调用_UIGestureRecognizerUpdateObserver()获取所有待处理的 GestureRecognizer并执行回调。</p>
+<h4 id="界面更新"><a href="#界面更新" class="headerlink" title="界面更新"></a>界面更新</h4><p>当在操作UI(改变Frame、更新UIView/CALayer层次)或者手动调用UIView/CALayer的setNeedsLayout/setNeedsDisplay后，这个<strong>UIView/CALayer被标记为待处理，并被提交到一个全局容器</strong>。App启动后，Apple在主线程RunLoop里注册了一个Observer监听BeforeWaiting(即将进入休眠)和Exit(即将退出Loop)，其回调内会调用_ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv()去遍历所有待处理的UIView/CAlayer并执行绘制和调整，最后更新UI界面。</p>
+<h4 id="定时器"><a href="#定时器" class="headerlink" title="定时器"></a>定时器</h4><p>NSTimer即(toll-free bridged)CFRunLoopTimerRef。一个NSTimer注册到RunLoop时会在未来重复时间点提前注册好事件，<strong>不过为了节省资源，并不会非常准确触发。Timer有个属性Tolerance(宽容度)表示时间点容许的最大误差</strong>。如果某个时间点被错过了，比如在执行一个长任务，那么对应的回调也会跳过去，不会延后执行。CADisplayLink是一个和屏幕刷新率一致的定时器(和NSTimer不一样，其用Source实现，且原理更复杂）。如果两次屏幕刷新之间在执行一个长任务，那么其中一帧就被跳过(和NSTimer相似)，造成界面卡顿的感觉。在快速滑动TableView时，即使一帧的卡顿也会有所察觉。Facebook开源的AsyncDisplayLink(内部也用到RunLoop)就是为了解决界面卡顿的问题。</p>
+<h4 id="PerformSelecter"><a href="#PerformSelecter" class="headerlink" title="PerformSelecter"></a>PerformSelecter</h4><p>调用performSelector系列方法时，实际都会创建一个Timer并添加到对应线程RunLoop中，如果对应线程没有RunLoop则该方法会失效。</p>
+<h4 id="关于GCD"><a href="#关于GCD" class="headerlink" title="关于GCD"></a>关于GCD</h4><p>实际上RunLoop底层也会用到GCD，比如RunLoop是用dispatch_source_t实现的Timer。同时GCD的某些接口也用到RunLoop，例如dispatch_async()。当调用dispatch_async(dispatch_get_main_queue(), block)时，libDispatch会向主线程RunLoop发送消息，主线程RunLoop被唤醒并从消息中取得block，在回调<strong>CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE</strong>()里执行这个block。但仅限于dispatch到主线程，dispatch到其他线程仍然是由libDispatch处理的。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="https://developer.apple.com/library/prerelease/ios/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html#//apple_ref/doc/uid/10000057i-CH16-SW1" target="_blank" rel="noopener">Run Loops</a></li>
+<li><a href="http://blog.ibireme.com/2015/05/18/runloop/" target="_blank" rel="noopener">深入理解RunLoop</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/10/01/2015-10-01[Thread-Runloop]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/10/01/2015-10-01[Thread-Runloop]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/01/2015-10-01[Thread-Runloop]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-09-26T06:58:06.000Z"><a href="/2015/09/26/2015-09-26[Thread-基本概念]/">周六, 9月 26 2015, 2:58:06 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/09/26/2015-09-26[Thread-基本概念]/">Thread 基本概念</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h4 id="线程是什么"><a href="#线程是什么" class="headerlink" title="线程是什么"></a>线程是什么</h4><p>线程是一个在程序里实现多个执行路径的相对轻量级的方法。系统根据各个程序的需要分配不同的时间片段，让程序之间并行执行。程序内部存在至少一个线程，线程之间又同时执行不同的任务。系统本身直接管理这些线程，在可用的执行单元上运行。</p>
+<p>一个线程是用来管理代码执行的<strong>内核级和程序级数据结构的组合</strong>。内核级数据用来协助完成线程调度和抢占式执行。程序级数据包括函数调用需要的堆栈和线程属性和状态。</p>
+<p>单线程程序只有一个执行线程，该线程起止于main。多线程程序开始有一个，需要的时候创建额外的线程。每个新线程有它自己的执行入口。多线程有2个优点：</p>
+<ul>
+<li>多线程可以提高程序的感知响应。</li>
+<li>多个线程可以提高程序在多核系统上的实时性能。</li>
+</ul>
+<p>如果只有一个线程，那么它要做所有的事情：响应事件，更新界面，完成其他计算来实现程序功能等等。单线程的问题是，每个时刻只能做一件事。当程序需要执行一个长时间任务时会发生什么呢？程序会停止响应用户操作来更新界面。如果任务很长，用户会以为程序死了并强制退出。但是，如果把计算任务移到另一个线程去做，那么主线程就很轻松地响应用户操作。</p>
+<p>多核电脑能够让执行不同任务的线程在不同的执行单元上同时运行，使得程序在给定的时间内完成更多的任务成为可能。</p>
+<p>当然，线程也不总是解决程序性能的万能药。线程带来好处的同时也带来潜在的问题。程序有多个执行路径会增加代码复杂度。每个线程都需要和其他线程协同，来防止信息状态被破坏。因为同一程序的线程共享同一内存地址空间，都可以访问所有的数据。如果两个线程同时操作同一个数据，就有可能破坏该数据。</p>
+<h4 id="线程术语"><a href="#线程术语" class="headerlink" title="线程术语"></a>线程术语</h4><ul>
+<li>线程(thread)表示一个<strong>独立的代码执行路径</strong>。</li>
+<li>进程(process)表示一个<strong>正在运行的程序</strong>，它可以包含多个线程。</li>
+<li>任务(task)表示一个<strong>需要运行的任务的抽象</strong>。</li>
+</ul>
+<h4 id="线程备选方案"><a href="#线程备选方案" class="headerlink" title="线程备选方案"></a>线程备选方案</h4><p>创建线程给代码带来了不确定性，因为线程相对底层和复杂，如果不完全理解，就很容易遇到同步问题和效率问题。需要考虑清楚是否真的需要多线程。</p>
+<ul>
+<li><strong>Opertation objects</strong> 10.5引入，执行对象是对一个通常在另一个线程执行的任务的封装。这个封装隐藏了执行任务的线程管理细节，更专注于任务本身。通常执行对象和执行队列对象(Operation Queue Object)一起配合使用，执行队列在一个或多个线程上管理这些执行对象的运行。</li>
+<li><strong>Grand Central Dsipatch(GCD)</strong> 10.6引入，用中央调度能专注于任务而不是线程管理。有了GCD，定义要执行的任务，然后加入到负责调度合适线程来执行任务的工作队列里。工作队列相比手动管理，会权衡可用执行单元数量和当前运行状态来更有效地执行任务。</li>
+<li><strong>Idle-time notifications</strong> 对于时间短又不急的任务，空闲时间通知会在程序不忙的时候执行任务。Cocoa用NSNotificationQueue对象支持，通过向NSNotificationQueue默认对象发送包含NSPostWhenIdle选项的通知来请求。NSNotificationQueue会延迟发送通知直到程序空闲。</li>
+<li><strong>Asynchronous functions</strong> 系统接口有很多提供原子同步的异步函数。这些API或者使用系统后台进程或者创建自定义线程来执行任务并返回结果。(实际怎么实现无关要紧，因为它与应用代码隔离。)当设计程序时，查查提供异步功能的函数，考虑用它们代替创建一个新线程同步执行相同的任务。</li>
+<li><strong>Timers</strong> 在主线程用定时器执行不重要到用线程但又需要定期执行的周期性任务。</li>
+<li><strong>Separate processes</strong> 进程虽然比线程重量级，但是当任务与程序无关的时候，创建新的进程来执行或许会有用。如果一个任务需要大量内存或者更高权限时也许用进程实现更好。</li>
+</ul>
+<h2 id="线程支持"><a href="#线程支持" class="headerlink" title="线程支持"></a>线程支持</h2><h4 id="线程包"><a href="#线程包" class="headerlink" title="线程包"></a>线程包</h4><p>多线程的底层实现机制是Mach，但是很少直接使用，而是更多使用方便的POSIX API或者他的衍生方法。Mach没有提供线程所有特征，但是至少包括抢占式的执行模型和调度线程的能力，所以它们相互独立。</p>
+<ul>
+<li><strong>Cocoa threads</strong> Cocoa用NSThreads实现线程。Cocoa也给NSObject添加了方法用新线程或者已经存在的线程来执行代码。</li>
+<li><strong>POSIX threads</strong> POSIX线程为创建线程提供了标准C接口。如果不是写一个Cocoa程序，这是创建线程最好的方法。POSIX接口对配置线程来说相对简单又足够灵活。</li>
+<li><strong>Multiprocessing Services</strong> 略</li>
+</ul>
+<p>应用层上，和其他平台一样，所有线程的行为本质上都是一样的。启动后就进入三个状态的任何一个：运行(running)、就绪(ready)、阻塞(blocked)。如果一个线程当前没有运行,那么它不是处于阻塞，就是等待外部输入，或者已经准备就绪等待分配CPU。线程持续在这三个状态之间切换，直到它运行完或者被终止。</p>
+<p>创建新线程时，必须指定入口函数。当函数返回或者中断时，线程永久停止并被系统回收。因为创建线程需要一些时间和内存，是相对比较昂贵的操作，建议在入口函数里多做些任务或者启动一个Runloop进行持久性的任务。</p>
+<h4 id="Runloop"><a href="#Runloop" class="headerlink" title="Runloop"></a>Runloop</h4><p>Runloop是管理异步到达线程的事件的基本。Runloop为线程监测一个或多个事件源。当事件到达时，系统唤醒线程并把事件分发到Runloop，Runloop再分配给指定的处理方法进行处理。如果没有事件存在或都被处理过，Runloop又会把线程置于休眠状态。</p>
+<p>Runloop使用最小资源来创建较长时间运行的线程。因为在没有事件处理时线程会被Runloop置于休眠状态，它没有消耗CPU周期轮询，可以让处理器休眠进而节省电源。</p>
+<p>配置Runloop，启动线程，获得Runloop对象，匹配好事件处理方法，告诉Runloop对象开始运行。Cocoa程序的主线程自动配好，子线程必须自己配制。</p>
+<h4 id="同步工具"><a href="#同步工具" class="headerlink" title="同步工具"></a>同步工具</h4><p>线程编程危险之一就是多线程之间的资源争夺。多线程同一时间使用同一资源就会出现问题。解决方法之一就是，消除共享资源，确保每个线程都只有它能够操作的资源。但完全保持独立是不可行的，所以不得不通过锁，条件，原子操作等其他技术来同步资源访问。</p>
+<p>锁提供了同一时刻只有一个线程能执行代码的保护。最普遍的是互斥锁(mutual exclusion)，即通常所说的”mutex”。当一个线程试图获取一个已经被其他线程占据的互斥锁时，他会被阻塞直到该锁被释放。</p>
+<p>条件确保了程序多线程任务执行的顺序。一个条件是一个看门人，阻塞对应线程直到条件为真。(Operation之间的依赖关系的顺序确定了执行顺训，这和Condition很像。)</p>
+<p>原子操作是另一种保护并同步数据访问的方法。当执行标量数据类型的数学运算或者逻辑运算时，原子操作是一种轻量级的方法。原子操作用特殊的硬件指令来确保对一个变量的改变在另一个线程访问它之前就已经完成。</p>
+<h4 id="线程间通信"><a href="#线程间通信" class="headerlink" title="线程间通信"></a>线程间通信</h4><p>好的设计应最大限度减少线程间通信量，不过不可避免完全没有通信。(线程的任务就是分担程序工作，如果不通信去使用这些工作结果，那程序有什么意义呢?)因为线程共享相同的进程空间，意味着有大量的可选项来进行通信。</p>
+<ul>
+<li><strong>Direct messaging</strong> Cocoa程序支持直接某线程在任何线程上执行方法。因为这些方法在目标线程的上下文中等待被执行，所以这个机制执行的方法在目标线程上被串行执行。</li>
+<li><strong>Global variables, shared memory, and objects</strong> 另一个简单的线程间通信的机制是全局变量，共享对象，或者共享内存块。虽然共享变量又快又简单，但是相比发送消息而言还是更容易引起问题。共享变量必须用同步机制严格保护访问来确保代码正确执行，如果做得不好，可能引起条件竞争，数据损坏，或者崩溃。</li>
+<li><strong>Conditions</strong> 条件控制何时执行一段特定代码。可以把条件看成看门人，只有在条件为真时让线程运行。</li>
+<li><strong>Runloop sources</strong> 设置一个自定义Runloop源用来在线程里接收特定的程序信号。因为它是事件驱动，当没事时让线程休眠节省电源。</li>
+<li><strong>Ports and sockets</strong> 基于端口的通信是线程间通信中又精确又可靠的方法。更重要的是，端口和套接字可以用来和外部对象(其他进程和服务)通信。为了考虑电源，端口被实现为Runloop事件源，所以端口上没有数据等待的时候线程会休眠。</li>
+<li><strong>Message queues</strong> 传统多处理队列定义了一个先进先出的队列，用来管理进出数据。虽然它简单又方便，但是和其他方法比起来不够高效。</li>
+<li><strong>Cocoa distributed objects</strong> 略</li>
+</ul>
+<h2 id="设计要点"><a href="#设计要点" class="headerlink" title="设计要点"></a>设计要点</h2><h4 id="避免显式创建线程"><a href="#避免显式创建线程" class="headerlink" title="避免显式创建线程"></a>避免显式创建线程</h4><p>尽量避免手动编写线程，这样容易容易出错，应该尽量使用隐式创建线程的API。可以考虑使用异步API，GCD或者操作对象实现多线程机制。这些技术背后做了相关工作，并保证无误。其中GCD和NSOperation被设计用来管理线程，比手动实现根据当前负载调整活动线程的数量更高效。</p>
+<h4 id="保持线程合理的忙碌"><a href="#保持线程合理的忙碌" class="headerlink" title="保持线程合理的忙碌"></a>保持线程合理的忙碌</h4><p>如果准备手动创建和管理线程，因为线程消耗系统的宝贵资源，应该尽量确保分配的线程运行适当时间做了很多事。同时，不要害怕终止那些消耗了大量空闲时间的线程。线程占用一定量的内存，所以释放空闲线程不但减少程序内存，而且释放更多物理内存给系统其他进程使用。</p>
+<h4 id="避免共享数据结构"><a href="#避免共享数据结构" class="headerlink" title="避免共享数据结构"></a>避免共享数据结构</h4><p>避免造成线程访问资源冲突最简单有效的方法是，给每个线程一份独立的数据副本。最小化线程间通信和资源竞争时并行代码会最有效执行。</p>
+<p>即使代码里面所有共享资源的地方都有保护，代码依然可能语义不安全。比如，一个特定的顺序会修改共享数据结构。将代码改为原子方式，来弥补多线程可能产生的性能损耗。把避免资源争竞争放在首位考虑，通常能得到简单的设计和高效的性能。</p>
+<h4 id="线程和用户界面"><a href="#线程和用户界面" class="headerlink" title="线程和用户界面"></a>线程和用户界面</h4><p>如果程序有用户界面，建议在主线程里接收界面事件和更新界面。这有助于避免处理界面事件和更新界面之间的同步问题。有些框架，例如Cocoa，通常需要这样的行为，但即使不需要的框架，这么做也简化了程序用户界面的逻辑管理。</p>
+<p>也有在子线程里执行图形任务更好的列外。比如，可以用子线程来创建和处理图片或者其他图形相关计算。这么做通常会地提高性能。如果不确定一个任务是否和图像处理相关，那么就在主线程上执行它。</p>
+<h4 id="注意线程退出时的行为"><a href="#注意线程退出时的行为" class="headerlink" title="注意线程退出时的行为"></a>注意线程退出时的行为</h4><p>进程一直运行直到所有非分离线程都退出为止。默认只有主线程是以非分离方式创建，但也可以用同样方式创建子线程。当要退出程序时，立即中断所有分离线程通常被认为是合适的，因为分离线程所做的工作是可选的。如果程序使用后台线程来保存数据到硬盘或者其他关键工作，那么可以把这些线程创建为非分离的，来保证退出程序时不丢失数据。</p>
+<p>以非分离方式(又称为可连接)创建线程需要做一些额外工作。因为大部分上层线程封装技术默认不创建可连接线程。必须使用POSIX API来创建。此外，还必须在程序主线程里添加代码，在非分离线程最终退出的时连接它们。</p>
+<p>如果是Cocoa程序，也可以通过使用applicationShouldTerminate:的代理方法来延迟程序的终止直到一段时间后或者取消。当延迟终止时，需要等到所有关键线程都完成任务后，再调用replyToApplicationShouldTerminate:方法。</p>
+<h4 id="处理异常"><a href="#处理异常" class="headerlink" title="处理异常"></a>处理异常</h4><p>当一个异常抛出时，异常的处理机制根据于当前调用堆栈来执行必要的清理工作。因为每个线程都有它自己的调用堆栈，所以每个线程都负责捕获自己的异常。如果子线程捕获一个抛出的异常失败，那么主线程也同样捕获该异常失败：它所属的进程就会终止。不能抛出一个不能被捕获的异常给另一个线程去处理。</p>
+<p>如果需要通知另一个线程(比如主线程)在此线程中的一个异常情况，应该先捕捉该异常，并简单地发送消息到其他线程告知发生了什么事。根据设计和意图，捕获异常的线程可以继续运行(如果可能的话)，等待命令，或者干脆退出。</p>
+<p><code>注意：在Cocoa里面，一个NSException对象是一个自包含对象，可以被从一个线程传递到另外一个线程。</code></p>
+<p>在一些情况下，异常处理被自动创建。比如@synchronized包含了一个隐式的异常处理。</p>
+<h4 id="干净地终止线程"><a href="#干净地终止线程" class="headerlink" title="干净地终止线程"></a>干净地终止线程</h4><p>线程自然退出的最好方式是让它达到入口结束点。虽然有不少函数可以立即终止线程，但是这些函数应作为最后的手段。在线程达到它自然结束点之前终止它，会妨碍它完成清理。如果线程已经分配了内存，打开了文件，或者获取了其他类型资源，可能没法回收这些资源，造成内存泄漏或者其他潜在的问题。</p>
+<h4 id="库的线程安全"><a href="#库的线程安全" class="headerlink" title="库的线程安全"></a>库的线程安全</h4><p>虽然程序开发者能控制是否多线程，但库的开发者不能控制。当开发库时，必须假设库的调用程序是多线程，或者是和否可以随时切换。因此应该总是在临界区使用锁功能。</p>
+<p>对库开发者而言，只当程序是多线程时才创建锁是不明智的。如果代码中某些部分需要被锁定，在库早期开发时就应该创建锁对象来使用，最好是库有显式的初始化并在其中创建锁。虽然也可以使用静态库的初始化函数来创建这些锁，但是仅当没有其他方法时才应该这样做。执行初始化函数会延长加载库的时间，且可能对程序性能造成不利影响。</p>
+<p><code>注意：库里保持锁的占据和释放平衡。应该依赖库里加锁保护数据结构，而不是依赖库外的调用代码，来提供线程安全。</code></p>
+<p>开发Cocoa的类库，在NSWillBecomeMultiThreadedNotification注册一个观察者，程序变成多线程的时候收到通知。不过不要过于依赖它，因为可能在类库被调用之前已经发出了。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="https://developer.apple.com/library/prerelease/ios/documentation/Cocoa/Conceptual/Multithreading/AboutThreads/AboutThreads.html#//apple_ref/doc/uid/10000057i-CH6-SW2" target="_blank" rel="noopener">About Threaded Programming</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/09/26/2015-09-26[Thread-基本概念]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/09/26/2015-09-26[Thread-基本概念]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/09/26/2015-09-26[Thread-基本概念]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-09-19T03:39:30.000Z"><a href="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/">周六, 9月 19 2015, 11:39:30 中午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/">iOS Programming Guide(2nd) 读书笔记</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>这是一本iOS4的入门书籍，有一些概念过时，有一些概念没有，但不妨碍学习一些最基本的概念。从头学起，从最基础学起。</p>
+<h2 id="Chapter-1"><a href="#Chapter-1" class="headerlink" title="Chapter 1"></a>Chapter 1</h2><h4 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h4><p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgybn3huqj21ge0s2n6b.jpg" alt=""></p>
+<h4 id="Xib"><a href="#Xib" class="headerlink" title="Xib"></a>Xib</h4><p>A XIB file is an XML representation of the archived objects. When you build a project, the XIB file is compiled into a NIB file. Developers manipulate XIB files (they’re easier to work with), and applications use NIB files (they’re smaller and easier to parse). When you build an application, the compiled NIB file is copied into the application’s bundle. An iOS application is really <strong>a directory containing the executable and any resources the executable uses</strong>. We refer to this directory as the <strong>bundle</strong>. When your application reads in the NIB file, the objects in the archive are brought to life. A complex application can have many NIB files that are read in as they are needed.</p>
+<h4 id="Deploy-an-app"><a href="#Deploy-an-app" class="headerlink" title="Deploy an app"></a>Deploy an app</h4><p>To install an application on your development device, you need a developer certificate from Apple. Developer certificates are issued to registered iOS Developers who have paid the developer fee. <strong>This certificate grants you the ability to sign your code</strong>, which allows it to run on a device. Without a valid certificate, devices will not run your application.</p>
+<h4 id="Developer-Certificate"><a href="#Developer-Certificate" class="headerlink" title="Developer Certificate"></a>Developer Certificate</h4><p>This certificate file is added to your Mac’s keychain using Keychain Access. It is used to digitally sign your code.</p>
+<h4 id="App-ID"><a href="#App-ID" class="headerlink" title="App ID"></a>App ID</h4><p>The application identifier is <strong>a string that uniquely identifies your application on the App Store</strong>. Application identifiers typically look like this: com.bignerdranch.AwesomeApp, where the name of the application follows the name of your company. The App ID in your provisioning profile must match the bundle identifier of your application. A development profile, like you just created, will have a wildcard character (*) for its App ID<br>and therefore will match any bundle identifier.</p>
+<h4 id="Device-ID-UDID"><a href="#Device-ID-UDID" class="headerlink" title="Device ID (UDID)"></a>Device ID (UDID)</h4><p>This identifier is unique for each iOS device.</p>
+<h4 id="Provisioning-Profile"><a href="#Provisioning-Profile" class="headerlink" title="Provisioning Profile"></a>Provisioning Profile</h4><p>This is a file that lives on your development device and on your computer. <strong>It references a Developer Certificate, a single App ID, and a list of the device IDs for the devices that the application can be installed on</strong>. When an application is deployed to a device, Xcode uses a provisioning profile on your computer to access the appropriate certificate. This certificate is used to sign the application binary. Then, the development device’s UDID is matched to one of the UDIDs contained within the provisioning profile, and the App ID is matched to the bundle identifier. The signed binary is then sent to your development device where it is confirmed by the same provisioning profile on the device and finally launched.</p>
+<h2 id="Chapter-2"><a href="#Chapter-2" class="headerlink" title="Chapter 2"></a>Chapter 2</h2><h4 id="Exceptions"><a href="#Exceptions" class="headerlink" title="Exceptions"></a>Exceptions</h4><p>In a language like C, we have functions, and when we call a function, code is executed. If we try and call a function that doesn’t exist, the compiler says, “I can’t do that, Joe,” and the code will fail to compile. This is known as a <strong>compile-time error</strong>. Objective-C, being a dynamically typed language, isn’t able to figure out at compile time whether an object will respond to a message. (An object only responds to a message if its class implements the associated method.) The compiler will warn you if it thinks you are sending a message to an object that won’t respond, but the code will still compile. If, for some reason (and there are many), you end up sending a message to an object that doesn’t respond, your application will throw an exception, also known as a <strong>run-time error</strong>.</p>
+<h2 id="Chapter-3"><a href="#Chapter-3" class="headerlink" title="Chapter 3"></a>Chapter 3</h2><h4 id="Autorelease-pool-draining"><a href="#Autorelease-pool-draining" class="headerlink" title="Autorelease pool draining"></a>Autorelease pool draining</h4><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgybvtcynj21as0qigrf.jpg" alt=""></p>
+<h2 id="Chapter-4"><a href="#Chapter-4" class="headerlink" title="Chapter 4"></a>Chapter 4</h2><h4 id="Projects-targets-and-frameworks"><a href="#Projects-targets-and-frameworks" class="headerlink" title="Projects, targets, and frameworks"></a>Projects, targets, and frameworks</h4><p>A project is <strong>a file that contains a list of references to other files (source code, resources, frameworks, and libraries) as well as a number of settings that lay out the rules for items within the project</strong>. Projects end in .xcodeproj, as in Whereami.xcodeproj. A project always has at least one target. </p>
+<p>A target <strong>uses the files in the project to build a particular product</strong>. When you build and run, you build and run the target, not the project.</p>
+<p>The product the target builds is typically <strong>an application, although it can be a compiled library or a unit test bundle</strong>. When you create a new project and choose a template, Xcode automatically creates a target for you.</p>
+<p>A framework is <strong>a collection of related classes</strong> that you can add to a target. Cocoa Touch is a collection of frameworks. One of the benefits of Cocoa Touch being organized into frameworks is that you only have to add the frameworks that a target needs.</p>
+<h4 id="Delegation"><a href="#Delegation" class="headerlink" title="Delegation"></a>Delegation</h4><p>Delegation is <strong>an object-oriented approach to callbacks</strong>. A callback is a function that is supplied in advance of an event and is called every time the event occurs. Some objects need to make a callback for more than one event. In a target-action pair, you have a target object that you send an action message to when an event occurs. The target must implement the action message, and, for each event, a new target-action pair must be created. With delegation, on the other hand, you set the delegate once and can then send it messages for different events. The delegate will implement the method for each event it wants to hear about.</p>
+<h4 id="Build-Phases"><a href="#Build-Phases" class="headerlink" title="Build Phases"></a>Build Phases</h4><p>Building an application in Xcode takes several steps. We call these steps build phases.</p>
+<ul>
+<li><strong>Compile Sources</strong> This build phase contains the source code files that are compiled when this target is built. By default, any time you add a source code file to a project, it is added to this build phase.</li>
+<li><strong>Link Binary With Libraries</strong> After your source code has been compiled, it is linked with the frameworks (libraries). This allows your code to use classes from these frameworks.</li>
+<li><strong>Copy Bundle Resources</strong> After your code is compiled and linked, an executable is created and placed inside an application bundle, which is really just a folder. Then, the files listed in the Copy Bundle Resources phase are added to the bundle alongside the executable. These resources are the data files that your application uses at runtime, like MainWindow.xib and any images or sounds that are part of the application. By default, when you add a file to a project that is not source code, it is added to this build phase.</li>
+</ul>
+<h4 id="Preprocessing"><a href="#Preprocessing" class="headerlink" title="Preprocessing"></a>Preprocessing</h4><p>The goal of the preprocessing phase is to create an intermediate file for each implementation file (.m). The intermediate file is still Objective-C code like the implementation file, but the intermediate file can get very large. To create an intermediate file, the preprocessor resolves all the preprocessor directives in the implementation file. Preprocessor directives are statements prefixed with the pound symbol (#), like #import. The resolution of a #import statement replaces the import statement with the contents of the imported file.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgycom7qtj21aq144auq.jpg" alt=""></p>
+<h4 id="Compiling"><a href="#Compiling" class="headerlink" title="Compiling"></a>Compiling</h4><p>Once the preprocessor has finished, the generated intermediate files are compiled. Compiling an intermediate file takes the Objective-C code and turns it into machine code. This machine code is stored in an object file, one for each intermediate file. The compiling phase – the transition to machine code – is where we see most of our errors as programmers. When the compiler doesn’t understand our code, it generates an error. We call errors generated during this phase compile-time errors or syntax errors. Compile-time errors are typically misplaced semicolons, unbalanced brackets ([]) or braces ({}), spelling or capitalization errors.</p>
+<h4 id="Linking"><a href="#Linking" class="headerlink" title="Linking"></a>Linking</h4><p>An object file contains the machine code for the methods implemented in the implementation file. However, within an implementation file, you use code from other implementation files. Instead of copying the code for this method into the object file, the compiler leaves a link to the other object file.</p>
+<p>A framework is a collection of classes, and a class is defined by two files: a header file and an implementation file. A framework, however, has pre-compiled its implementation files and shoved the resulting object files into one or more library files. That’s why in Objective-C you can’t see the implementation files in a framework – they are already machine code.</p>
+<p>If a link cannot be resolved (because the object file that contains the code cannot be found or because the object file doesn’t contain the referenced code), you get a linker error. Linker errors are more difficult for new developers to understand because they use unfamiliar terms and because there isn’t one line of code that generated the error.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewh10qiz5wj21c20r0dub.jpg" alt=""></p>
+<h2 id="Chapter-6"><a href="#Chapter-6" class="headerlink" title="Chapter 6"></a>Chapter 6</h2><h4 id="The-drawRect-method"><a href="#The-drawRect-method" class="headerlink" title="The drawRect: method"></a>The drawRect: method</h4><p>Each time an instance of UIView needs to be drawn (or redrawn), <strong>the system prepares a graphics context specifically for that view</strong>. Then the context is activated, and the message drawRect: is sent to the instance of UIView that is being drawn. The graphics context’s type is CGContextRef (Core Graphics Context Reference), and <strong>it is responsible for aggregating drawing commands and producing an image as a result</strong>. This image is the appearance of the view instance. A graphics context also stores its drawing state, which includes things like the current drawing color, coordinate system, and the current line width. Sometimes when drawing a view, you will use Objective-C to make calls defined in the UIKit framework that implicitly use the active graphics context. Other times, you will get hold of the graphics context explicitly and draw using the C functions of the Core Graphics framework. </p>
+<h4 id="class"><a href="#class" class="headerlink" title="@class"></a>@class</h4><p>Notice the @class directive after the import statement. This is a forward declaration for the class. When you forward declare a class, you aren’t going as far as importing the header file; you are just informing the Header File of the class so the compiler can validate it. Forward declaring a class <strong>saves time when compiling – especially with large projects</strong>.</p>
+<h4 id="Redrawing-Views"><a href="#Redrawing-Views" class="headerlink" title="Redrawing Views"></a>Redrawing Views</h4><p>When a UIView instance is sent the message setNeedsDisplay, that view is marked for re-display. View subclasses send themselves setNeedsDisplay when their drawable content changes. When a view has marked itself for re-display, it is not immediately redrawn; instead, <strong>it is added to a list of views that need updating</strong>. Your application is a giant infinite loop called the run loop. The run loop’s job is to check for input (a touch, Core Location updates, data coming in through a network interface, etc.) and then find the appropriate handlers for that event (like an action or delegate method for an object). Those handler methods call other methods, which call more methods, and so on. <strong>Views are not redrawn until after the methods have completed and control returns to the run loop</strong>.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgydfbkgpj21h00rgall.jpg" alt=""></p>
+<p>When control returns to the run loop, it says, “Well, a bunch of code was just executed. I’m going to check if any views need to be redrawn.” Then the run loop prepares the necessary drawing contexts and sends the message drawRect: to all of the views that have been sent setNeedsDisplay in this iteration of the loop. <strong>After a view has redrawn itself, its subviews are automatically asked to redraw themselves as well</strong>.</p>
+<h2 id="Chapter-7"><a href="#Chapter-7" class="headerlink" title="Chapter 7"></a>Chapter 7</h2><h4 id="File’s-Owner"><a href="#File’s-Owner" class="headerlink" title="File’s Owner"></a>File’s Owner</h4><p>We need some way to connect objects loaded from the XIB file to objects that exist in memory before the XIB file is loaded. This way, the already existing CurrentTimeViewController could set its view instance variable to point at the view loaded from this XIB file. This is where the File’s Owner comes in. The File’s Owner is <strong>a placeholder object</strong>. When a XIB file is loaded, placeholder objects are not instantiated. You can think of a placeholder object as <strong>a hole in which existing objects can be placed</strong> so that connections can be made between them and the objects in the XIB file.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgydpsmvfj216u0xon3b.jpg" alt=""></p>
+<p>When your application first launches, an instance of UIApplication is created and it loads MainWindow.xib. The UIApplication is the File’s Owner. The File’s Owner of this file has a outlet connection for its delegate that has been connected to HypnoTimeAppDelegate. Therefore, after the XIB file loads, the delegate of the UIApplication is set to point at the HypnoTimeAppDelegate object – the reason why HypnoTimeAppDelegate gets sent the message application:didFinishLaunchingWithOptions:.</p>
+<h4 id="The-View-Controller-Lifecycle-and-Low-Memory-Warnings"><a href="#The-View-Controller-Lifecycle-and-Low-Memory-Warnings" class="headerlink" title="The View Controller Lifecycle and Low-Memory Warnings"></a>The View Controller Lifecycle and Low-Memory Warnings</h4><p>A view controller, like any other object, is created through alloc and init. It does not, however, create its view at that time. Instead, <strong>it waits until the view is really needed before it calls loadView</strong>. When the system is running low on RAM, it issues a low-memory warning to the running application. The application responds by freeing up any resources that it doesn’t need at the moment and can easily recreate. View controllers, during a low-memory warning, are sent the message didReceiveMemoryWarning. The default implementation of this method will check to see if the view is currently on screen; if it is not, it is released. (If the view is on screen, nothing happens.)</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgye7rnedj20zs10cgw5.jpg" alt=""></p>
+<p><strong>A rule</strong>: Never access a view controller’s view in that view controller’s initialization method. If you have extra work you want to perform on the view, do so in viewDidLoad. This message is sent to a view controller each time it loads its view.</p>
+<h2 id="Chapter-8"><a href="#Chapter-8" class="headerlink" title="Chapter 8"></a>Chapter 8</h2><h4 id="FirstResponder"><a href="#FirstResponder" class="headerlink" title="FirstResponder"></a>FirstResponder</h4><p>The window’s firstResponder is <strong>the object that gets sent all of the motion events</strong>. Motion events have nothing to do with the UIAccelerometer delegate. The system determines there is a shake by querying the accelerometer hardware and then sends the appropriate messages to the firstResponder.</p>
+<h4 id="Retina-Display"><a href="#Retina-Display" class="headerlink" title="Retina Display"></a>Retina Display</h4><p>For vector graphics, like HypnosisView’s drawRect: method and drawn text, you don’t need to do anything; the same code will render as crisply as the device allows. However, if you draw using <strong>Core Graphics functions, these graphics will appear differently on different devices</strong>. In Core Graphics, also called Quartz, we describe lines, curves, text, etc. in terms of points. On a non-Retina display, a point is 1x1 pixel. On a Retina display, a point is 2x2 pixels.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyeeiejhj217s0hwaec.jpg" alt=""></p>
+<p>Given these differences, bitmap images (like JPEG or PNG files) will be unattractive if the image isn’t tailored to the device’s screen type. Say your application includes a small image of 25x25 pixels. If this image is displayed on a Retina display, then the image must be stretched to cover an area of 50x50 pixels. At this point, the system does a type of averaging called anti-aliasing to keep the image from looking jagged. The result is an image that isn’t jagged – but it is fuzzy.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyeutxd3j219o0l810f.jpg" alt=""></p>
+<p>You could use a larger file instead, but the averaging would then cause problems in the other direction when the image is shrunk for a non-Retina display. The only solution is to bundle two image files with your application: <strong>one at a pixel resolution equal to the number of points on the screen for non-Retina displays and one twice that size in pixels for Retina displays</strong>.</p>
+<p>Fortunately, you do not have to write any extra code to handle which image gets loaded on which device. All you have to do is suffix the higher-resolution image with @2x. Then, when you use UIImage’s imageNamed: method to load the image, this method looks in the bundle and gets the file that is appropriate for the particular device.</p>
+<h2 id="Chapter-9"><a href="#Chapter-9" class="headerlink" title="Chapter 9"></a>Chapter 9</h2><h4 id="NSNotificationCenter"><a href="#NSNotificationCenter" class="headerlink" title="NSNotificationCenter"></a>NSNotificationCenter</h4><p>The notification center does <strong>not retain observers</strong>. If an object registers with the notification center, that object must unregister before it is deallocated. If it doesn’t, the next time a notification it registered for is posted, the center will try to send the object a message. Since that object has been deallocated, your application will crash.</p>
+<h4 id="Autosizing"><a href="#Autosizing" class="headerlink" title="Autosizing"></a>Autosizing</h4><p>You can click this control in six different places: on the four sides outside the inner box and along the vertical and horizontal axes inside the inner box. We call the outside four struts, and the inside two springs. Clicking on one of these areas toggles an autoresizing mask option. A solid red line means the option is on, and a dim red dotted line means the option is off.</p>
+<p><strong>A spring</strong> that is turned on tells the view to <strong>change size when its superview changes size</strong>. For example, if you turn on the horizontal spring, the view will change its width at the same rate its superview changes its width.</p>
+<p><strong>A strut</strong> tells the view to <strong>keep the margin between the view and its superview constant</strong>. For example, if you turn on the left strut, the view will maintain the distance from the left side of its superview when the superview changes its width.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewh10zfrvnj21160o045d.jpg" alt=""></p>
+<h2 id="Chapter-10"><a href="#Chapter-10" class="headerlink" title="Chapter 10"></a>Chapter 10</h2><h4 id="UITableViewCells"><a href="#UITableViewCells" class="headerlink" title="UITableViewCells"></a>UITableViewCells</h4><p><strong>Table views can be broken up into sections, and each section has its own set of rows</strong>. A UITableViewCell is a subclass of UIView, and each row in a UITableView is a UITableViewCell. A table in iOS can only have one column, so a row only has one cell. The UITableViewCells are subviews of the UITableView.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyfcq1ukj21ac09k77d.jpg" alt="">. `</p>
+<p>A cell itself has one subview – its contentView. The contentView is the superview for the content of the cell. </p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewh116tjwtj218c0rqjx0.jpg" alt=""></p>
+<p>It also can draw an accessory indicator. The accessory indicator shows an action-oriented icon, such as a checkmark, a disclosure icon, or a fancy blue dot with a chevron inside. These icons are accessed through pre-defined constants for the appearance of the accessory indicator. </p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyfytt8oj21ai0l2dnh.jpg" alt=""></p>
+<h4 id="Reusing-UITableViewCells"><a href="#Reusing-UITableViewCells" class="headerlink" title="Reusing UITableViewCells"></a>Reusing UITableViewCells</h4><p>iOS devices have a limited amount of memory. If we were displaying a list with thousands of entries in a UITableView, we would have thousands of instances of UITableViewCell. To preserve the lives of iOS devices everywhere, you can reuse table view cells. When the user scrolls the table, some cells move offscreen. <strong>Offscreen cells are put into a pool of cells available for reuse</strong>. Then, instead of creating a brand new cell for every request, the data source first checks the pool. If there is an unused cell, the data source configures it with new data and returns it to the table view.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewh11hoy2zj21b20t2gt7.jpg" alt=""></p>
+<p>There is one problem: sometimes a UITableView has different types of cells. Occasionally, you have to subclass UITableViewCell to create a special look or behavior. However, different subclasses floating around the pool of reusable cells create the possibility of getting back a cell of the wrong type. You must be sure of the type of the cell returned to you so that you can be sure of what properties and methods it has.</p>
+<h2 id="Chapter-11"><a href="#Chapter-11" class="headerlink" title="Chapter 11"></a>Chapter 11</h2><p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyh5uveuj21am0q2tgt.jpg" alt=""></p>
+<h4 id="Editing-Mode"><a href="#Editing-Mode" class="headerlink" title="Editing Mode"></a>Editing Mode</h4><p>UITableView has an editing property, and when this property is set to YES, the UITableView enters editing mode. Once the table view is in editing mode, the rows of the table can be manipulated by the user. The user can change the order of the rows, add rows, or remove rows. Editing mode does not allow the user to edit the content of a row.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyhnhdnpj21920wk490.jpg" alt=""></p>
+<h4 id="NSBundle"><a href="#NSBundle" class="headerlink" title="NSBundle"></a>NSBundle</h4><p>To load a XIB file manually, you use NSBundle. <strong>This class is the interface between an application and the application bundle it lives in. When you want to access a file in the application bundle, you ask NSBundle for it</strong>. An instance of NSBundle is created when your application launches, and you can get a pointer to this instance by sending the message mainBundle to NSBundle.</p>
+<p>XIB files are typically used to create the window and application delegate (MainWindow.xib) and to create the view for a view controller (for example, CurrentTimeViewController.xib). The code to load these XIB files is already written in the implementations of UIApplication and UIViewController. </p>
+<p>However, as you can see, a XIB file can be used any time you wish to archive view objects, and any object can load a XIB file.</p>
+<pre><code>- (UIView *)headerView
+{
+       // If we haven&apos;t loaded the headerView yet...
+       if (!headerView) {
+           // Load HeaderView.xib
+           [[NSBundle mainBundle] loadNibNamed:@&quot;HeaderView&quot; owner:self options:nil];
+       }
+       return headerView;
+}
+</code></pre><h4 id="Adding-Rows-amp-amp-Deleting-Rows-amp-amp-Moving-Rows"><a href="#Adding-Rows-amp-amp-Deleting-Rows-amp-amp-Moving-Rows" class="headerlink" title="Adding Rows &amp;&amp; Deleting Rows &amp;&amp; Moving Rows"></a>Adding Rows &amp;&amp; Deleting Rows &amp;&amp; Moving Rows</h4><p>Implement the corresponding DataSource Methods</p>
+<h2 id="Chapter-12"><a href="#Chapter-12" class="headerlink" title="Chapter 12"></a>Chapter 12</h2><h4 id="UINavigationController"><a href="#UINavigationController" class="headerlink" title="UINavigationController"></a>UINavigationController</h4><p>When your application presents multiple screens of information, UINavigationController maintains a stack of those screens. <strong>The stack is an NSArray of view controllers, and each screen is the view of a UIViewController. When a UIViewController is on top of the stack, its view is visible</strong>. </p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyi3bxnoj21by0q8dpo.jpg" alt=""></p>
+<p>When writing iOS applications, it is important to treat each UIViewController as its own little world. </p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgyio1khcj21ca14wtkk.jpg" alt=""></p>
+<h4 id="UINavigationBar"><a href="#UINavigationBar" class="headerlink" title="UINavigationBar"></a>UINavigationBar</h4><p>Every UIViewController has a navigationItem property of type UINavigationItem. However, unlike UINavigationBar, UINavigationItem is not a subclass of UIView, so it cannot appear on the screen. Instead, the navigation item supplies the navigation bar with the content it needs to draw. When a UIViewController comes to the top of a UINavigationController’s stack, the UINavigationBar uses the UIViewController’s navigationItem to configure itself.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyivfkt5j217g0g8wix.jpg" alt=""></p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyj492i4j219q0gsgrc.jpg" alt=""></p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgyjltkklj21cy0kigu5.jpg" alt=""></p>
+<h4 id="SEL"><a href="#SEL" class="headerlink" title="SEL"></a>SEL</h4><p><strong>The SEL data type is a pointer to a selector. A selector is a unique ID for a method</strong>. Wrapping a method name in the @selector() directive returns the SEL that points at that method. Remember that a selector is the entire method name including any colons. </p>
+<p>Notice that @selector() <strong>doesn’t care about the return type, argument types, or names of arguments</strong> – only the selector itself. Also, know that @selector() <strong>doesn’t check to see if the method actually exists</strong>. If you give a SEL to a button, that button will send the corresponding message regardless of whether the method is implemented by the target.</p>
+<h4 id="Pushing-view-controllers"><a href="#Pushing-view-controllers" class="headerlink" title="Pushing view controllers"></a>Pushing view controllers</h4><p>When using a UINavigationController, you cannot simply store all of the possible view controllers in its stack. The viewControllers array of a navigation controller is <strong>dynamic</strong> – you start with a root view controller and add view controllers depending on user input.</p>
+<p>Any view controller in a navigation controller’s stack can get a pointer to the navigation controller by sending itself the message <strong>navigationController</strong>. </p>
+<p>Having a view controller push the next view controller is a common pattern. In any application with a UINavigationController, the navigation controller has one root view controller. The root view controller typically creates the next view controller, and the next view controller creates the one after that, and so on. </p>
+<h2 id="Chapter-13"><a href="#Chapter-13" class="headerlink" title="Chapter 13"></a>Chapter 13</h2><p>A UIToolbar works a lot like a UINavigationBar in that you can add UIBarButtonItems to it. However, where a navigation bar has two bar button items, a toolbar has an array of items. You can place as many UIBarButtonItems in a toolbar as can fit on the screen.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyk5j5luj21ew14cgw0.jpg" alt=""></p>
+<p>When a view controller is modal, it takes over the entire screen until it has finished its work. To present a view modally, presentModalViewController:animated: is sent to the UIViewController whose view is on the screen. The view controller to be presented is passed to it, and its view slides up from the bottom of the screen.</p>
+<p>A view controller should re-populate its view’s subviews with data whenever it is sent the message viewWillAppear:, eliminating the possibility that a low-memory warning could wipe out its content.</p>
+<h2 id="Chapter-14"><a href="#Chapter-14" class="headerlink" title="Chapter 14"></a>Chapter 14</h2><p>Show a view controller’s view: </p>
+<ul>
+<li>Set it as the root view controller of the window</li>
+<li>Push it onto a UINavigationController’s stack</li>
+<li>Add it to a UITabBarController</li>
+<li>Present it modally</li>
+</ul>
+<p>Every view controller has a property named <strong>modalViewController</strong>. If a view controller presents another view controller modally, then this property holds a pointer to that view controller. Every modally-presented view controller has a pointer named <strong>parentViewController</strong> that it sets to the view controller.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgykcc1iqj212y0getbu.jpg" alt=""></p>
+<h2 id="Chapter-15"><a href="#Chapter-15" class="headerlink" title="Chapter 15"></a>Chapter 15</h2><h4 id="Saving-Loading-and-Multitasking"><a href="#Saving-Loading-and-Multitasking" class="headerlink" title="Saving, Loading, and Multitasking"></a>Saving, Loading, and Multitasking</h4><p>Every iOS application has its own application sandbox. An application sandbox is <strong>a directory on the filesystem that is barricaded from the rest of the filesystem</strong>. Your application must stay in its sandbox, and no other application can access your sandbox.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgykp63z7j215k0igtfl.jpg" alt=""></p>
+<h4 id="application-bundle"><a href="#application-bundle" class="headerlink" title="application bundle"></a>application bundle</h4><p>This directory contains all the <strong>resources and the executable</strong>. It is read-only.</p>
+<h4 id="Library-Preferences"><a href="#Library-Preferences" class="headerlink" title="Library/Preferences/"></a>Library/Preferences/</h4><p>This directory is where any preferences are stored and where the Settings application looks for <strong>application preferences</strong>. Library/Preferences is handled automatically by the class NSUserDefaults (which you will learn about in Chapter 19) and is backed up when the device is synchronized with iTunes.</p>
+<h4 id="tmp"><a href="#tmp" class="headerlink" title="tmp/"></a>tmp/</h4><p>This directory is <strong>where you write data that you will use temporarily during an application’s runtime</strong>. You should remove files from this directory when done with them, and the operating system may purge them while your application is not running. It does not get backed up when the device is synchronized with iTunes. To get the path to the tmp directory in the application sandbox, you can use the convenience function <strong>NSTemporaryDirectory</strong>.</p>
+<h4 id="Documents"><a href="#Documents" class="headerlink" title="Documents/"></a>Documents/</h4><p>This directory is <strong>where you write data that the application generates during runtime and that you want to persist between runs of the application</strong>. It is backed up when the device is synchronized with iTunes. If something goes wrong with the device, files in this directory can be restored from iTunes. For example, in a game application, the saved game files would be stored here.</p>
+<h4 id="Library-Caches"><a href="#Library-Caches" class="headerlink" title="Library/Caches/"></a>Library/Caches/</h4><p>This directory is where you write data that the application generates during runtime and that you want to persist between runs of the application. However, unlike the Documents directory, <strong>it does not get backed up when the device is synchronized with iTunes</strong>. A major reason for not backing up cached data is that the data can be very large and extend the time it takes to synchronize your device. Data stored somewhere else – like a web server – can be placed in this directory. If the user needs to restore the device, this data can be downloaded from the web server again.</p>
+<h4 id="Archiving"><a href="#Archiving" class="headerlink" title="Archiving"></a>Archiving</h4><p>There are many ways to write data to the filesystem on iOS, and one of the most important is called archiving. <strong>Archiving is the process of taking one or more objects from memory and writing them to the filesystem. Unarchiving reads these objects back from the filesystem into memory</strong>.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyl4gq9hj21cy0qawos.jpg" alt=""></p>
+<p>Archiving works by creating an instance of NSCoder, which is essentially just a container for data, and placing objects and their data inside it. Once the NSCoder has all of the data you have instructed it to collect, it will be written to a specific file in the filesystem.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgylc534dj217m0jmgpz.jpg" alt=""></p>
+<p>Not all objects can be archived – only those whose class conforms to the NSCoding protocol. The NSCoding protocol has two methods, and both are required: encodeWithCoder: (for archiving) and initWithCoder: (for unarchiving).</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgylrbeapj21gc0m8k00.jpg" alt=""></p>
+<p>Like NSString, the classes NSDictionary and NSArray have writeToFile: and initWithContentsOfFile: methods. In order to write objects of these types to the filesystem in this fashion, they must contain <strong>only property list serializable objects</strong>. The only objects that are property list serializable are <strong>NSString</strong>, <strong>NSNumber</strong>, <strong>NSDate</strong>, <strong>NSData</strong>, <strong>NSArray</strong>, and <strong>NSDictionary</strong>. When an NSArray or NSDictionary is written to the filesystem with these methods, an XML property list is created.</p>
+<h4 id="Application-States-Transitions-and-Multitasking"><a href="#Application-States-Transitions-and-Multitasking" class="headerlink" title="Application States, Transitions, and Multitasking"></a>Application States, Transitions, and Multitasking</h4><p>An application in the suspended state cannot execute code, and any resources it doesn’t need while suspended are released. A suspended application is essentially freeze-dried and can be quickly thawed when the user relaunches it. The resources that are released are ones that can be reloaded, like cached images, system-managed caches, and other graphics data.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgymcadzxj21e210egxs.jpg" alt=""></p>
+<h4 id="The-Application-Bundle"><a href="#The-Application-Bundle" class="headerlink" title="The Application Bundle"></a>The Application Bundle</h4><p>When you build an iOS application project in Xcode, you create an application bundle. The application bundle contains the <strong>application executable and any resources</strong> you have bundled with your application. Resources are things like XIB files, images, audio files – any files that will be used at runtime. When you add a resource file to a project, Xcode is smart enough to realize that it should be bundled with your application and categorizes it accordingly.</p>
+<p>Also, files within the application bundle are <strong>read-only</strong>. You <strong>cannot</strong> <strong>modify</strong> them nor can you <strong>dynamically</strong> <strong>add</strong> files to the application bundle at runtime. Files in the application bundle are typically things like button images, interface sound effects, or the initial state of a database you ship with your application. You will use this method in later chapters to load these types of resources at runtime.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgymvhfpuj21cc0n0k2f.jpg" alt=""></p>
+<h2 id="Chapter-16"><a href="#Chapter-16" class="headerlink" title="Chapter 16"></a>Chapter 16</h2><h4 id="Subclassing-UITableViewCell"><a href="#Subclassing-UITableViewCell" class="headerlink" title="Subclassing UITableViewCell"></a>Subclassing UITableViewCell</h4><p>You subclass UITableViewCell by changing the view objects in a cell’s contentView. Adding subviews to the contentView instead of directly to the UITableViewCell subclass is important because the cell will resize the contentView at certain times. For example, when a table view enters editing mode, the contentView redraws itself to make room for the editing controls.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyncuc8bj21cs0pcajj.jpg" alt=""></p>
+<p>If you were to add subviews directly to the UITableViewCell, these editing controls would obscure the subviews. The cell doesn’t know to adjust its size when entering edit mode, but the contentView does.</p>
+<h4 id="Laying-out-subviews"><a href="#Laying-out-subviews" class="headerlink" title="Laying out subviews"></a>Laying out subviews</h4><p>When a table view’s data source is asked for a cell, it creates a cell, configures its content, and returns it to the table view. The table view then adds the cell as a subview of itself and positions and sizes the cell. Therefore, when you first create a cell, it doesn’t know its size quite yet. For this reason, you do not set the frames of a cell’s content view at initialization time. Instead, you wait until the cell knows how big it is.</p>
+<p>First, you always invoke the superclass’ implementation of <strong>layoutSubviews</strong>. Invoking this method allows the UITableViewCell to layout its subview, the contentView. Then, you get the bounds of the contentView to find out how much area you have to work with when sizing and positioning all of the subviews. (If you don’t invoke the superclass’ implementation of layoutSubviews, the bounds of the contentView may not be correct.) Finally, you set the frame of each subview relative to the contentView’s bounds.</p>
+<h2 id="Chapter-18"><a href="#Chapter-18" class="headerlink" title="Chapter 18"></a>Chapter 18</h2><p>Internationalization is making sure your native cultural information is <strong>not hard-coded</strong> into your application. (By cultural information, we mean language, currency, date formats, number formats, and more.) Localization, on the other hand, is providing the appropriate data in your application <strong>based on the user’s Language and Region Format settings</strong>. NSLocale knows how different regions display symbols, dates, and decimals and whether they use the metric system.</p>
+<h4 id="Localizing-Resources"><a href="#Localizing-Resources" class="headerlink" title="Localizing Resources"></a>Localizing Resources</h4><p>Localization is the process by which application-specific substitutions given a region or a language setting are created. This usually means one of two things:</p>
+<ul>
+<li>Generating multiple copies of resources like images, sounds, and interfaces for different regions and languages</li>
+<li>Creating and accessing “strings tables” to translate text into different languages</li>
+</ul>
+<p><strong>ibtool</strong></p>
+<h4 id="NSLocalizedString-and-Strings-Tables"><a href="#NSLocalizedString-and-Strings-Tables" class="headerlink" title="NSLocalizedString and Strings Tables"></a>NSLocalizedString and Strings Tables</h4><p>A strings table is a file containing a list of key-value pairs for all of the strings your application uses and their associated translations. </p>
+<p><strong>NSLocalizedString()</strong>.</p>
+<h4 id="NSBundle’s-Role-in-Internationalization"><a href="#NSBundle’s-Role-in-Internationalization" class="headerlink" title="NSBundle’s Role in Internationalization"></a>NSBundle’s Role in Internationalization</h4><p>The real work of adding a localization is done for you by the class NSBundle. For example, when a UIViewController is initialized, it is given two arguments: the name of a XIB file and an NSBundle object. The bundle argument is typically nil, which is interpreted as the application’s main bundle. (The main bundle is another name for the application bundle – all of the resources and the executable for the application. When an application is built, all of the lproj directories are copied into this bundle.)</p>
+<p>When the view controller loads its view, it asks the bundle for the XIB file. The bundle, being very smart, <strong>checks the current language settings of the device and looks in the appropriate lproj directory</strong>. The path for the XIB file in the lproj directory is returned to the view controller and loaded.</p>
+<p>NSBundle knows how to search through localization directories for every type of resource using the instance method pathForResource:ofType:. When you want a path to a resource bundled with your application, you send this message to the main bundle. Here’s an example using the resource file myImage.png:</p>
+<pre><code>NSString *path = [[NSBundle mainBundle] pathForResource:@&quot;myImage&quot; ofType:@&quot;png&quot;];
+</code></pre><p>The bundle first checks to see if there is a myImage.png file in the top level of the application bundle. If so, it returns the full path to that file. <strong>If not, the bundle gets the device’s language settings and looks in the appropriate lproj directory to construct the path</strong>. If no file is found, it returns nil.</p>
+<p>This is why you must delete and clean an application when you localize a file. The previous un-localized file will still be in the root level of the application bundle because Xcode will not delete a file from the bundle when you re-install. Even though there are lproj folders in the application bundle, the bundle finds the top-level file first and returns its path.</p>
+<h2 id="Chapter-19"><a href="#Chapter-19" class="headerlink" title="Chapter 19"></a>Chapter 19</h2><h4 id="NSUserDefaults"><a href="#NSUserDefaults" class="headerlink" title="NSUserDefaults"></a>NSUserDefaults</h4><p>These temporary defaults are placed in the <strong>registration domain</strong> of NSUserDefaults. Any preferences set by the user are stored in a different domain, the <strong>application domain</strong>.<br>By default, the application domain is empty: there are no keys and no values. The first time a user changes a setting, a value is added to the application domain for the specified key. When you ask the NSUserDefaults for the value of a preference, <strong>it first looks in the application domain</strong>. If there is a value for that key, then the user has set a preference, and the NSUserDefaults returns that value. If not, the NSUserDefaults looks in the registration domain and finds the temporary default.</p>
+<p><strong>The application domain is always saved to disk; that’s why it remembers user preferences on the next launch. The registration domain is not, and its values must be set every time the application launches</strong>. To set the values of the registration domain, you create an NSDictionary with a key-value pair for each preference you plan on using in your application. Then, you send the dictionary as an argument to the message registerDefaults: of NSUserDefaults.</p>
+<p>Typically, you send the <strong>registerDefaults:</strong> message before any object is able to access the instance of NSUserDefaults. This means before the instance of the application delegate is created. What comes before the creation of the WhereamiAppDelegate? The creation of the WhereamiAppDelegate class. Like any object, a class also must be initialized before it can receive messages. So, after a class is created but before it receives its first message, it is sent the message initialize.</p>
+<pre><code>+ (void)initialize
+{
+    NSDictionary *defaults = [NSDictionary
+                            dictionaryWithObject:[NSNumber numberWithInt:1]
+                                          forKey:WhereamiMapTypePrefKey];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
+}
+</code></pre><h2 id="Chapter-21"><a href="#Chapter-21" class="headerlink" title="Chapter 21"></a>Chapter 21</h2><h4 id="The-Static-Analyzer"><a href="#The-Static-Analyzer" class="headerlink" title="The Static Analyzer"></a>The Static Analyzer</h4><p>When the static analyzer checks the code, it examines each function and method individually by <strong>iterating over every possible code path</strong>. A method can have a number of control statements (if, for, switch, etc.). The conditions of these statements will dictate which code is actually executed. A code path is one of the possible paths the code will take given these control statements.</p>
+<h4 id="Xcode-Schemes"><a href="#Xcode-Schemes" class="headerlink" title="Xcode Schemes"></a>Xcode Schemes</h4><p><strong>A workspace is a collection of projects, and a project is a collection targets and files. A target has a number of build settings and phases that reference files from its project. When built, a target creates a product, which is usually an application. A scheme contains one or more targets and specifies what to do with the product or products</strong>.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewh14b3y30j21ae1dgttj.jpg" alt=""></p>
+<p>When you create a new project, a scheme with the same name as the project is created for you. </p>
+<h4 id="Creating-a-new-scheme"><a href="#Creating-a-new-scheme" class="headerlink" title="Creating a new scheme"></a>Creating a new scheme</h4><p>As projects become larger and more complicated, they require more specific testing and debugging. This can result in more time fiddling with the options for scheme actions. <strong>To avoid constant fiddling, we typically create new schemes for common situations</strong>. For example, if we have an application that consumes a lot of memory, we might want to routinely run the Allocations instrument on it. Instead of having Instruments ask which instrument to use when we profile the application, we can set up a new scheme that always runs Allocations.</p>
+<h4 id="Build-Settings"><a href="#Build-Settings" class="headerlink" title="Build Settings"></a>Build Settings</h4><p>Every target includes build settings that describe how it should be built. Every project also has build settings that serve as defaults for all the targets within the project.</p>
+<p>The far right column shows the iOS Default settings; these serve as the <strong>project’s defaults</strong>, which it can override. The next column to the left shows the <strong>project’s settings</strong>, and the one after that shows the currently selected <strong>target’s settings</strong>. The Resolved column shows which setting will actually be used; <strong>it is always be equal to the left-most specified value</strong>.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyo5m80pj21hy09yn39.jpg" alt=""></p>
+<p>Each target and project has multiple build configurations. <strong>A build configuration is a set of build settings</strong>. When you create a project, there are two build configurations: <strong>debug</strong> and <strong>release</strong>. The build settings for the debug configuration make it easier to debug your application, while the <strong>release settings turn on optimizations to speed up execution</strong>.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewlfp4kcjmj21g80hkn5f.jpg" alt=""></p>
+<p>When performing a scheme action, the scheme will use one of these configurations when building its targets. You can specify the build configuration that the scheme uses in the scheme editor in the option for Build Configuration in the Info pane.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewlfn87ka7j21dk0nq457.jpg" alt=""></p>
+<h2 id="Chapter-22"><a href="#Chapter-22" class="headerlink" title="Chapter 22"></a>Chapter 22</h2><p>At its core, an instance of CALayer is <strong>a buffer containing a bitmap</strong>. When you draw a layer (or a stack of layers), the rendering is <strong>hardware-accelerated</strong>. This makes drawing a layer to the screen incredibly fast. A CAAnimation object <strong>causes a change over time</strong>.</p>
+<h4 id="Layers-and-views"><a href="#Layers-and-views" class="headerlink" title="Layers and views"></a>Layers and views</h4><p>A view doesn’t know how to draw to the screen; it only knows how to draw to an instance of CALayer. When you instantiate a view, it creates a layer, and when the view draws, it is drawing on its layer. We call layers created by views <strong>implicit layers</strong>. Because every view has a layer, there is a matching layer hierarchy that mimics the view hierarchy. After the views draw on their layers, the layers are <strong>composited</strong> to the screen.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyonjc2jj219q0qe7bn.jpg" alt=""></p>
+<p>UIView is a subclass of UIResponder. A view is really an abstraction of a visible object that can be interacted with on the screen, wrapped into a tidy class. A layer, on the other hand, is all about the drawing.</p>
+<h4 id="Creating-a-CALayer"><a href="#Creating-a-CALayer" class="headerlink" title="Creating a CALayer"></a>Creating a CALayer</h4><p>Not all layers are implicit layers. You can create a layer by sending alloc to the class CALayer. Layers created this way are called <strong>explicit layers</strong>.</p>
+<h4 id="Layer-Content"><a href="#Layer-Content" class="headerlink" title="Layer Content"></a>Layer Content</h4><p>A layer is simply a bitmap, and its contents can be set programmatically or with an image. To set the contents programmatically, you either <strong>subclass</strong> CALayer or <strong>assign a delegate</strong> to an instance of CALayer. The delegate then implements drawing routines.</p>
+<p>Because layers exist in a hierarchy, they can have sublayers, and each layer has a pointer back to its parent layer called <strong>superlayer</strong>. When a layer is composited to the screen, it is copied to the screen, and then each sublayer is composited atop it. Therefore, a layer always draws on top of its superlayer.</p>
+<p>When the Z-axis is discussed, some developers imagine that perspective is applied, and they expect a layer to appear larger as its zPosition increases. However, Core Animation layers are presented orthographically; they do not appear as different sizes based on their zPositions.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyotd61yj21dy0omjvl.jpg" alt=""></p>
+<h4 id="Implicitly-Animatable-Properties"><a href="#Implicitly-Animatable-Properties" class="headerlink" title="Implicitly Animatable Properties"></a>Implicitly Animatable Properties</h4><p>Several of the properties of CALayer are <strong>implicitly animatable</strong>. This means that changes to these properties are automatically animated when their setters are called.</p>
+<p>To disable an implicit animation, you can use an animation transaction. <strong>Animation transactions allow you to batch animations and set their parameters</strong>, like the duration and animation curve. To begin a transaction, you send the message begin to the class CATransaction. To end a transaction, you send commit to CATransaction. Within the begin and commit block, you can set properties of a layer and also set values for the transaction as a whole.</p>
+<pre><code>[CATransaction begin];
+[CATransaction setDisableActions:YES];
+[CATransaction commit];
+</code></pre><h4 id="Programmatically-Generating-Content"><a href="#Programmatically-Generating-Content" class="headerlink" title="Programmatically Generating Content"></a>Programmatically Generating Content</h4><ul>
+<li>Subclass - drawInContext:</li>
+<li>Delegate - drawLayer:inContext:</li>
+</ul>
+<p>For both subclassing and delegation, you must send an <strong>explicit setNeedsDisplay</strong> to the layer in order for these methods to be invoked. Otherwise, the layer thinks it doesn’t have any content and won’t draw.</p>
+<h4 id="Layers-Bitmaps-and-Contexts"><a href="#Layers-Bitmaps-and-Contexts" class="headerlink" title="Layers, Bitmaps, and Contexts"></a>Layers, Bitmaps, and Contexts</h4><p>A layer is simply a bitmap – <strong>a chunk of memory that holds the red, green, blue, and alpha values of each pixel</strong>. When you send the message setNeedsDisplay to a UIView instance, that method is forwarded to the view’s layer. After the run loop is done processing an event, every layer marked for re-display prepares a CGContextRef. Drawing routines called on this context generate pixels that end up in the layer’s bitmap.</p>
+<p>How do drawing routines get called on the layer’s context? After a layer prepares its context, it sends the message <strong>drawLayer:inContext:</strong> to its delegate. The delegate of an implicit layer is its view, so in the implementation for drawLayer:inContext:, the view sends drawRect: to itself.</p>
+<p>A layer creates the same kind of context when it needs to redraw its contents.</p>
+<h2 id="Chapter-23"><a href="#Chapter-23" class="headerlink" title="Chapter 23"></a>Chapter 23</h2><p>An animation object drives change over time. An animation object is an instruction set (“Move from point A to point B over 2 seconds”) that can be added to a CALayer instance.</p>
+<h4 id="Animation-Objects"><a href="#Animation-Objects" class="headerlink" title="Animation Objects"></a>Animation Objects</h4><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgypa0hd7j21bc0oqqbn.jpg" alt=""></p>
+<p><strong>CAPropertyAnimation</strong> is a subclass of CAAnimation that extends the ability of its superclass by adding the ability to change the properties of a layer. Each property animation has a key path of type NSString. This string is the name of an <strong>animatable property</strong> of a CALayer. Many of CALayer’s properties are animatable. CAPropertyAnimation is an abstract superclass. To create an animation object that modifies a property of a layer, you use one of the two concrete subclasses of CAPropertyAnimation: CABasicAnimation and CAKeyframeAnimation.</p>
+<p><strong>CABasicAnimation</strong> has two properties: <strong>fromValue</strong> and <strong>toValue</strong>, and it inherits CAAnimation’s duration property. When a basic animation is added to a layer, the property to be animated is set to the value in fromValue. Over the time specified by duration, the value of the property is interpolated linearly from fromValue to toValue.</p>
+<p>The difference between CABasicAnimation and <strong>CAKeyframeAnimation</strong> is that a basic animation only interpolates two values while a keyframe animation can interpolate as many values as you give it. These values are put into an NSArray in the order in which they are to occur. This array is then set as the values property of a CAKeyframeAnimation instance. Each value in the values property is called a <strong>keyframe</strong>. Keyframes are the values that the animation will interpolate; the animation will take the property it is animating through each of these keyframes over its duration. A basic animation is really a keyframe animation that is limited to two keyframes. (In addition to allowing more than two keyframes, CAKeyframeAnimation adds the ability to change the timing of each of the keyframes)</p>
+<p>A <strong>CAAnimationGroup</strong> instance holds an array of animation objects. When an animation group is added to a layer, the animations run <strong>concurrently</strong>.</p>
+<p><strong>CATransition</strong> animates layers as they are transitioning on and off the screen. On Mac OS X, CATransition is made very powerful by Core Image Filters. In iOS, it can only do a couple of simple transitions like fading and sliding. (CATransition is used by UINavigationController when pushing a view controller’s view onto the screen.) CATransaction <strong>turn off implicit animations</strong> for any layer modifications occurring within the transaction.</p>
+<h4 id="The-Presentation-Layer-and-the-Model-Layer"><a href="#The-Presentation-Layer-and-the-Model-Layer" class="headerlink" title="The Presentation Layer and the Model Layer"></a>The Presentation Layer and the Model Layer</h4><p>CALayer as having two parts: <strong>the content</strong> that gets composited onto the screen, and <strong>a set of parameters</strong> that describe how it should be composited: opacity, transform, position, etc. When a layer is being animated, it actually has two copies of these parameters: the <strong>model version</strong> and the <strong>presentation version</strong>. The presentation parameters are the ones that are being smoothly changed by the animation object. The model parameters are the persistent ones – the ones that will be used once the animation is over. So, when a layer is being animated, its content is composited to the screen using the presentation parameters. When it is animation-less, the model parameters are used.</p>
+<h2 id="Chapter-24"><a href="#Chapter-24" class="headerlink" title="Chapter 24"></a>Chapter 24</h2><p>A block is <strong>a set of instructions</strong> that can be passed around as a variable and called like a function. Blocks provide conveniences for a programmer and performance boosts for applications. If you are familiar with other high-level languages, you may know blocks as <strong>closures or anonymous functions</strong>. Block <strong>captures variables</strong> which separates it from function pointers. You can define the block’s code at the same point where the block is registered as a callback. This keeps your code nice and clean.</p>
+<p>Categories have another use: <strong>pseudo-private methods</strong>.</p>
+<h4 id="Pros-and-Cons-of-Callback-Options"><a href="#Pros-and-Cons-of-Callback-Options" class="headerlink" title="Pros and Cons of Callback Options"></a>Pros and Cons of Callback Options</h4><p>Callbacks have two major components: <strong>the process of registering it and the code for the callback</strong>.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgypole3qj21bw0ri45v.jpg" alt=""></p>
+<p>You use <strong>target-action</strong> when you have a close relationship between the two objects (like a view controller and one of its views) and when there may be many instances of object that call back.</p>
+<p><strong>Delegation</strong> is used when an object receives many events and it wants the same object to handle each of those events.</p>
+<p><strong>Notifications</strong> are used when you want multiple objects to invoke their callback for the same event and/ or when two objects are not related.</p>
+<p><strong>Blocks</strong> are the outliers when it comes to callbacks because they are not an object-oriented approach. Blocks are useful when the callback is going to happen only once or when the callback is just a quick and simple task (like updating a progress bar). One of the reasons blocks are better suited for this one-shot behavior is because they will retain any objects they reference.</p>
+<p>An approach to callbacks we have not discussed is <strong>subclassing</strong>.</p>
+<h2 id="Chapter-25"><a href="#Chapter-25" class="headerlink" title="Chapter 25"></a>Chapter 25</h2><p>An <strong>NSURL</strong> instance contains the location of a web application in URL format.</p>
+<p>An <strong>NSURLRequest</strong> instance holds all the data necessary to communicate with a web server.</p>
+<p>An <strong>NSURLConnection</strong> instance is responsible for actually making the connection to a web server, sending the information in its NSURLRequest, and gathering the response from the server.</p>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-09-05T07:46:06.000Z"><a href="/2015/09/05/2015-09-05[Products]/">周六, 9月 5 2015, 3:46:06 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/09/05/2015-09-05[Products]/">Products</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="iOS"><a href="#iOS" class="headerlink" title="iOS"></a>iOS</h3><ul>
+<li><a href="https://itunes.apple.com/us/app/audio-record-pro-lu-yin/id1113927538?mt=8" target="_blank" rel="noopener">Audio Record Pro</a></li>
+<li><a href="https://itunes.apple.com/us/app/meeting-recorder-lecture-recorder/id1123542104?mt=8" target="_blank" rel="noopener">Meeting Lecture &amp; Notepad Voice Audio Note Record</a></li>
+<li><a href="https://itunes.apple.com/us/app/audio-trim-audio-split-edit-lite/id1208911043" target="_blank" rel="noopener">Audio Trim &amp; Audio Split Edit</a></li>
+<li><a href="https://itunes.apple.com/us/app/video-edit-trim-rotate-effect-cut-editor-lite/id1234466495" target="_blank" rel="noopener">Video Edit - Trim Rotate Effect Cut Editor</a></li>
+<li><a href="https://itunes.apple.com/us/app/audio-merge-audio-cut-edit-lite/id1220326103" target="_blank" rel="noopener">Audio Merge &amp; Audio Cut Edit</a></li>
+<li><a href="https://itunes.apple.com/us/app/photo-panorama-pro/id1151017475?mt=8" target="_blank" rel="noopener">Photo Panorama Pro</a></li>
+</ul>
+<h3 id="Image"><a href="#Image" class="headerlink" title="Image"></a>Image</h3><ul>
+<li><a href="https://itunes.apple.com/us/app/photo-mosaic-pro/id1024919377?mt=12" target="_blank" rel="noopener">Photo Mosaic Pro</a></li>
+<li><a href="http://www.greatdy.com/mac-os-x/magic-image" target="_blank" rel="noopener">Magic Image</a></li>
+<li><a href="http://www.greatdy.com/mac-os-x/collage-image-pro" target="_blank" rel="noopener">Collage Image Pro</a></li>
+<li><a href="http://www.greatdy.com/mac-os-x/picture-collage-maker-pro" target="_blank" rel="noopener">Picture Collage Maker Pro</a></li>
+<li><a href="http://www.david-team.com/mac-os-x/photo-focus-pro" target="_blank" rel="noopener">Photo Focus Pro</a></li>
+<li><a href="http://www.quicksoftwarez.com/mac-os-x/fine-photo-collage-pro" target="_blank" rel="noopener">Fine Photo Collage Pro</a></li>
+<li><a href="http://www.digitalsoftteam.com/mac-os-x/image-editor-pro" target="_blank" rel="noopener">Image Editor Pro</a></li>
+<li><a href="https://itunes.apple.com/us/app/photo-collage-photo-poster-hd/id1000916378?mt=12" target="_blank" rel="noopener">Photo Collage-Photo Poster HD</a></li>
+</ul>
+<h3 id="Audio"><a href="#Audio" class="headerlink" title="Audio"></a>Audio</h3><ul>
+<li><a href="https://itunes.apple.com/us/app/audio-diary-photo-text-voice/id1059990365?mt=12" target="_blank" rel="noopener">Audio Diary - Photo Text Voice Note Recorder</a></li>
+<li><a href="https://itunes.apple.com/us/app/audio-edit-trim-merge-split/id975790852?mt=12" target="_blank" rel="noopener">Audio Edit ( Trim , Merge , Split ) Lossless Pro</a></li>
+<li><a href="http://www.greatdy.com/mac-os-x/audio-studio-pro" target="_blank" rel="noopener">Audio Studio Pro</a></li>
+<li><a href="http://www.quicksoftwarez.com/mac-os-x/audio-edit-merge-split" target="_blank" rel="noopener">Audio Edit - Merge Split</a></li>
+<li><a href="http://www.quicksoftwarez.com/support/audionoterecorder" target="_blank" rel="noopener">Audio Note Recorder</a></li>
+<li><a href="http://www.ut-team.com/mac-os-x/fine-audio-recorder" target="_blank" rel="noopener">Fine Audio Recorder</a></li>
+</ul>
+<h3 id="Video"><a href="#Video" class="headerlink" title="Video"></a>Video</h3><ul>
+<li><a href="https://itunes.apple.com/us/app/photo-movie-maker-your-slideshow/id453163102?mt=12" target="_blank" rel="noopener">Photo Movie Maker - your slideshow builder</a></li>
+<li><a href="https://itunes.apple.com/us/app/final-photo-movie-maker/id954962128?mt=12" target="_blank" rel="noopener">Final Photo Movie Maker</a></li>
+<li><a href="https://itunes.apple.com/us/app/video-edit-trim-merge-split/id974495324?mt=12" target="_blank" rel="noopener">Video Edit ( Trim , Merge , Split ) Lossless Pro</a></li>
+<li><a href="http://www.greatdy.com/mac-os-x/dvd-slideshow-make-pro" target="_blank" rel="noopener">DVD Slideshow Maker Pro</a></li>
+<li><a href="http://www.greatdy.com/mac-os-x/photo-slideshow-maker-pro" target="_blank" rel="noopener">Photo Slideshow Maker Pro</a></li>
+<li><a href="http://www.david-team.com/mac-os-x/photo-movie-maker-pro" target="_blank" rel="noopener">Photo Movie Maker Pro</a></li>
+<li><a href="http://www.david-team.com/mac-os-x/photo-to-video-dvd" target="_blank" rel="noopener">Photo Movie + DVD Slideshow Pro</a></li>
+<li><a href="http://www.chaoyuemesoft.com/mac-os-x/photo-slideshow-builder-pro" target="_blank" rel="noopener">Photo Slideshow Builder Pro</a></li>
+<li><a href="http://www.quicksoftwarez.com/support/finemoviecreator" target="_blank" rel="noopener">Fine Movie Creator</a></li>
+<li><a href="http://www.ut-team.com/mac-os-x/photo-movie-maker-pro" target="_blank" rel="noopener">Photo Video Pro</a></li>
+<li><a href="http://www.ut-team.com/mac-os-x/photo-movie-builder-pro" target="_blank" rel="noopener">Photo Movie Builder Pro</a></li>
+</ul>
+<hr>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/09/05/2015-09-05[Products]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/09/05/2015-09-05[Products]/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/09/05/2015-09-05[Products]/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+<nav id="pagination">
+  
+    <a href="/page/2/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>上一页</a>
+  
+  
+  <div class="clearfix"></div>
+</nav>
+
+<script src="/js/jquery.anystretch.min.js"></script>
+<script src="/js/cover.js"></script>
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2018 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

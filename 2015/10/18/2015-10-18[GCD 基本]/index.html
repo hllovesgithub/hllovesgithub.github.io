@@ -1,0 +1,447 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>GCD 基本 | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="GCD 基本">
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-18T05:49:48.000Z"><a href="/2015/10/18/2015-10-18[GCD 基本]/">周日, 10月 18 2015, 1:49:48 下午</a></time>
+
+  
+    <h1 class="title">GCD 基本</h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>中央调度(GCD)由语言特征、运行时库和系统改善组成，对运行iOS和OSX系统的多核硬件并行执行代码提供了系统的、全面的支持。BSD子系统，CoreFoundation和Cocoa的API都已扩展来使用这项改善技术来帮助系统和应用程序运行得更快速更有效更响应。考虑到一个应用程序能够有效地使用多核是多么的困难，更不用说在有不同核数的计算设备里和其他应用程序竞争。在系统级工作的GCD可以根据所有正在运行的程序，以最平衡的的方式分配它们有效的系统资源。GCD不光支持在Unix类操作系统的同步异步执行代码，还可以与文件描述符、Mach端口、Unix信号和定时器工作。</p>
+<p>在使用Objc编译器构建App时，所有的dispatch objects(调度对象)都是Objc对象。所以，当ARC(Automatic reference counting)开启时，dispatch objects会像Objc对象一样被编译器自动在适当的地方retain和release。当ARC关闭时，使用dispatch_retain和dispatch_release(而不是retain和release)管理内存。</p>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><ul>
+<li><strong>串行并行(Serial &amp; Concurrent)</strong>串行是指同一时间只执行一个任务，并行是指同一时间能执行多个任务。串行执行完前一个任务后才能开始执行后一个任务，严格保证任务之间的执行顺序。并行开始执行一个任务和其他并行任务无关，任务之间的执行顺序也是任意随机。</li>
+<li><strong>同步异步(Synchronize &amp; Asynchronize)</strong>同步异步是为了描述任务发起者和任务执行者之间的等待关系。同步是指，任务发起者必须要等到任务执行者执行完任务之后再继续做自己的事儿。异步是指，任务发起者不用等到任务执行者执行完任务之后就可以继续做自己的事儿。线程上的表现，同步就是阻塞挂起休眠，异步就是返回继续执行。</li>
+<li><strong>临界区(Critical Area)</strong>临界区是指一个不能同时被多个线程访问、当有线程进入执行其他线程必须等待的代码块。</li>
+<li><strong>竞态条件(Race Condition)</strong>静态条件是某任务不能屏蔽被多线程无序执行带来的副作用(执行结果对顺序敏感)。</li>
+<li><strong>死锁(Dead Lock)</strong>死锁是指多线程由于竞争造成所有相关线程都被阻塞而程序无法继续执行。</li>
+</ul>
+<h3 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h3><p>宏观上并发与并行都是同时执行。微观上并发同一时间只执行一个任务，但执行适当时间后暂停当前任务，切换到新任务再执行适当时间；并行确实真真正正的同一时间都在执行多个任务。其差别在于，系统能够使用的核数目。单核的确只能执行一个任务为了支持多线程才用并发，多核就能够执行多个任务便可以并行。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4cb94oqj20go09gq31.jpg" alt=""></p>
+<h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><p>dispatch queues(调度队列)是GCD提供用来提交任务并执行的轻量级对象。dispatch queues以FIFO(First In First Out)的顺序开始执行任务。系统管理线程池用来处理分配线程执行提交到dispatch queues的任务。所有dispatch queues都是线程安全的，可以在多线程中访问。GCD提供1个串行队列(主队列)和4个并行队列(全局队列：高、默认<br>低、后台)，也可以创建自定义的串行或者并行队列。</p>
+<p><strong>串行队列(Serial Queue)</strong>的任务串行执行(以FIFO开始和结束)，因此不会出现竞争资源的临界区访问。</p>
+<ul>
+<li>dispatch_get_main_queue()主队列由系统自动创建并和主线程关联唯一能访问UI的队列</li>
+<li>dispatch_queue_create(“Serial”,DISPATCH_QUEUE_SERIAL)</li>
+</ul>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4cn7yl6j20dc07k3zb.jpg" alt=""></p>
+<p><strong>并行队列(Concurrent Queue)</strong>的任务并行执行(以FIFO开始)。旧任务何时完成，新任务何时开始，某时刻多少个任务在执行完全取决于GCD。</p>
+<ul>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0)</li>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0)</li>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW,0)</li>
+<li>dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND,0)</li>
+<li>dispatch_queue_create(“Concurrent”,DISPATCH_QUEUE_CONCURRENT)</li>
+</ul>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1exc4cto4zaj20dc07k0te.jpg" alt=""></p>
+<p><strong>dispatch_queue_create</strong>自定义队列创建时可以用字符串当标签用来在XCode调试、Instruments检测，Crash报告中标识自己。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1exk1qtr512j20hg0a33zf.jpg" alt=""></p>
+<p><strong>dispatch_set_target_queue</strong>一个对象的目标队列决定了最终在那个队列里处理该对象(调度队列Dispatch Queue、调度源Dispatch Sources、调度I/O管道)。对调度队列而言，如果有目标队列，则其优先级继承自目标队列。使用目标队列可以实现很多满足特定需求的队列体系。动态改变任务优先级，动态改变任务同异步。比如任务组里的任务要同步，且与其他任务组的任务也同步：</p>
+<pre><code>dispatch_queue_t targetQueue = dispatch_queue_create(&quot;com.Banana.Demo&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queue_t serial1 = dispatch_queue_create(&quot;Serial1&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queue_t serial2 = dispatch_queue_create(&quot;Serial2&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queue_t serial3 = dispatch_queue_create(&quot;Serial3&quot;, DISPATCH_QUEUE_SERIAL);
+
+dispatch_set_target_queue(serial1, targetQueue);
+dispatch_set_target_queue(serial2, targetQueue);
+dispatch_set_target_queue(serial3, targetQueue);
+
+dispatch_async(serial1, ^{
+    // Task 1_1
+});
+dispatch_async(serial1, ^{
+    // Task 1_2
+});
+
+dispatch_async(serial2, ^{
+    // Task 2_1
+});
+dispatch_async(serial2, ^{
+    // Task 2_2
+});
+
+dispatch_async(serial3, ^{
+    // Task 3_1
+});
+dispatch_async(serial3, ^{
+    // Task 3_2
+});
+</code></pre><h3 id="管理调度对象"><a href="#管理调度对象" class="headerlink" title="管理调度对象"></a>管理调度对象</h3><p>GCD提供调度对象接口让程序管理诸如内存管理、暂停恢复、定义语境和记录日志的功能。</p>
+<p>内存管理：dispatch_retain和dispatch_release(ARC不用)，dispatch_set_finalizer_f(调度对象销毁前用于释放相关连的资源)。<br>暂停恢复：dispatch_resume和dispatch_suspend。<br>定义语境：dispatch_set_context和dispatch_get_context。<br>记录日志：dispatch_debug。</p>
+<p><strong>dispatch_set_context</strong>参数context是一个可以指向任意的void＊，为队列设置任意类型数据，在合适时取出使用。GCD是主要用C编写的底层库，对于C开辟的内存和Cpp创建的对象本身有Coder自己管理内存，但Objc在ARC环境中就需要接管Objc对象的内存管理以免在获取context时已经释放。</p>
+<pre><code>typedef struct TestC {
+    int number;
+}TestC;
+void finalizerC(void *context) {
+    TestC *testC = (TestC *)context;
+    NSLog(@&quot;End C: %d&quot;, testC-&gt;number);
+    free(testC);
+}
+
+@interface TestObjC : NSObject
+@property(assign, nonatomic) int number;
+@end
+@implementation TestObjC
+- (void)dealloc {
+    NSLog(@&quot;%@&quot;, NSStringFromSelector(_cmd));
+}
+@end
+void finalizerObjC(void *context) {
+    TestObjC *testObjC = (__bridge_transfer TestObjC *)(context);
+    NSLog(@&quot;End ObjC: %d&quot;, testObjC.number);
+}
+
+- (void)test {
+    dispatch_queue_t queueC = dispatch_queue_create(&quot;com.Banana.TestC&quot;, DISPATCH_QUEUE_SERIAL);
+    dispatch_set_context(queueC, malloc(sizeof(TestC)));
+    dispatch_set_finalizer_f(queueC, finalizerC);
+    dispatch_async(queueC, ^{
+        TestC *testC = dispatch_get_context(queueC);
+        NSLog(@&quot;Start C: %d&quot;, testC-&gt;number);
+        testC-&gt;number = 1;
+    });
+
+    dispatch_queue_t queueObjC = dispatch_queue_create(&quot;com.Banana.TestObjC&quot;, DISPATCH_QUEUE_SERIAL);
+    dispatch_set_context(queueObjC, (__bridge_retained void *)[[TestObjC alloc] init]);
+    dispatch_set_finalizer_f(queueObjC, finalizerObjC);
+    dispatch_async(queueObjC, ^{
+        TestObjC *testObjC = (__bridge TestObjC *)dispatch_get_context(queueObjC);
+        NSLog(@&quot;Start ObjC: %d&quot;, testObjC.number);
+        testObjC.number = 1;
+    });
+}
+</code></pre><ul>
+<li><strong>__bridge</strong>:只转换类型(Ojbc<->CF)，不改所有权；</-></li>
+<li><strong>__bridge_retained</strong>(即CFBridgingRetain)转换类型(Ojbc-&gt;CF)，并从ARC获取所有权，后续负责管理对象内存；</li>
+<li><strong>__bridge_transfer</strong>(即CFBridgingRelease)转换类型(CF-&gt;Objc)，并移交所有权到ARC，不再负责管理对象内存。</li>
+</ul>
+<h3 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h3><ul>
+<li><strong>sync</strong>所有的dispatch-sync方法同步提交任务到队列并阻塞直到任务结束。</li>
+<li><strong>async</strong>所有的dispatch-async方法异步提交任务到队列并立即返回继续执行。</li>
+<li><strong>dispatch_after</strong>异步提交定时任务并立即返回继续执行。</li>
+<li><strong>dispatch_apply</strong>同步提交多个任务并阻塞直到所有任务结束。任务间根据目标队列(Target Queue)同步(意义不大)或者异步执行。</li>
+<li><strong>dispatch_group_wait</strong>阻塞当前线程直到所有提交的任务结束或者超时。</li>
+<li><strong>dispatch_semaphore_wait</strong>阻塞当前线程直到获取一个信号量。</li>
+<li><strong>dispatch_barrier_sync</strong>同步提交一个屏障任务并阻塞直到任务结束。</li>
+</ul>
+<p>以上方法中所有的同步方法在使用时都需要认真考虑以避免出现死锁。串行队列就很容易出戏：</p>
+<pre><code>SyncMethodA(SerialQueue, ^{
+    SyncMethodB(SerialQueue, ^{
+        // The Task
+    });
+});
+</code></pre><p>Sync为什么比较容易出现死锁？我个人认为因为封装。方法封装了操作，调用时(该方法，没有源代码，没有API说明，或者Coder根本就没注意或者懒得注意或者开始注意后来不小心忘记)不知道方法里面(或者里面的里面的里面)是否嵌套了同步，如果继续同步调用该方法就很有可能死锁(即使不是在同一个队列)。比较保险的方法就是在符合语义的情况下尽可能使用异步方法，对于在异步部分之后需要同步的内容可以写在异步任务里顺序执行。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4d3mb87j20jg08c40h.jpg" alt=""></p>
+<h3 id="单例"><a href="#单例" class="headerlink" title="单例"></a>单例</h3><p>单例模式的常见问题是，单例常常在多线程中同时被多个对象访问而线程不安全。<strong>dispatch_once</strong>整个程序生命周期里，以线程安全的方式执行且仅执行一次任务，很适合单例初始化:</p>
+<pre><code>+ (instancetype)sharedname {
+    static class *_sharedname = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        _sharedname = initializer;
+    });
+
+    return _sharedname;
+}
+</code></pre><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1exc4dbhlxhj20dc07mq4a.jpg" alt=""></p>
+<h3 id="组"><a href="#组" class="headerlink" title="组"></a>组</h3><p>程序可以提交多个任务(任务可以是同步也能是异步，即使在不同队列中)到调度组并跟踪它们直到都结束或者超时。提交到任务组有2种方式：</p>
+<ul>
+<li>dispatch_group_async</li>
+<li>dispatch_group_enter和dispatch_group_leave(必须成对调用)</li>
+</ul>
+<p>任务组结束的通知任务也有同步dispatch_group_wait和异步dispatch_group_notify2种方式。</p>
+<pre><code>dispatch_group_t group = dispatch_group_create();
+dispatch_queue_t mainQueue = dispatch_get_main_queue();
+dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_group_async(group, globalQueue, ^{
+    // Task1
+});
+dispatch_group_enter(group);
+// Task 2
+dispatch_group_leave(group);
+
+dispatch_group_notify(group, mainQueue, ^{
+    // Async Notify
+});
+
+dispatch_time_t then = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC));
+dispatch_group_wait(group, then);
+// Sync Notify
+</code></pre><h3 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h3><p>调度信号量是传统计数信号量的有效实现。调度信号量只在调用线程需要被阻塞时才产生内核调用。dispatch_semaphore_signal创建并设置初始信号量，dispatch_semaphore_signal产生一个信号量并唤醒等待信号量的线程，dispatch_semaphore_wait等待阻塞线程直到有一个信号量消耗并恢复执行。</p>
+<pre><code>dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
+dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_time_t then = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));
+dispatch_async(queue, ^{
+    // Task1
+    if (!dispatch_semaphore_wait(semaphore, then)) {
+        NSLog(@&quot;YES 1&quot;);
+        sleep(1.0);
+        dispatch_semaphore_signal(semaphore);
+    } else {
+        NSLog(@&quot;NO 1&quot;);
+    }
+});
+dispatch_async(queue, ^{
+    // Task1
+    if (!dispatch_semaphore_wait(semaphore, then)) {
+        NSLog(@&quot;YES 2&quot;);
+        sleep(1.0);
+        dispatch_semaphore_signal(semaphore);
+    } else {
+        NSLog(@&quot;NO 2&quot;);
+    }
+});
+dispatch_async(queue, ^{
+    // Task1
+    if (!dispatch_semaphore_wait(semaphore, then)) {
+        NSLog(@&quot;YES 3&quot;);
+        sleep(1.0);
+        dispatch_semaphore_signal(semaphore);
+    } else {
+        NSLog(@&quot;NO 3&quot;);
+    }
+});
+</code></pre><h3 id="屏障"><a href="#屏障" class="headerlink" title="屏障"></a>屏障</h3><p>在线程同步技术中提到过内存屏障同步内存读写操作，GCD使用队列屏障在并行队列里创建一个同步机会，等待已提交的任务执行结束，禁止没提交的任务开始执行。使得执行队列屏障任务时不会有其他任务执行，一旦执行完成，并行队列恢复之前的状态和行为。GCD支持同步提交dispatch_barrier_sync和异步dispatch_barrier_async提交2种方式。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1exc4di0ogrj20dc07kmxy.jpg" alt=""></p>
+<pre><code>- (void)setSafeObject:(id)object forKey:(NSString *)key {
+    key = [key copy];
+    dispatch_barrier_async(self.ioQueue, ^{
+        if (key &amp;&amp; object) {
+            [_dic setObject:object forKey:key];
+        }
+    });
+    [key release];
+}
+
+- (id)getSafeObjectForKey:(NSString *)key {
+    __block id result = nil;
+    dispatch_sync(self.ioQueue, ^{
+        result = [_dic objectForKey:key];
+    });
+    return result;
+}
+</code></pre><hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://www.anselz.com/2014/04/20/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart12/" target="_blank" rel="noopener">深入了解GCD：Part 1/2</a></li>
+<li><a href="http://www.anselz.com/2014/05/05/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart-22/" target="_blank" rel="noopener">深入了解GCD：Part 2/2</a></li>
+<li><a href="http://objccn.io/issue-2-1/#priority_inversion" target="_blank" rel="noopener">并发编程：API 及挑战</a></li>
+<li><a href="http://objccn.io/issue-2-3/" target="_blank" rel="noopener">底层并发 API</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+          
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <span class="jiathis_txt">分享到：</span>
+  <a class="jiathis_button_weixin">微信</a>
+  <a class="jiathis_button_tsina">新浪微博</a>
+  <a class="jiathis_button_renren">人人网</a>
+  <a class="jiathis_button_qzone">QQ空间</a>
+  <a class="jiathis_button_douban">豆瓣</a>
+  <a class="jiathis_button_pocket">Pocket</a>
+  <a href="http://www.jiathis.com/share?uid=901656" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=901656" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+          <div class="clearfix"></div>
+          <nav id="pagination">
+  
+    <a href="/2015/10/25/2015-10-25[GCD 扩展]/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
+  
+  
+    <a href="/2015/10/07/2015-10-07[Runtime]/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+
+  
+      <!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-thread-key="/2015/10/18/2015-10-18[GCD 基本]/"></div>
+<!-- Duoshuo Comment END -->
+  
+</section>
+
+
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2018 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

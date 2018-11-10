@@ -1,0 +1,392 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>Block | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Block">
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-31T06:46:08.000Z"><a href="/2015/10/31/2015-11-01[Block]/">周六, 10月 31 2015, 2:46:08 下午</a></time>
+
+  
+    <h1 class="title">Block</h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>尝试自己写了篇介绍block，由于文章写得太少加上技术沉淀不够，阅读起来不够舒服，所以基本知识就转载<a href="http://blog.devtang.com/blog/2013/07/28/a-look-inside-blocks/" target="_blank" rel="noopener">谈Objective-C Block的实现</a>了，再额外加点自己的理解。</p>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p>在我看来，block有以下几个特点：</p>
+<ul>
+<li>匿名性：减少函数命名冲突</li>
+<li>闭包性：使上下文持续有效</li>
+<li>闭包性：增强抵抗参数变化</li>
+<li>直观性：代码逻辑连贯紧凑</li>
+<li>抽象性：分离变化解耦结构</li>
+</ul>
+<p><strong>匿名性</strong>：block块之所以能够像函数一样调用，是因为block是闭包在objc中的实现。而闭包简而言之就是，一个函数及其持有的变量环境。根据clang的-rewrite-objc查看到的代码，很清楚block是一个struct类型(当然其第一个参数是个void＊类型，可以看作为一个objc对象)，其内部有一个函数指针，刚刚好指向了由编译器根据block包涵代码编译的C静态函数(同时保证了函数的访问安全性)，而函数的命名规则目前来看是：<strong>所在的类名</strong>所在的函数名__block_func_索引值(区分同一类中同一函数里多个block)。命名本身是非常讲究的事儿，良好的命名(不管是函数，而是编程过程所有的概念对象：类、属性、方法、参数等等等等)能够帮助一目了然地理解和维护。而block在编译器的帮助下，coder不需要关心block的实现函数怎么命名，只需要给block起个有意义的名字即可(如果有必要的话)。</p>
+<p><strong>闭包性</strong>：实现block的struc类型其内部会保留所引用到的外部变量(稍后讲到)，而函数同步执行完后栈会回收跳转到另一个函数继续重新使用栈，这就使得在函数异步执行前不用手动保存所需要的栈上变量，延长了局部变量的生命周期。block能够灵活地保留引用变量并和参数变量隔离开来，参数变量应设计为对block稳定的影响，引用变量应设计为对block变化的影响。举个例子：</p>
+<pre><code>- (BOOL)isName:(NSString *)name in:(NSArray *)names {
+    __block BOOL flag = NO;
+    name = [name copy];
+    [names enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isMemberOfClass:[NSString class]]) {
+            NSString *str = (NSString *)obj;
+            flag = [str isEqualToString:name];
+            *stop = flag;
+        }
+    }];
+    return flag;
+}
+</code></pre><p>block抽象的是逻辑。对带有block的API的设计，其参数变量是稳定的，block的逻辑因业务需求的变化而变化，这个变化就可以通过改变block的引用变脸来实现，隔离了变化对API参数的影响。</p>
+<p><strong>直观性</strong>：block分解地来看，其实还是对函数的调用。更详细一点，是对回调函数的调用。而无论是Targer-Action，Delegate，Notification还是block，其本质都是回调函数。只不过是面向不同层级的抽象，以淡化类型污染，分离结构耦合。block能做到的事儿，delegate都能做到。是的，比方说用到多少个block就写多少个对应的回调。但是，不仅delegate获取的变量固定有限不能相迎变化的参数需求，而且有函数名竞争和潜在函数名写错的风险，最主要的是，查看delegate声明和实现需要多个文件之间来回跳转，逻辑容易中断(特别是异步调用)。而block，作为objc能够FP(Functional Programming)的基础，能够当作参数传递，使得多个不同的代码块能够写在一起，阅读维护时风格简单直观逻辑清晰连贯。业务的不同层级交互可以写在一个地方，不用污染功能模块。举个例子：</p>
+<pre><code>RACSignal *networkRequest = [RACSignal createSignal:^(id&lt;RACSubscriber&gt; subscriber) {
+    AFHTTPRequestOperation *operation = [client
+        HTTPRequestOperationWithRequest:request
+        success:^(AFHTTPRequestOperation *operation, id response) {
+            [subscriber sendNext:response];
+            [subscriber sendCompleted];
+        }
+        failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            [subscriber sendError:error];
+        }];
+
+    [client enqueueHTTPRequestOperation:operation];
+    return [RACDisposable disposableWithBlock:^{
+        [operation cancel];
+    }];
+}];
+</code></pre><p><strong>抽象性</strong>：</p>
+<p>block抽象的是一段，公开了可以影响执行结果的参数接口的，执行逻辑。因为block可以作为参数传递，所以可以将变化的逻辑作为功能的参数暴露出来，而稳定的逻辑写在函数里面。分离外部变化和内部实现，最大限度地维护代码稳定。功能调用者不用关心内部实现是什么，只用关心外部业务是什么。</p>
+<pre><code>- (Result)processBussness:(Change (^)(Steady a, Steady b, Steady c))external {
+    // PreProcess Steady
+    Steady a = ...
+    Steady b = ...
+    Steady c = ...
+    // Get The Change
+    Change change = external(a, b, c);
+    // PostProcess Result Using Steady And Change
+    Result result = ...
+}
+- (void)bussnessA {
+    [self processBussness:^(Steady a, Steady b, Steady c){
+        // Make Change By Rule A
+        return changeA
+    }];
+}
+- (void)bussnessB {
+    [self processBussness:^(Steady a, Steady b, Steady c){
+        // Make Change By Rule B
+        return changeB
+    }];
+}
+- (void)bussnessC {
+    [self processBussness:^(Steady a, Steady b, Steady c){
+        // Make Change By Rule C
+        return changeC
+    }];
+}
+</code></pre><h3 id="保留引用变量"><a href="#保留引用变量" class="headerlink" title="保留引用变量"></a>保留引用变量</h3><pre><code>#import &lt;Foundation/Foundation.h&gt;
+int main(int argc, const char * argv[]) {
+    NSInteger intN = 123;
+    __block NSInteger intY = 321;
+    NSMutableArray *aryN = [[NSMutableArray alloc] initWithArray:@[@(123)]];
+    __block NSMutableArray *aryY = [[NSMutableArray alloc] initWithArray:@[@(321)]];
+    NSLog(@&quot;IntN:%p   AryN:%p   IntY:%p   AryY:%p&quot;, &amp;intN, &amp;aryN, &amp;intY, &amp;aryY);
+    dispatch_block_t block = ^(void){
+        NSLog(@&quot;IntN:%p   AryN:%p   IntY:%p   AryY:%p&quot;, &amp;intN, &amp;aryN, &amp;intY, &amp;aryY);
+    };
+    block();
+    dispatch_block_t blockCopy = [block copy];
+    blockCopy();
+    return 0;
+}
+MRC
+原本：IntN:0x7fff5fbff840   AryN:0x7fff5fbff818   IntY:0x7fff5fbff838   AryY:0x7fff5fbff800
+栈上：IntN:0x7fff5fbff7c8   AryN:0x7fff5fbff7b0   IntY:0x7fff5fbff838   AryY:0x7fff5fbff800
+堆上：IntN:0x000100600948   AryN:0x000100600930   IntY:0x000100600968   AryY:0x000100600328
+ARC
+原本：IntN:0x7fff5fbff840   AryN:0x7fff5fbff818   IntY:0x7fff5fbff838   AryY:0x7fff5fbff800
+栈上：IntN:0x000100500848   AryN:0x000100500830   IntY:0x000100500868   AryY:0x000100500028
+堆上：IntN:0x000100500848   AryN:0x000100500830   IntY:0x000100500868   AryY:0x000100500028
+</code></pre><ul>
+<li>类型维度：基本类型和对象类型</li>
+<li>读写维度：默认只读和__block可写</li>
+<li>堆栈维度：栈和堆</li>
+<li>ARC维度：MRC和ARC</li>
+</ul>
+<p><strong>类型维度</strong>：基本类型可在栈或堆上，而对象类型一直都在堆上。</p>
+<p><strong>读写维度</strong>：对于__block符号，无则引用的是原类型(基本类型变量或者对象类型指针)，有则引用的是新类型(包含原类型信息的结构体指针)，并且在结构体内分别有2个函数负责管理包含的对象的内存：</p>
+<pre><code>void (*__Block_byref_id_object_copy)(void*, void*);
+void (*__Block_byref_id_object_dispose)(void*);
+</code></pre><p>结构体在创建后调用Block_byref_id_object_copy函数来retain对象，结构体在释放前调用Block_byref_id_object_dispose函数来release对象。使得新类型结构体在有效期间内，包含的对象始终有效。</p>
+<p><strong>ARC维度</strong>：MRC有3种类型的block(_NSConcreteGlobalBlock，_NSConcreteStackBlock和_NSConcreteMallocBlock)，而ARC用_NSConcreteMallocBlock替换了_NSConcreteStackBlock，即ARC下不会再在栈上临时分配block，而是把所有block(除了编译期间就能确定实现的_NSConcreteGlobalBlock全局block)都创建在堆上。</p>
+<p><strong>堆栈维度</strong>：当block从栈copy到堆时，会调用_Block_object_assign函数来retain所有新类型结构体。当block从堆中释放时，会调用_Block_object_dispose函数来release所有新类型结构体。使得block对象在有效期间，包含的所有__block新类型结构体都有效。</p>
+<p><strong>总结</strong>：(其中ARC和MRC的堆情况一致)</p>
+<ul>
+<li>栈上只读基本类型变量：栈上block有一个栈上原变量新副本，变量值不受栈上原变量改变影响。</li>
+<li>栈上可写基本类型变量：变成一个新类型结构体(内部有个等值变量)，栈上block有一个指向栈上结构体指针，block内外都能通过指针影响栈上结构体内部变量值。</li>
+<li>栈上只读对象类型指针：栈上block有一个栈上原对象指针新副本，指向对象不受栈上原指针改变影响，但指向对象的信息可被改变。</li>
+<li>栈上可读对象类型指针：变成一个新类型结构体(内部有个等值指针)，栈上block有一个指向栈上结构体指针，block内外都能通过指针影响栈上结构体内部指向对象，且指向对象的信息可被改变。</li>
+<li>堆上只读基本类型变量：堆上block有一个堆上原变量新拷贝，变量值不受栈上原变量改变影响。</li>
+<li>堆上可写基本类型变量：变成一个新类型结构体(内部有个等值变量)，堆上block有一个指向堆上结构体指针，栈上结构体重定向到堆上结构体，block内外都能通过指针影响堆上结构体内部变量值。</li>
+<li>堆上只读对象类型指针：堆上block有一个堆上原对象指针新拷贝，指向对象不受栈上原指针改变影响，但指向对象的信息可被改变。</li>
+<li>堆上可写对象类型指针：变成一个新类型结构体(内部有个等值指针)，堆上block有一个指向堆上结构体指针，栈上结构体重定向到堆上结构体，block内外都能通过指针影响堆上结构体内部指向对象，且指向对象的信息可被改变。</li>
+</ul>
+<p>我认为，ARC用_NSConcreteMallocBlock替换_NSConcreteStackBlock，第一是统一类型方便管理内存，第二是减少MRC时潜在问题。比如对于带有block的API设计，如果API是同步执行，block在调用时所引用的外部变量都还在栈中有效，如果API是异步执行，而API实现者在内部没有或者忘记对block进行copy到堆中，那么block执行的时候就会出错。MRC时Apple所有带有block的API内部默认应该都是有拷贝过的，但不能保证Coder自己构造API时不会出错。所以ARC统一block的类型为_NSConcreteMallocBlock保证了都至少在堆上存在有效。</p>
+<h3 id="类型声明"><a href="#类型声明" class="headerlink" title="类型声明"></a>类型声明</h3><p>block的类型声明并没有什么需要特别注意的，除了参数类型为()代表的不是(void)，而是缺省类型。在某些时候，是可以做到跟id或者协议一样范型编程的：</p>
+<pre><code>typedef void(^BLOCK)();
+int main(int argc, const char * argv[]) {
+    BLOCK blk0 = ^(void){
+        NSLog(@&quot;No Value&quot;);
+    };
+    BLOCK blk1 = ^(NSString *str){
+        NSLog(@&quot;Value is %@&quot;, str);
+    };
+    BLOCK blk2 = ^(NSInteger a, CGFloat b){
+        NSLog(@&quot;Valus are %ld and %f&quot;, a, b);
+    };
+    blk0();
+    blk1(@&quot;Test&quot;);
+    blk2(1,2.3);
+    return 0;
+}
+</code></pre><h3 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h3><p>block的实现里指明了reference的作用，将栈上的结构体重定向到堆上结构体，从而访问正确的引用。在ARC下已经没有栈上结构体了所以不要紧，在MRC下也只有出现堆上block后还执行栈上block的情况下才有真正起到作用：</p>
+<pre><code>#import &lt;Foundation/Foundation.h&gt;
+int main(int argc, const char * argv[]) {
+    __block NSInteger intN = 123;
+    dispatch_block_t blockN = ^(void){
+        intN = 0;
+    };
+    blockN();
+    [blockN copy];
+
+    __block NSInteger intY = 123;
+    dispatch_block_t blockY = ^(void){
+        intY = 0;
+    };
+    [blockY copy];
+    blockY();
+
+    return 0;
+}
+</code></pre><h3 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h3><p>循环引用循环是使用block的一个最主要的内存问题。因为block是个对象也会保留引用的对象，所以如果被引用的对象恰好也保留了该block，那么就构成了循环引用。其实此类问题基本性质都是一样的，只是犹豫block的匿名性导致不太注意而引起。原则就是：block不要直接引用拥有block的对象。对于GCD的block，没有对象引用它，所以可以大胆地写，但是作为对象的属性或者API的参数，都需要注意该对象和调用者之间的拥有关系<a href="http://tanqisen.github.io/blog/2013/04/19/gcd-block-cycle-retain/" target="_blank" rel="noopener">正确使用Block避免Cycle Retain和Crash</a>。这里介绍一个优秀库<a href="https://github.com/jspahrsummers/libextobjc" target="_blank" rel="noopener">libextobjc</a>，其定义了<strong>@weakify</strong>，<strong>@unsafeify</strong>，<strong>@strongify</strong>语法糖，优雅地解决了block循环引用问题，下次专门写篇blog来介绍它。</p>
+<h3 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h3><p>block作为objc的闭包实现，为FP(Functional Programming)打下坚实的基础。BlocksKit就是结合block实现的对象函数式扩展。ReactiveCocoa就是利用block实现的响应函数式编程。不过，如果block嵌套较多后，很容易出错也很难调试。函数式编程又是另一个庞大复杂的课题了，我也学习了一段时间，也觉得是将来的发展方向，以后慢慢花时间写点东西。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://www.devtang.com/blog/2013/07/28/a-look-inside-blocks/" target="_blank" rel="noopener">谈Objective-C Block的实现</a></li>
+<li><a href="http://chun.tips/blog/2014/11/13/hei-mu-bei-hou-de-blockxiu-shi-fu/" target="_blank" rel="noopener">黑幕背后的__block修饰符</a></li>
+<li><a href="http://tanqisen.github.io/blog/2013/04/19/gcd-block-cycle-retain/" target="_blank" rel="noopener">正确使用Block避免Cycle Retain和Crash</a></li>
+<li><a href="http://tech.meituan.com/block-in-Meituan-iOS.html" target="_blank" rel="noopener">block在美团iOS的实践</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+          
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <span class="jiathis_txt">分享到：</span>
+  <a class="jiathis_button_weixin">微信</a>
+  <a class="jiathis_button_tsina">新浪微博</a>
+  <a class="jiathis_button_renren">人人网</a>
+  <a class="jiathis_button_qzone">QQ空间</a>
+  <a class="jiathis_button_douban">豆瓣</a>
+  <a class="jiathis_button_pocket">Pocket</a>
+  <a href="http://www.jiathis.com/share?uid=901656" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=901656" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+          <div class="clearfix"></div>
+          <nav id="pagination">
+  
+    <a href="/2015/11/07/2015-11-07[Runtime应用]/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
+  
+  
+    <a href="/2015/10/25/2015-10-25[GCD 扩展]/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+
+  
+      <!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-thread-key="/2015/10/31/2015-11-01[Block]/"></div>
+<!-- Duoshuo Comment END -->
+  
+</section>
+
+
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2018 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>
