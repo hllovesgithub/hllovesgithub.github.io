@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>GCD 扩展 | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="GCD 扩展">
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-25T01:48:31.000Z"><a href="/2015/10/25/2015-10-25-GCD 扩展/">周日, 10月 25 2015, 9:48:31 上午</a></time>
+
+  
+    <h1 class="title">GCD 扩展</h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="调度源"><a href="#调度源" class="headerlink" title="调度源"></a>调度源</h3><p>GCD提供一些调度源接口来监测底层系统对象(比如Unix文件描述符、Mach端口、Unix信号、Unix虚拟文件系统节点、自定义源等等)的活动。不像阻塞等待事件发生或者反复轮询查看那样浪费资源也无法度量，调度源像<a href="https://en.wikipedia.org/wiki/Kqueue" target="_blank" rel="noopener">kquque</a>一样自动异步地提交任务到指定调度队列响应处理。</p>
+<ul>
+<li><strong>dispatch_source_create</strong>：创建一个新的调度源来检测底层系统对象，并响应事件自动提交事件回调任务到指定队列执行。调度源开始都是暂停状态，需要使用<strong>dispatch_resume</strong>启动。不再使用时需要调用<strong>dispatch_release</strong>释放资源。</li>
+<li><strong>dispatch_source_set_registration_handler</strong>：调度源底层的事件发送策略是异步设置的。在调度源完全设置好并准备开始发送事件时，注册回调任务就会被提交到指定队列执行。在调度源暂停或者正在执行回调任务期间，如果事件到达，事件会合并在一起，等到调度源启动或者回调任务执行完再发送。</li>
+<li><strong>dispatch_source_set_event_handler</strong>：监测的事件发生时，事件回调任务响应并被提交到指定队列执行。其中使用<strong>dispatch_source_get_data</strong>获取调度源等待处理的数据，其代表意义因调度源类型的不同而不同。</li>
+<li><strong>dispatch_source_set_cancel_handler</strong>：当系统释放了所有对调度源的引用时，取消回调任务响应并被提交到指定队列执行。通常用于清理占用的资源，例如打开的文件或者套接字。</li>
+<li><strong>dispatch_source_cancel</strong>：异步地取消调度源，阻止事件回调任务继续执行。</li>
+</ul>
+<p>dispatch_source_t <strong>dispatch_source_create</strong>(dispatch_source_type_t type, uintptr_t handle, unsigned long mask, dispatch_queue_t queue)中，type是最重要的参数，因为它决定了handle和mask参数将会是什么。</p>
+<ul>
+<li>DISPATCH_SOURCE_TYPE_DATA_ADD监测自定义源逻辑Add数据合并，handle和mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_DATA_OR监测自定义源逻辑Or数据合并，handle和mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_MACH_RECV监测Mach端口接收，handle代表<strong>Mach端口号</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_MACH_SEND监测Mach端口发送，handle代表<strong>Mach端口号</strong>，mask代表<strong>发送事件标识</strong>。</li>
+<li>DISPATCH_SOURCE_TYPE_PROC监测进程，handle代表<strong>进程号</strong>，mask代表<strong>进程事件标识</strong>。</li>
+<li>DISPATCH_SOURCE_TYPE_READ监测文件描述符读，handle代表<strong>文件描述符</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_SIGNAL监测信号，handle代表<strong>信号量</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_TIMER监测定时器，handle和mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_VNODE监测虚拟文件系统节点，handle代表<strong>文件描述符</strong>，mask代表<strong>节点事件标识</strong>。</li>
+<li>DISPATCH_SOURCE_TYPE_WRITE监测文件描述符写，handle代表<strong>文件描述符</strong>，mask未使用。</li>
+<li>DISPATCH_SOURCE_TYPE_MEMORYPRESSURE监测内存压力，handle未使用，mask代表<strong>压力事件标识</strong>。</li>
+</ul>
+<p><strong>自定义源</strong>：通过<strong>dispatch_source_merge_data</strong>主动发送信号产生系统事件。其函数名的来由是，如果当前比较繁忙，GCD会在执行响应方法前，会多次自动联结事件，最终只执行一次响应方法。</p>
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+__block unsigned long data = 0;
+dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, mainQueue);
+dispatch_source_set_event_handler(source, ^{
+    unsigned long delta = dispatch_source_get_data(source);
+    data += delta;
+});
+dispatch_resume(source);
+
+dispatch_apply(100, globalQueue, ^(size_t index) {
+    dispatch_source_merge_data(source, 1);
+});
+</code></pre><p><strong>文件描述符</strong>：使用GCD监测文件描述符读写。</p>
+<pre><code>dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_source_t stdinSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, STDIN_FILENO, 0, globalQueue);
+dispatch_source_set_event_handler(stdinSource, ^{
+    char buf[1024];
+    long len = read(STDIN_FILENO, buf, sizeof(buf));
+    if(len &gt; 0)
+        NSLog(@&quot;Got data from stdin: %s&quot;, buf);
+});
+dispatch_resume(stdinSource);    
+</code></pre><p><strong>进程</strong>：使用GCD监测进程事件，包括进程退出、进程分叉、进程执行和进程信号。</p>
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+NSArray *runningApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:@&quot;com.apple.mail&quot;];
+NSRunningApplication *mail = [runningApps count]
+? runningApps[0]
+: nil;
+if (mail) {
+    pid_t const pid = mail.processIdentifier;
+    dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_PROC, pid, DISPATCH_PROC_EXIT, mainQueue);
+    dispatch_source_set_event_handler(source, ^(){
+        NSLog(@&quot;Mail Quit&quot;);
+    });
+    dispatch_resume(source);
+}
+</code></pre><p><strong>文件系统节点</strong>：使用GCD监测文件系统节点事件，包括节点删除、节点内容写入、节点大小变化、节点属性变化、节点链接数变化、节点名字变化和节点被删除。</p>
+<pre><code>NSURL *directoryURL; // assume this is set to a directory
+int const fd = open([[directoryURL path] fileSystemRepresentation], O_EVTONLY);
+if (fd &lt; 0) {
+    char buffer[80];
+    strerror_r(errno, buffer, sizeof(buffer));
+    NSLog(@&quot;Unable to open \&quot;%@\&quot;: %s (%d)&quot;, [directoryURL path], buffer, errno);
+    return;
+}
+dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, fd, DISPATCH_VNODE_WRITE | DISPATCH_VNODE_DELETE, DISPATCH_TARGET_QUEUE_DEFAULT);
+dispatch_source_set_event_handler(source, ^(){
+    unsigned long const data = dispatch_source_get_data(source);
+    if (data &amp; DISPATCH_VNODE_WRITE) {
+        NSLog(@&quot;The directory changed.&quot;);
+    }
+    if (data &amp; DISPATCH_VNODE_DELETE) {
+        NSLog(@&quot;The directory has been deleted.&quot;);
+    }
+});
+dispatch_source_set_cancel_handler(source, ^(){
+    close(fd);
+});
+dispatch_resume(source);
+</code></pre><p><strong>信号</strong>：使用GCD监测信号，这些信号可在signal.h中找到。比如，信号SIGSTOP将会在进程接收到一个无法回避的暂停指令时被发出。LLDB调试器调试应用时使用的也是这个信号。</p>
+<pre><code>dispatch_queue_t mainQueue = dispatch_get_main_queue();
+__typeof(self) __weak weakSelf = self;
+
+static dispatch_source_t source = nil;
+static dispatch_once_t onceToken;
+dispatch_once(&amp;onceToken, ^{
+    source = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGSTOP, 0, mainQueue);
+    if (source) {
+        dispatch_source_set_event_handler(source, ^{
+            NSLog(@&quot;Hi, I am: %@&quot;, weakSelf);
+        });
+        dispatch_resume(source);
+    }
+});
+</code></pre><p><strong>定时器</strong>：使用GCD监测定时器。GCD不保证计时器100%精准触发，由参数leeway决定了触发精准度。其意义是为了降低资源消耗，因为系统可以让CPU休息足够长的时间，尽量每次醒来时执行一个任务集合，而不是不断醒来只执行一个任务，这样效率更高。比如较大的leeway允许系统拖延计时器触发，尽量拖延到与其他任务一起执行。</p>
+<pre><code>dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, DISPATCH_TARGET_QUEUE_DEFAULT);
+dispatch_source_set_timer(source, DISPATCH_TIME_NOW, 1ull * NSEC_PER_SEC, 0);
+dispatch_source_set_event_handler(source, ^(){
+    NSLog(@&quot;Time flies.&quot;);
+});
+dispatch_resume(source);
+</code></pre><h3 id="调度I-O管道"><a href="#调度I-O管道" class="headerlink" title="调度I/O管道"></a>调度I/O管道</h3><p>调度I/O通道提供了一种与读写文件描述符不同的方式。有流和随机存取两种类型的管道。比如，硬盘文件可以创建一个随机存取管道(因为文件描述符是可寻址的)，套接字可以创建一个流管道。和文件描述符一样，I/O管道也拥有读写操作，但这些操作都是以非阻塞，异步I/O的形式高效实现的。I/O管道也有同步读写操作的屏障操作，还可以设置最高和最低字节数限制，操作周期。</p>
+<h3 id="调度缓冲区"><a href="#调度缓冲区" class="headerlink" title="调度缓冲区"></a>调度缓冲区</h3><p>以往处理多个小而散的缓冲区数据时，通常会将它们组合成大缓冲区再进行处理，但这样不仅会复制大量数据，而且大量I/O操作会在降低性能占用更多资源。很多旧C的API有个问题是，缓冲区没有所有权的概念，所以不得不将数据再次拷贝以保证使用期间有效。GCD的dispatch_data_t，在某种程度上和Objc的NSData很相似，但是必须记住GCD只是纯C的API不能使用Objc对象。dispatch_data_t(基于栈或基于栈)使得对应的缓冲区有了所有权的概念能确保有效性不产生拷贝操作，而且其相当独特的是可以基于多个零碎的内存区域抽象成一个连续的内存区域来提供使用。</p>
+<ul>
+<li><strong>dispatch_data_create</strong>：创建调度缓冲区对象，指定析构回调任务和执行队列。</li>
+<li><strong>dispatch_data_create_map</strong>：返回一个拷贝原缓冲区对象内容且内存连续分布的新缓冲区对象。</li>
+<li><strong>dispatch_data_create_concat</strong>：返回一完整引用了两个缓冲区对象的新缓冲区对象。</li>
+<li><strong>dispatch_data_create_subrange</strong>：返回一个引用原缓冲区对象部分的新缓冲区对象。</li>
+<li><strong>dispatch_data_apply</strong>：贯穿整个缓冲区对象每一个子区域并执行方法。</li>
+<li><strong>dispatch_data_copy_region</strong>：返回一个拷贝原缓冲区对象部分内容的新缓冲区对象。</li>
+</ul>
+<h3 id="基准测试"><a href="#基准测试" class="headerlink" title="基准测试"></a>基准测试</h3><p>GCD有一个适合优化代码的灵巧小工具：uint64_t <strong>dispatch_benchmark</strong>(size_t count, void (^block)(void));文件头部声明该函数类型，就能够测量测试代码执行的平均纳秒数：</p>
+<pre><code>size_t const objectCount = 100;
+uint64_t n = dispatch_benchmark(1000, ^{
+    @autoreleasepool {
+        id obj = @42;
+        NSMutableArray *array = [NSMutableArray array];
+        for (size_t i = 0; i &lt; objectCount; ++i) {
+            [array addObject:obj];
+        }
+    }
+});
+NSLog(@&quot;-[NSMutableArray addObject:] : %llu ns&quot;, n);
+</code></pre><hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://www.anselz.com/2014/04/20/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart12/" target="_blank" rel="noopener">深入了解GCD：Part 1/2</a></li>
+<li><a href="http://www.anselz.com/2014/05/05/%E6%B7%B1%E5%85%A5%E4%BA%86%E8%A7%A3gcd%EF%BC%9Apart-22/" target="_blank" rel="noopener">深入了解GCD：Part 2/2</a></li>
+<li><a href="http://objccn.io/issue-2-1/#priority_inversion" target="_blank" rel="noopener">并发编程：API 及挑战</a></li>
+<li><a href="http://objccn.io/issue-2-3/" target="_blank" rel="noopener">底层并发 API</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+          
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <span class="jiathis_txt">分享到：</span>
+  <a class="jiathis_button_weixin">微信</a>
+  <a class="jiathis_button_tsina">新浪微博</a>
+  <a class="jiathis_button_renren">人人网</a>
+  <a class="jiathis_button_qzone">QQ空间</a>
+  <a class="jiathis_button_douban">豆瓣</a>
+  <a class="jiathis_button_pocket">Pocket</a>
+  <a href="http://www.jiathis.com/share?uid=901656" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=901656" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+          <div class="clearfix"></div>
+          <nav id="pagination">
+  
+    <a href="/2015/10/31/2015-11-01-Block/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
+  
+  
+    <a href="/2015/10/18/2015-10-18-GCD基本/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+
+  
+      <!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-thread-key="/2015/10/25/2015-10-25-GCD 扩展/"></div>
+<!-- Duoshuo Comment END -->
+  
+</section>
+
+
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2020 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

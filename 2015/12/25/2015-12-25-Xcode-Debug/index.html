@@ -1,0 +1,299 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>Xcode Debug | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Xcode Debug">
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-12-25T06:27:25.000Z"><a href="/2015/12/25/2015-12-25-Xcode-Debug/">周五, 12月 25 2015, 2:27:25 下午</a></time>
+
+  
+    <h1 class="title">Xcode Debug</h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>基于LLDB我们可以在运行期间对App进行Debug，除此之外Xcode也提供了一些设置，使得App在编译期间和运行期间独立LLDB之外方便发现问题。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>一个常见的错误就是，对一个指向已经释放过的对象的指针－即指向无效内存的野指针－进行操作。语义上讲，一个指针在其指向的对象无效时就应该标记为无效，比如指向nil，就算程序中不再使用该指针虽然不会出错，但还是存在着未来变化的风险。指向同一个对象地址的指针可以有很多个，怎么才能确保所有这些指针的安全呢？ARC的weak指针能够解决这一问题。同时，strong指针在试用期间就能确保指向的对象至少存在，所以也不会出错。而等效于MRC时代指针的unsafe_unretained指针就非常容易出错，因为它即不涉及内存管理，也不被安全置nil。那么，autoreleasing指针呢？</p>
+<pre><code>{
+    __autoreleasing NSArray *test = nil;
+    @autoreleasepool {
+        test = @[@&quot;A&quot;, @&quot;B&quot;, @&quot;C&quot;];
+    }
+    [test count];
+}
+</code></pre><p>会发生EXC_BAD_ACCESS错误。test在离开{}后其注册在AutoreleasePool的对象被释放，但是test还是指向原地址没有被安全处理。所以，unsafe_unretained和autoreleasing指针都不是安全的。</p>
+<p>为什么有时候已经释放过的对象，使用指向它的指针不会粗错呢？这是因为，Apple对回收对象内存这个行为不一定按照字面理解那样。最简单的就是更改heap的统计信息，而没有将内存全部置为0。如果在使用野指针时，其指向的内存还跟对象释放前一样的内容，那么这个时候是可以看起来正常运行的。</p>
+<pre><code>{
+    NSView *view = [[NSView alloc] init];
+    [view release];
+    [[[NSWindow alloc] init] autorelease];
+    [view description];
+}
+</code></pre><p>这是个不易发现但又确实存在的问题。</p>
+<h3 id="Static-Analyze"><a href="#Static-Analyze" class="headerlink" title="Static Analyze"></a>Static Analyze</h3><p>静态分析指的是一种在不执行程序的情况下对程序代码进行分析的行为，对应着Scheme的Analyze(快捷键Shift+Command+B)。静态分析主要通过分析语法来发现这几种问题：</p>
+<ul>
+<li>逻辑错误：访问未初始化的变量等。</li>
+<li>声明错误：从未使用过的变量等。</li>
+<li>内存错误：内存泄漏或错误释放等。</li>
+</ul>
+<p>声称变量并初始化是一个良好又安全的习惯，访问为初始化的变量将会带来出乎意料的行为。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ezcyp1e26aj20qq06q75m.jpg" alt=""></p>
+<p>对于没有使用的变量，虽然不会引起程序出错，编译优化时也可能直接省略掉，但是这些信息是可以在源代码中去掉的，这可以提高代码简洁度。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ezcyotzzpsj20qq02y74k.jpg" alt=""></p>
+<p>ARC不代表所有内存操作都没有问题，对于使用了不属于ARC管理范围的内存操作就可能出现问题。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ezcyomwsfxj21gg05yq5f.jpg" alt=""></p>
+<p>MRC相比于ARC出错的可能性要多得多，所以MRC时使用Analyze比ARC时更有必要。像之前内存回收的问题，在Analyze的帮助下可以在运行之前就能发现。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ezcyogrphgj20qo04i759.jpg" alt=""></p>
+<p>这些问题在编译期间很难被发现，但是通过Analyze就变得容易。总的来说，虽然Analyze不能发现并解决所有的问题，但是从预防角度来讲，Analyze是成本最低的改成代码错误的方法。阶段性地在Run前Analyze一下是个好习惯。可以在Build Settings里也可以通过设置，让Xcode在Build时也执行Analyze及执行程度。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ezb4f6xt0qj20qw06yaaz.jpg" alt=""></p>
+<h3 id="NSZombieEnabled"><a href="#NSZombieEnabled" class="headerlink" title="NSZombieEnabled"></a>NSZombieEnabled</h3><p>我在<a href="http://hllovesgithub.github.io/2015/11/07/2015-11-07[Runtime%E5%BA%94%E7%94%A8]/">Runtime应用</a>里介绍过NSZombieEnabled，这能够让对象伪释放，动态修改对象的类型信息，利用转发消息机制将发送给伪释放对象的消息传递到特定类型，打印出来以供追踪。Xcode的Scheme里面，可以在Argument的Environment Variable里设置：</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ezb386rnpoj20gs05emxf.jpg" alt=""></p>
+<p>也可以在Diagnostics里设置：</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ezb38e6yr4j20gy04wjrw.jpg" alt=""></p>
+<p>不过需要注意的是，因为Zombie对象并没有真正地释放内存，所以适合在发现问题后设置并重跑直面问题，否则长时间运行会产生大量不必要也消不掉的内存。</p>
+<h3 id="Memory-Management－Malloc"><a href="#Memory-Management－Malloc" class="headerlink" title="Memory Management－Malloc"></a>Memory Management－Malloc</h3><p>对于语义上已经释放了、但是内存内容没有改变，且有时Zombie不适合的问题，可以在对象内存释放时在对应内存中写入无意义数据，如0×55(销毁时)，0xAA(生成时)；对于定位大内存越界访问的问题，可以在大内存分配之前和之后添加边界保护页；对于向内存缓冲区溢出和缓冲区释放后再用这样的常见内存问题，可以使用libgmalloc来追踪。Xcode都已经有了这些功能，分别是<strong>Malloc Scribble</strong>和<strong>Malloc Guard Edges</strong>和<strong>Guard Malloc</strong>，其实这些功能都是对malloc库(libsystem_malloc.dylib)自身调试库的调用。这些都能让相应的潜在的内存错误更容易显示地准确地暴露出来。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ezb45ooq9lj20gw04u0ta.jpg" alt=""></p>
+<h3 id="Logging－Malloc"><a href="#Logging－Malloc" class="headerlink" title="Logging－Malloc"></a>Logging－Malloc</h3><p>有时候发现了野指针，通过Scribble确定了是意外释放，但是找不到释放的地方时，就可以使用Logging来追踪。Xcode提供了Malloc Stack功能来记录内存分配和释放的日志。在终端中使用<strong>malloc_history</strong>，App的PID、crash的地址，这里记录着该地址对应的所有分配释放日志。最终可以找到是谁对它意外释放了的。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezb45vxld3j20dy04ut94.jpg" alt=""></p>
+<h3 id="Address-Sanitization"><a href="#Address-Sanitization" class="headerlink" title="Address Sanitization"></a>Address Sanitization</h3><p><strong>EXC_BAD_ACCESS</strong>一直是很多开发者的噩梦，因为这个错误出现后难以实现跟踪。Apple在Xcode7中带来了提升，这样的错误会有更详细的信息，甚至会有内存使用情况的展示。启用该功能会在App下一次运行时重新编译，插入调试信息。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ezb466y091j20fu02iaa9.jpg" alt=""></p>
+<h3 id="Environment-Variable"><a href="#Environment-Variable" class="headerlink" title="Environment Variable"></a>Environment Variable</h3><p>通过添加能起到调试作用的环境变量能：</p>
+<ul>
+<li>NSZombieEnabled</li>
+<li>MallocLogFile</li>
+<li>MallocGuardEdges</li>
+<li>MallocDoNotProtectPrelude</li>
+<li>MallocDoNotProtectPostlude</li>
+<li>StackLogging</li>
+<li>StackLoggingNoCompact</li>
+<li>MallocCorruptionAbort</li>
+<li>MallocNanoZone</li>
+<li>MallocCheckHeap</li>
+<li>CA_DEBUG_TRANSACTIONS</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>总的来说，ARC要比MRC安全的多，在CoreFoundation的也支持ARC后更是如此，但是使用ARC也不是完全没事绝对安全的，比如block的循环引用。非Objc对象造成的内存错误可以有malloc相关的技术发现。这些工具都是帮助定位错误的地方，最根本的还是开发者自身编码习惯的培养和内存原则的执行。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://www.cocoachina.com/ios/20140526/8555.html" target="_blank" rel="noopener">5个Xcode开发调试技巧</a></li>
+<li><a href="https://developer.apple.com/library/watchos/recipes/xcode_help-scheme_editor/Articles/SchemeDiagnostics.html#//apple_ref/doc/uid/TP40010402-CH9-SW1" target="_blank" rel="noopener">Running Your Application with Diagnostics</a></li>
+<li><a href="http://www.cocoachina.com/ios/20150922/13383.html" target="_blank" rel="noopener">说说iOS与内存管理（中）</a></li>
+<li><a href="http://www.cocoachina.com/ios/20151020/13794.html" target="_blank" rel="noopener">Xcode7中你一定要知道的炸裂调试神技</a></li>
+<li><a href="http://jimkubicek.com/blog/2013/04/23/debugging-memory-smashers/" target="_blank" rel="noopener">Debugging Smashed Memory in Obj-C</a></li>
+<li><a href="http://bugly.qq.com/blog/?p=200" target="_blank" rel="noopener">先提高野指针Crash率</a></li>
+<li><a href="http://bugly.qq.com/blog/?p=308" target="_blank" rel="noopener">让非必现Crash变成必现</a></li>
+<li><a href="http://bugly.qq.com/blog/?p=335" target="_blank" rel="noopener">加点黑科技让Crash自报家门</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+          
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <span class="jiathis_txt">分享到：</span>
+  <a class="jiathis_button_weixin">微信</a>
+  <a class="jiathis_button_tsina">新浪微博</a>
+  <a class="jiathis_button_renren">人人网</a>
+  <a class="jiathis_button_qzone">QQ空间</a>
+  <a class="jiathis_button_douban">豆瓣</a>
+  <a class="jiathis_button_pocket">Pocket</a>
+  <a href="http://www.jiathis.com/share?uid=901656" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=901656" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+          <div class="clearfix"></div>
+          <nav id="pagination">
+  
+    <a href="/2016/01/03/2016-01-03-Chisel/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
+  
+  
+    <a href="/2015/12/19/2015-12-19-LLDB基本使用/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+
+  
+      <!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-thread-key="/2015/12/25/2015-12-25-Xcode-Debug/"></div>
+<!-- Duoshuo Comment END -->
+  
+</section>
+
+
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2020 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

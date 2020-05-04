@@ -1,0 +1,361 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>NSNotification | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="NSNotification">
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-11-21T07:43:56.000Z"><a href="/2015/11/21/2015-11-21-NSNotification/">周六, 11月 21 2015, 3:43:56 下午</a></time>
+
+  
+    <h1 class="title">NSNotification</h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>NSNotificationCenter是Cocoa上实现观察者模式的中间桥梁，NSNotification抽象了观察者和被观察者之间的通信。因为观察者和被观察者没有类型限制的广播性，所以一般作为程序中用来解耦模块之间纵深通信的方法(MVC中主要用作M向C通信)。NSNotificationCenter是线程安全的，意味着可以在多线程中不用担心同步问题而轻松访问和使用，例如注册观察者，移除观察者，发送与执行等。</p>
+<h3 id="添加观察者"><a href="#添加观察者" class="headerlink" title="添加观察者"></a>添加观察者</h3><pre><code>// A
+- (void)addObserver:(id)notificationObserver
+           selector:(SEL)notificationSelector
+               name:(NSString *)notificationName
+             object:(id)notificationSender
+// B
+- (id&lt;NSObject&gt;)addObserverForName:(NSString *)name
+                            object:(id)obj
+                             queue:(NSOperationQueue *)queue
+                        usingBlock:(void (^)(NSNotification *note))block
+</code></pre><p>A是传统的方法，B是支持block之后的方法。需要注意的是，NSNotificationCenter<strong>不会retain</strong>方法A的观察者notificationObserver(目前看来也不是weak，我个人认为是为了更本质地暴露问题，而是unsafe_unretained类型的引用)，<strong>但会retain</strong>方法B的返回值id<nsobject>，都将作为记录观察者和被观察者之间映射关系。而且每次添加都会重新注册一次，即使同一对象监听同一消息，而不是去覆盖原来的监听。</nsobject></p>
+<p>在涉及到block的方法B中，需要注意到不要产生循环引用的内存问题。因为block参数为返回的观察对象(__NSObserver类型)拥有，如果观察对象是成员变量而block中又引用了类本身，就构成了循环引用。</p>
+<h3 id="移除观察者"><a href="#移除观察者" class="headerlink" title="移除观察者"></a>移除观察者</h3><pre><code>// A
+- (void)removeObserver:(id)notificationObserver
+                  name:(NSString *)notificationName
+                object:(id)notificationSender
+// B
+- (void)removeObserver:(id)
+</code></pre><p>方法A移除了观察者、被观察者和通知名都匹配的映射关系，方法B移除了匹配观察者的所有映射关系。良好的编码习惯，就像allloc和dealloc，open和close，需要添加和移除配对出现。否则，当观察者已经无效而被观察者继续发送通知时，通知中心中还记录者映射关系(此时为野指针)，调用方法A的观察者的处理方法就会crash；方法B虽然不会crash，但是block内部引用的对象永远不会释放。</p>
+<p>方法A适合于在阶段性周期性的方法中调用，以避免不知情的情况下移除了可视范围外其他与对象关联的映射关系，即具体地移除自己控制的映射关系。方法B适合于在终极性一次性的方法中调用，这样可以确保清除与对象关联的映射关系；</p>
+<h3 id="通知与执行"><a href="#通知与执行" class="headerlink" title="通知与执行"></a>通知与执行</h3><pre><code>- (void)postNotification:(NSNotification *)notification
+- (void)postNotificationName:(NSString *)notificationName
+                      object:(id)notificationSender
+- (void)postNotificationName:(NSString *)notificationName
+                      object:(id)notificationSender
+                    userInfo:(NSDictionary *)userInfo
+</code></pre><p>可以根据需要指定通知名(notificationName)、发送者(notificationSender)和额外信息(userInfo)，所有这些信息封装在一个NSNotification中，由postNotification:发送，其中参数notification不能为空，否则会引发异常。添加观察者的方法A和B都会<strong>同步地</strong>通知观察者并等待其执行完毕，只不过A在通知发生当前的线程中，而B则是在注册时指定队列的线程中。</p>
+<p>但是，当有通知发送时，NSNotificationCenter是通过遍历所有的观察者映射关系，来找到每一个需要通知的观察者的。所以一旦注册到NSNotificationCenter的观察者过多，那么整个发送到响应通知的过程的效率就比较低，也不是什么需求都通过通知来解决，还是需要仔细思考适不适合。如果的确适合，也尽可能晚地注册，不再使用时也尽可能早地移除，这样使得内部的映射关系保持在最低量。</p>
+<h3 id="通知重定向"><a href="#通知重定向" class="headerlink" title="通知重定向"></a>通知重定向</h3><p>添加观察者的方法B已经很好地解决了这个问题，如果有需要尽量采用方法B，不过实现的原理还是值得研究一下的。下面的方法针对方法A(有可能方法B就是这么在NSNotificationCenter内部实现的)。Apple的<a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Notifications/Articles/Threading.html#//apple_ref/doc/uid/20001289-CEGJFDFG" target="_blank" rel="noopener">官方文档</a>这么说的：</p>
+<blockquote>
+<p>For example, if an object running in a background thread is listening for notifications from the user interface, such as a window closing, you would like to receive the notifications in the background thread instead of the main thread. In these cases, you must capture the notifications as they are delivered on the default thread and redirect them to the appropriate thread.</p>
+</blockquote>
+<p>思路是自定义一个缓存需要重定向NSNotification的集合(比如数组)。当通知来了时，先检查发送这个通知的线程是不是期望的线程，如果不是，则将这个通知缓存到集合中，并告诉期望的线程有通知需要处理。期望的线程得知后，从集合中移除通知，并进行处理。</p>
+<pre><code>@interface AppDelegate () &lt;NSMachPortDelegate&gt;
+@property (nonatomic,readwrite,strong) NSMutableArray *notifications;
+@property (nonatomic,readwrite,strong) NSThread *notificationThread;
+@property (nonatomic,readwrite,strong) NSLock *notificationLock;
+@property (nonatomic,readwrite,strong) NSMachPort *notificationPort;
+@end
+
+@implementation AppDelegate
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    NSLog(@&quot;current thread = %@&quot;, [NSThread currentThread]);
+    self.notifications = [[NSMutableArray alloc] init];
+    self.notificationLock = [[NSLock alloc] init];
+
+    self.notificationThread = [NSThread currentThread];
+    self.notificationPort = [[NSMachPort alloc] init];
+    self.notificationPort.delegate = self;
+
+    [[NSRunLoop currentRunLoop] addPort:self.notificationPort forMode:(__bridge NSString *)kCFRunLoopCommonModes];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(processNotification:) name:@&quot;TestNotification&quot; object:nil];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@&quot;TestNotification&quot; object:nil userInfo:nil];
+    });
+}
+- (void)handleMachMessage:(void *)msg {
+    [self.notificationLock lock];
+    while ([self.notifications count]) {
+        NSNotification *notification = [self.notifications objectAtIndex:0];
+        [self.notifications removeObjectAtIndex:0];
+        [self.notificationLock unlock];
+        [self processNotification:notification];
+        [self.notificationLock lock];
+    };
+    [self.notificationLock unlock];
+}
+- (void)processNotification:(NSNotification *)notification {
+    if ([NSThread currentThread] != _notificationThread) {
+        [self.notificationLock lock];
+        [self.notifications addObject:notification];
+        [self.notificationLock unlock];
+        [self.notificationPort sendBeforeDate:[NSDate date] components:nil from:nil reserved:0];
+    } else {
+        NSLog(@&quot;current thread = %@&quot;, [NSThread currentThread]);
+        NSLog(@&quot;process notification&quot;);
+    }
+}
+@end
+</code></pre><h3 id="多线程安全"><a href="#多线程安全" class="headerlink" title="多线程安全"></a>多线程安全</h3><p>NSNotificationCenter之所以在同一个线程中同步发送和执行通知，应该是Apple出于线程安全的原因，但是并不代表没有线程安全的问题。因为通知的发送和执行没有限制必须在某一个线程(例如主线程)，所以在线程A执行通知的期间，会有线程B释放观察者的可能性。如果观察者的执行方法里访问了观察者自己，那么这种情况下就会因访问野指针而crash：</p>
+<pre><code>@interface Poster : NSObject
+@end
+@implementation Poster
+- (instancetype)init {
+    self = [super init];
+    if (self){
+        [self performSelectorInBackground:@selector(postNotification) withObject:nil];
+    }
+    return self;
+}
+- (void)postNotification {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@&quot;Test&quot; object:nil];
+}
+@end
+
+@interface Observer : NSObject {
+    Poster  *_poster;
+}
+@property (nonatomic, assign) NSInteger i;
+@end
+@implementation Observer
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@&quot;Test&quot; object:nil];
+        _poster = [[Poster alloc] init];
+    }
+    return self;
+}
+- (void)handleNotification:(NSNotification *)notification {
+    NSLog(@&quot;handle notification begin&quot;);
+    sleep(1);
+    self.i = 10;
+    NSLog(@&quot;handle notification end&quot;);
+}
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSLog(@&quot;Observer dealloc&quot;);
+}
+@end
+
+@implementation AppDelegate
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    __autoreleasing Observer *observer = [[Observer alloc] init];
+}
+@end
+</code></pre><p>总之一句话，如何才能保证方法所有涉及到的对象，在方法执行期间有效？不过这类问题已经很典型了，在方法开始时确保所有对象的有效性后再执行，ARC下使用strong，MRC下使用retain+autorelease。今天写这篇文章的时候(XCode7.1.1)，我检测了引用文章的例子，惊奇的是已经<strong>没有问题</strong>了。我认为Apple解决了这个问题，应该是在执行通知方法前，内部strong或者retain+autorelease观察者。这能做到通知方法<strong>执行期间</strong>至少不会产生观察者都无效，如果执行前观察者都已经无效就会直接crash。引用文的例子是方法A，我认为方法B本身就不会有问题，因为它是个block对象，内部strong了观察者，而__NSObserver必须通过NSNotificationCenter的removeObserver方法才能移除。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="http://southpeak.github.io/blog/2015/03/20/cocoa-foundation-nsnotificationcenter/" target="_blank" rel="noopener">Foundation: NSNotificationCenter</a></li>
+<li><a href="http://southpeak.github.io/blog/2015/03/14/nsnotificationyu-duo-xian-cheng/" target="_blank" rel="noopener">Notification与多线程</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+          
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <span class="jiathis_txt">分享到：</span>
+  <a class="jiathis_button_weixin">微信</a>
+  <a class="jiathis_button_tsina">新浪微博</a>
+  <a class="jiathis_button_renren">人人网</a>
+  <a class="jiathis_button_qzone">QQ空间</a>
+  <a class="jiathis_button_douban">豆瓣</a>
+  <a class="jiathis_button_pocket">Pocket</a>
+  <a href="http://www.jiathis.com/share?uid=901656" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=901656" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+          <div class="clearfix"></div>
+          <nav id="pagination">
+  
+    <a href="/2015/12/06/2015-11-29-Test/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
+  
+  
+    <a href="/2015/11/15/2015-11-15-Autorelease/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+
+  
+      <!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-thread-key="/2015/11/21/2015-11-21-NSNotification/"></div>
+<!-- Duoshuo Comment END -->
+  
+</section>
+
+
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2020 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>Objc高级编程之Block-读书笔记 | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Objc高级编程之Block-读书笔记">
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-12-12T06:01:03.000Z"><a href="/2015/12/12/2015-12-12-Objc高级编程之Block-读书笔记/">周六, 12月 12 2015, 2:01:03 下午</a></time>
+
+  
+    <h1 class="title">Objc高级编程之Block-读书笔记</h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="Block存储域"><a href="#Block存储域" class="headerlink" title="Block存储域"></a>Block存储域</h3><p>Block也是Objc对象，其类型有以下几种：</p>
+<ul>
+<li>_NSConcreteStatckBlock</li>
+<li>_NSConcreteGlobalBlock</li>
+<li>_NSConcreteMallocBlock</li>
+</ul>
+<p>目前ARC已经不再创建_NSConcreteStatckBlock类型的Block对象，进一步确保了block在使用时候的有效性，不过本书的内容我还是如实记录。_NSConcreteStatckBlock类的对象存储在栈(Stack)上，_NSConcreteGlobalBlock类的对象存储在数据区(.data)上，_NSConcreteMallocBlock类的对象存储在堆(Heap)上。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyexv5omj20zi0t6tdm.jpg" alt=""></p>
+<p>因为_NSConcreteGlobalBlock类型的block内部不依赖执行时的状态，所以能够用结构体存储在与全局变量相同的数据区域中。在整个程序周期内都可以安全地使用。但是在栈上_NSConcreteStatckBlock类的block，如果其所在作用域结束后就会被销毁，__block变量也一样。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyf5zapgj21eq0pwwl4.jpg" alt=""></p>
+<p>Apple提供了将block和__block变量从栈<strong>复制</strong>到堆的方法解决了这个问题，这样即使block的作用域结束，我们还是可以继续安全地访问堆上的block。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyffcaq6j21do15c7db.jpg" alt=""></p>
+<p>通过block结构体成员变量<strong>forwarding的帮助，</strong>block变量无论在栈上还是在堆上都能够被正确地访问(后面详细说明)。</p>
+<pre><code>typedef int (^blk_t)(int);
+blk_t func(int rate) {
+    return ^(int count) {return rate * count;};
+}
+//等价于
+typedef int (^blk_t)(int);
+blk_t func(int rate) {
+    blk_t tmp = &amp;__func_block_impl_0(__func_block_func_0, &amp;__func_block_desc_0_DATA, rate);
+    tmp = objc_retainBlock(tmp);
+    return objc_autoreleaseReturnValue(tmp);
+}
+//而objc_retainBlock实际上就是_Block_copy
+</code></pre><p>大多数情况下编译器会适当地判断block的内存管理，不过少数情况还是需要开发者手动管理。比如向方法的参数传递block时，编译器就不能判断是否对block进行copy。这主要以来方法内部的实现是否自己对作为参数的block进行copy，对于copy过的方法，使用时就不用再对block手动copy。相反，就需要考虑手动复制(当然，目前已经没有_NSConcreteStatckBlock类的block存在也不存在这样的问题了)。</p>
+<pre><code>- (id)getBlockArray {
+    int val = 10;
+    return @[[^{NSLog(@&quot;blk0:%d&quot;, val);} copy], [^{NSLog(@&quot;blk1:%d&quot;, val);} copy]];
+}
+</code></pre><p>不管block之前存储在哪，用copy复制都不会引起任何问题，如果不确定时最好copy。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxyh6kwg9j21xm0l8n2b.jpg" alt=""></p>
+<h3 id="block变量存储域"><a href="#block变量存储域" class="headerlink" title="__block变量存储域"></a>__block变量存储域</h3><p>当block从栈copy到堆时，其使用的所有<strong>block变量也全部从栈复制到堆。如果block已经在堆上，对block再次copy也不会对</strong>block变量有任何影响。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyfmyecjj212y0smtdw.jpg" alt=""></p>
+<p>多个block使用同一个<strong>block变量时，任何一个block先从栈copy到堆后，</strong>block变量也被copy到堆上并被持有，当其他block再copy到堆上时，仅仅增加__block变量的引用计数。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyfy0c8rj21qq1ceand.jpg" alt=""></p>
+<p>block从堆中被销毁时，其使用的__block变量也会被销毁。block的内存管理和objc对象的内存管理完全相同。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxygbkd1rj21tw1d87kg.jpg" alt=""></p>
+<p>不管<strong>block变量存储在栈上还是堆上，都能够正确地访问对应的变量。所有栈中的</strong>block变量，将其架构体内部的forwarding值从自己替换为堆上的<strong>block变量，这样无论栈上</strong>block还是堆上__block都是forwarding指向同一个堆上结构体。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxygqh06uj21qa1bwqfc.jpg" alt=""></p>
+<h3 id="截获对象"><a href="#截获对象" class="headerlink" title="截获对象"></a>截获对象</h3><pre><code>blk_t blk;
+{
+   id array = [[]NSMutableArray alloc] init];
+   blk = [^(id obj) {
+       [array addObject:obj];
+       NSLog(@&quot;array count = %ld&quot;, [array count]);
+   } copy];
+}
+blk([[NSObject alloc] init]);
+blk([[NSObject alloc] init]);
+blk([[NSObject alloc] init]);
+</code></pre><p>作用域结束后block调用正常，意味着变量array其超出作用域而存在并没有被销毁。</p>
+<pre><code>//编译器模拟代码
+struct __block_impl {
+    void *isa;
+    int Flags;
+    int Reserved;
+    void *FuncPtr;
+};
+
+static void __main_block_copy_0(struct __main_block_impl_0 *dst, struct __main_block_impl_0 *src) {
+    _Block_object_assign(&amp;dst-&gt;array, src-&gt;array, BLOCK_FIELD_IS_OBJECT);
+}
+
+static void __main_block_dispose_0(struct __main_block_impl_0 *src) {
+    _Block_object_dispose(src-&gt;array, BLOCK_FIELD_IS_OBJECT);
+}
+
+static struct __main_block_desc_0 {
+    unsigned long reserved;
+    unsigned long Block_size;
+    void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
+    void (*dispose)(struct __main_block_impl_0*);
+}__main_block_desc_0_DATA = {
+    0,
+    sizeof(struct __main_block_impl_0),
+    __main_block_copy_0,
+    __main_block_dispose_0
+};
+
+struct __main_block_impl_0 {
+    struct __block_impl impl;
+    struct __main_block_desc_0* Desc;
+    id __strong array;
+    __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, id __strong _array, int flags=0) : array(_array) {
+        impl.isa = &amp;_NSConcreteStackBlock;
+        impl.Flags = flags;
+        impl.FuncPtr = fp;
+        Desc = desc;
+    }
+};
+
+static void __main_block_func_0(struct __main_block_impl_0 *__cself, id obj) {
+    id __strong array = __cself-&gt;array;
+    [array addObject:obj];
+    NSLog(@&quot;array count = %ld&quot;, [array count]);
+}
+
+blk_t blk;
+{
+    id __strong array = [[NSMutableArray alloc] init];
+    blk = &amp;__main_block_impl_0(__main_block_func_0, &amp;__main_block_desc_0_DATA, array, 0x22000000);
+    blk = [blk copy];
+}
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+</code></pre><p>作用域的局部自动变量array赋值给了block结构体中的成员变量，按照之前的描述，C语言结构体不能含有strong修饰符变量，因为编译器不知道应该何时对C语言结构体进行初始化和销毁从而管理内存，但是objc的runtime能够准确把握block从栈copy到堆以及从堆中销毁的时机，因此能够自动管理block结构体的初始化和销毁时机。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxyhiguv6j21xi0f8n0z.jpg" alt=""></p>
+<p>具体表现如下：</p>
+<ul>
+<li>调用block的copy方法时</li>
+<li>block作为方法的返回值返回时</li>
+<li>将block赋值给类的__strong修饰符id类型成员变量</li>
+<li>方法名中含有usingBlock的Cocoa框架方法和GCD方法中传递block作为参数时</li>
+</ul>
+<p>实现该功能需要在block描述结构体(XX_block_desc_X)中添加copy和dispose方法。在main_block_copy_0方法里，<strong>_Block_object_assign</strong>相当于retain，持有对象并赋值给block实现结构体(XX_block_impl_X)中的成员变量。在main_block_dispose_0方法里，<strong>_Block_object_dispose</strong>相当于release，释放赋值在block实现结构体中的成员变量。其中，参数BLOCK_FIELD_IS_OBJECT和BLOCK_FIELD_IS_BYREF用语区分对象类型和__block类型。</p>
+<h3 id="block变量和对象"><a href="#block变量和对象" class="headerlink" title="__block变量和对象"></a>__block变量和对象</h3><pre><code>__block id obj = [[NSObject alloc] init];
+
+//编译器模拟代码
+struct __Block_byref_obj_0 {
+    void *__isa;
+    __Block_byref_obj_0 *__forwarding;
+    int __flags;
+    int __size;
+    void (*__Block_byref_id_object_copy)(void*, void*);
+    void (*__Block_byref_id_object_dispose)(void*);
+    __strong id obj;
+};
+
+static void __Block_byref_id_object_copy_131(void *dst, void *src) {
+    _Block_object_assign((char*)dst + 40, *(void * *) ((char*)src + 40), 131);
+}
+
+static void __Block_byref_id_object_dispose_131(void *src) {
+    _Block_object_dispose(*(void * *) ((char*)src + 40), 131);
+}
+
+__Block_byref_obj_0 obj = {
+    0,
+    &amp;obj,
+    0x2000000,
+    sizeof(__Block_byref_obj_0),
+    __Block_byref_id_object_copy_131,
+    __Block_byref_id_object_dispose_131,
+    [[NSObject alloc] init]
+};
+</code></pre><p>由此看出，<strong>block变量虽然是个结构体，但实际上也是一个objc对象，并有持有和释放方法，其中使用_Block_object_assign持有</strong>block对象，使用_Block_object_dispose释放<strong>block对象。</strong>block对象可以为<strong>strong、</strong>weak和<strong>unsafe_unretained，不过使用</strong>unsafe_unretained时注意出现野指针访问无效对象的情况，而<strong>autoreleasing与</strong>block编译时不通过。</p>
+<h3 id="copy-release"><a href="#copy-release" class="headerlink" title="copy/release"></a>copy/release</h3><p>由于block时C语言的扩展，所以在C语言中也可以使用block语法。此时，使用Block_copy和Block_release代替objc的copy和release方法即可。另外，ARC无效时，<strong>block修饰符被用来避免block中的循环引用。因为block从栈copy到堆时，</strong>block成员变量如果是对象类型，则block不会retain它，反之则retain它。这样来避免block的循环引用。由于ARC和MRC时，__block修饰符的用途有很大区别，因为在开发时，必须要知道编译环境是ARC还是MRC，这一点需要特别注意。</p>
+
+      
+    </div>
+    <footer>
+      
+          
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <span class="jiathis_txt">分享到：</span>
+  <a class="jiathis_button_weixin">微信</a>
+  <a class="jiathis_button_tsina">新浪微博</a>
+  <a class="jiathis_button_renren">人人网</a>
+  <a class="jiathis_button_qzone">QQ空间</a>
+  <a class="jiathis_button_douban">豆瓣</a>
+  <a class="jiathis_button_pocket">Pocket</a>
+  <a href="http://www.jiathis.com/share?uid=901656" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=901656" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+          <div class="clearfix"></div>
+          <nav id="pagination">
+  
+    <a href="/2015/12/19/2015-12-19-LLDB基本使用/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
+  
+  
+    <a href="/2015/12/06/2015-12-06-Objc高级编程之ARC-读书笔记/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+
+  
+      <!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-thread-key="/2015/12/12/2015-12-12-Objc高级编程之Block-读书笔记/"></div>
+<!-- Duoshuo Comment END -->
+  
+</section>
+
+
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2020 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE HTML>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <title>Effective Objective-C 读书笔记-下 | Game Curiosity Development</title>
+  <meta name="author" content="hllovesgithub">
+  
+  <meta name="description" content="GCD">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Effective Objective-C 读书笔记-下">
+  <meta property="og:site_name" content="Game Curiosity Development">
+
+  
+    <meta property="og:image" content="">
+  
+
+  <link href="/favicon.ico" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Game Curiosity Development" type="application/atom+xml">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="/css/style.css">
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-368771XX-X']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</head>
+</html>
+<body>
+  <header id="header" class='normal_mode'>
+    <nav id="main-nav">
+  <ul class="container">
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+  </header>
+  <div id="content" class="container">
+    <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2016-01-24T01:46:38.000Z"><a href="/2016/01/24/2016-01-24-Effective-Objective-C读书笔记-下/">周日, 1月 24 2016, 9:46:38 上午</a></time>
+
+  
+    <h1 class="title">Effective Objective-C 读书笔记-下</h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="用handle块降低代码分散度"><a href="#用handle块降低代码分散度" class="headerlink" title="用handle块降低代码分散度"></a>用handle块降低代码分散度</h3><p>编写界面代码时，常会用到<strong>异步执行任务</strong>(perform task asynchronously)范式，其好处在于处理界面和用户交互的主线程不会因为要执行I/O或网络通信这类耗时任务而被阻塞。同步执行耗时任务时，用户界面变得无法响应用户输入，甚至因为长时间不响应而被系统终止执行。</p>
+<p>异步常见的模式是实用delegate进行异步回调，这种方法确实可行，而且也没有什么错误：</p>
+<pre><code>// DataFetcher.h
+@class DataFetcher;
+@protocol DataFetcherDelegate
+- (void)dataFetcher:(DataFetcher *)fetcher didGetData:(NSData *)data;
+@end
+
+@interface DataFetcher
+@property (nonatomic,readwrite,assign) id&lt;DataFetcherDelegate&gt; delegate;
++ (instance)dataFetcherWithURL:(NSURL *)url;
+- (void)start;
+@end
+
+// Other.m
+- (void)fetcherData {
+    DataFetcher *fetcher = [DataFetcher dataFetcherWithURL:someURL];
+    fetcher.delegate = self;
+    [fetcher start];
+}
+...
+- (void)dataFetcher:(DataFetcher *)fetcher didGetData:(NSData *)data {
+    _fetcherData = data;
+}
+</code></pre><p>然而如果使用block，代码更清晰易懂，逻辑更紧凑简洁：</p>
+<pre><code>// DataFetcher.h
+typedef void(^DataFetcherCompletion)(NSData *data);
+- (void)startWithCompletion:(DataFetcherCompletion)handler;
+
+// Other.m
+- (void)fetcherData {
+    DataFetcher *fetcher = [DataFetcher dataFetcherWithURL:someURL];
+    [fetcher startWithCompletion:^(NSData *data) {
+        _fetcherData = data;
+    }];
+}
+</code></pre><p>delegate有个缺点，多个委托对象在同一个回调中要进行区分。这不仅会让回调方法里因判断分支而变长，导致代码激增。使用block不需要：</p>
+<pre><code>// Delegate
+- (void)fetcherDataA {
+    _fetcherA = [DataFetcher dataFetcherWithURL:someURLA];
+    _fetcherA.delegate = self;
+    [_fetcherA start];
+}
+- (void)fetcherDataB {
+    _fetcherB = [DataFetcher dataFetcherWithURL:someURLB];
+    _fetcherB.delegate = self;
+    [_fetcherB start];
+}
+...
+- (void)dataFetcher:(DataFetcher *)fetcher didGetData:(NSData *)data {
+    if (fetcher == _fetcherA) {
+        _fetcherDataA = data;
+        _fetcherA = nil;
+    } else if (fetcher == _fetcherB) {
+        _fetcherDataB = data;
+        _fetcherB = nil;
+    }
+}
+
+// Block
+- (void)fetcherDataA {
+    DataFetcher *fetcher = [DataFetcher dataFetcherWithURL:someURL];
+    [fetcher startWithCompletion:^(NSData *data) {
+        _fetcherDataA = data;
+    }];
+}
+- (void)fetcherData {
+    DataFetcher *fetcher = [DataFetcher dataFetcherWithURL:someURL];
+    [fetcher startWithCompletion:^(NSData *data) {
+        _fetcherDataB = data;
+    }];
+}
+</code></pre><p>block协会发还有其他用途，比如很多基于block的API用来处理错误：</p>
+<pre><code>// A
+typedef void(^DataFetcherCompletion)(NSData *data);
+typedef void(^DataFetcherError)(NSError *error);
+- (void)startWithCompletion:(DataFetcherCompletion)handler failure:(DataFetcherError)failure;
+
+// B
+typedef void(^DataFetcherCompletion)(NSData *data, NSError *error);
+- (void)startWithCompletion:(DataFetcherCompletion)handler;
+</code></pre><p>对于方案A，成功和失败分别处理，使代码更易懂，有需要还可以省略不想处理的情况。对于方案B，全部逻辑放在一起会变得更长更复杂，但也更灵活，比如如果出现错误也可以继续使用已有的data等。Apple的API几乎都是基于方案B。基于handle设计API还有个原因，就是某些代码必须在特定线程上运行。由API的调用者根据需要设置参数，使得将指定代码块运行在指定线程中变得非常方便：</p>
+<pre><code>- (id)addObserverForName:(NSString *)name object:(id)object queue:(NSOerationQueue *)queue usingBlock:(void(^)(NSNotification *))block;
+</code></pre><hr>
+<h3 id="多用派发队列，少用同步锁"><a href="#多用派发队列，少用同步锁" class="headerlink" title="多用派发队列，少用同步锁"></a>多用派发队列，少用同步锁</h3><p>objc中的同步块@synchronized(id){}会根据给定的对象自动创建一个锁，进入括号前阻塞获取同步锁，执行完代码离开括号时释放同步锁。@synchronized的问题在于提供值，它相当于锁的ID。一般都是具有统一资源竞争相关性的代码片段对应同一个ID，如果滥用导致有大量相同ID的@synchronized存在，那么必然会降低代码效率。另一个方法是直接使用NSLock，同步执行前lock，执行完毕后unlock。</p>
+<p>GCD能以更简单更高效的形式为代码同步加锁。比如某属性的存取方法：</p>
+<pre><code>_syncQueue = dispatch_queue_create(&quot;SyncQueueForProperty&quot;, DISPATCH_QUEUE_SERIAL);
+- (NSString *)something {
+    __block NSString *something = nil;
+    dispatch_sync(_syncQueue, ^() {
+        something = _something;
+    });
+    return something;
+}
+- (void)setSomething:(NSString *)something {
+    dispatch_async(_syncQueue, ^() {
+        _something = something;
+    });
+}
+</code></pre><p>串行队列确保block同步执行。存方法使用异步派发可能比同步派发要慢，因为GCD异步派发需要拷贝block，但是如果block内的代码本身是比较耗时的话，同步执行会阻塞调用线程，而且同步获取是为了获取正确的值，同步设置本身也没有什么意义。多个取方法同能同时并发执行，而多个存取方法不能并发执行。所以改用并行队列会更快，同时使用GCD的<strong>栅栏</strong>(barrier)功能确保存方法单个执行：</p>
+<pre><code>_syncQueue = dispatch_queue_create(&quot;SyncQueueForProperty&quot;, DISPATCH_QUEUE_CONCURRENT);
+- (NSString *)something {
+    __block NSString *something = nil;
+    dispatch_sync(_syncQueue, ^() {
+        something = _something;
+    });
+    return something;
+}
+- (void)setSomething:(NSString *)something {
+    dispatch_barrier_async(_syncQueue, ^() {
+        _something = something;
+    });
+}
+</code></pre><hr>
+<h3 id="多用GCD，少用performSelector"><a href="#多用GCD，少用performSelector" class="headerlink" title="多用GCD，少用performSelector"></a>多用GCD，少用performSelector</h3><p>objc本质上是一门非常动态的语言，其定义了一些performSelector方法，令开发者可以随意调用任何方法。</p>
+<p><strong>一般方法</strong>：</p>
+<ul>
+<li>(id)performSelector:(SEL)aSelector;</li>
+<li>(id)performSelector:(SEL)aSelector withObject:(id)anObject;</li>
+<li>(id)performSelector:(SEL)aSelector withObject:(id)anObject withObject:(id)anotherObject;</li>
+</ul>
+<p>这些方法看上去似乎有些多余，但是其真正的用意是运行时利用选择子进行多重动态绑定：</p>
+<pre><code>SEL selector;
+if (Condition1) {
+    selector = @selector(foo);
+} else if (Condition2) {
+    selector = @selector(bar);
+} else {
+    selector = @selector(baz);
+}
+[object performSelector:selector];
+</code></pre><p>所以这种方式极为灵活，经常可以用来简化复杂代码。还有一种方法，先把selector保存起来等到特定事件发生后再调用。不管哪种，编译器都不知道selector是什么，必须要等到运行时才能最终确定。但是其代价是，虽然@selector可以检查方法名的合法性，但是selector终究是个NSString*类型的变量，可以被赋成任何值，所以可能因缺少编译器类型检查的帮助而引起调用不存在方法的问题。另外，编译器不知道将调用的selector是什么，所以不了解方法签名及返回值，甚至连是否有返回值都不清楚，基于方法名称来进行内存管理的ARC没法判断了。为了谨慎起见，ARC不添加释放操作，于是可能造成内存泄漏：</p>
+<pre><code>SEL selector;
+if (Condition1) {
+    selector = @selector(newObject);
+} else if (Condition2) {
+    selector = @selector(copy);
+} else {
+    selector = @selector(someProperty);
+}
+id ret = [object performSelector:selector];
+</code></pre><p>对于返回值，如果返回的是基本类型，则还需要转换工作。因为id类型表示指向人意objc对象的指针，如果返回的是自定义类型(如struct)其大小如果超出所在架构的指针大小，则还不能正确返回。同理可知传入参数也一样，而且明显的是参数个数受限。然而，block方法签名也有明确定义，内部可以引用任何类型任何个数的参数。</p>
+<p><strong>延迟执行方法</strong>：</p>
+<ul>
+<li>(void)performSelector:(SEL)aSelector withObject:(id)anArgument afterDelay:(NSTimeInterval)delay;</li>
+<li>(void)performSelector:(SEL)aSelector withObject:(id)anArgument afterDelay:(NSTimeInterval)delay inModes:(NSArray<nsstring *=""> *)modes;</nsstring></li>
+</ul>
+<p>很快会发现，这些方法都无法处理多个参数的selector。然而，dispatch_after可以实现相同的功能。</p>
+<p><strong>线程功能方法</strong>：</p>
+<ul>
+<li>(void)performSelectorInBackground:(SEL)aSelector withObject:(nullable id)arg;</li>
+<li>(void)performSelectorOnMainThread:(SEL)aSelector withObject:(nullable id)arg waitUntilDone:(BOOL)wait;</li>
+<li>(void)performSelector:(SEL)aSelector onThread:(NSThread *)thr withObject:(nullable id)arg waitUntilDone:(BOOL)wait</li>
+</ul>
+<p>同样，这些方法都无法处理多个参数的selector。</p>
+<hr>
+<h3 id="选择GCD还是NSOperationQueue"><a href="#选择GCD还是NSOperationQueue" class="headerlink" title="选择GCD还是NSOperationQueue"></a>选择GCD还是NSOperationQueue</h3><p>使用NSOperation的好处：</p>
+<p><strong>取消某个Operation</strong>：使用NSOperationQueue，想要取消Operation是很容易的。在运行Operation之前，可以调用cancel方法将Operation内部设置标志位，用于表明此Operation不需要执行。不过已经执行的Operation无法取消。GCD就不能做到这一点。虽然说可以自己实现，但是需要编写很多代码，而这些代码都是NSOperationQueue已经实现好了的。</p>
+<p><strong>指定Operation之间的依赖关系</strong>：一个Operation可以依赖其它多个Operation，建立依赖体系，值特定Operation在另一个Operation完成后才能执行。</p>
+<p><strong>支持KVO观测</strong>：Operation有许多属性适合KVO观测，比如通过isCancelled来判断是否已取消，比如通过isFinished来判断是否已完成。能在某个Operation变更状态时得到通知，控制比GCD更精细。</p>
+<p><strong>指定Operation的优先级</strong>：Operation的优先级统一队列中各个Operation之间的优先关系。优先级高的先执行，优先级低的后执行。GCD只是队列有优先级，但是同一queue中的各个block之间没有优先级。</p>
+<p><strong>重用Operation对象</strong>：Apple已经实现了一下NSOperation子类比如NSBlockOperation。可以根据需要自己创建特制的Operation，能够存放任何信息，Operation执行时可以充分利用这些信息，还可以随意调用定义的方法，这就比GCD那些简单的block要强大得多。</p>
+<hr>
+<h3 id="不要使用dispatch-get-current-queue"><a href="#不要使用dispatch-get-current-queue" class="headerlink" title="不要使用dispatch_get_current_queue"></a>不要使用dispatch_get_current_queue</h3><p>dispatch_get_current_queue有种典型的错误用法(antipattern)，就是用它来检测当前队列是不是某个特定队列，试图以此来避免执行同步派发时可能不要的死锁问题。考虑下面的代码：</p>
+<pre><code>- (NSString *)someString {
+    __block NSString *someString = nil;
+    dispatch_sync(_syncQueue, ^() {
+        someString = _someString;
+    });
+    return someString;
+}
+- (void)setSomestring {
+    dispatch_async(_syncQueue, ^() {
+        _someString = someString;
+    });
+}
+</code></pre><p>这种写法的问题在于，如果调用getter的线程就是同一个_syncQueue，那么可能会产生死锁。得知dispatch_get_current_queue后，也许觉得可以用它改写使得getter方法变得<strong>可重入</strong>，只需要检测当前队列是否为同步操作所针对的队列，如果是，就不派发直接执行：</p>
+<pre><code>- (NSString *)someString {
+    __block NSString *someString = nil;
+    dispatch_block_t task = ^() {
+        someString = _someString;
+    };
+    if (dispatch_get_current_queue() == _syncQueue) {
+        task();
+    } else {
+        dispatch_sync(_syncQueue, task);
+    }
+    return someString;
+}
+</code></pre><p>这种做法可以处理一些简单的情况。不过仍然有死锁的可能：</p>
+<pre><code>dispatch_queueu_t queueA = dispatch_queue_create(&quot;QueueA&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queueu_t queueB = dispatch_queue_create(&quot;QueueB&quot;, DISPATCH_QUEUE_SERIAL);
+
+dispatch_sync(queueA, ^() {
+    dispatch_sync(queueB, ^() {
+        dispatch_sync(queueA, ^() {
+            // Deadlock
+        });
+    });
+});
+</code></pre><p>这段代码执行到最内层时总会死锁。按照之前认为的办法使用dispatch_get_current_queue进行检测：</p>
+<pre><code>dispatch_sync(queueA, ^() {
+    dispatch_sync(queueB, ^() {
+        dispatch_block_t task = ^() {...};
+        if (dispatch_get_current_queue() == queueA) {
+            task();
+        } else {
+            dispatch_sync(queueA, task);
+        }
+    });
+});
+</code></pre><p>然而这样也不行，因为dispatch_get_current_queue返回的<strong>仅仅是当前执行block的队列</strong>，也就是queueB。这样queueA的同步派发依然会执行，和之前一样还是死锁。正确的做法是：确保存取方法<strong>不可重入</strong>，同步队列绝不访问同步队列。由于派发队列是一种极为轻量的机制，为了每项属性都有专用的同步队列，不妨创建多个队列。</p>
+<p>队列之间会形成一套层级体系，这意味着排在某队列中的block，会在其<strong>上级队列</strong>(parent queue)里执行。层级地位最高的队列总是<strong>全局并发队列</strong>。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1f059mnna4rj20ou0g6q4b.jpg" alt=""></p>
+<p>由于队列间有层级关系，所以dispatch_get_current_queue就起不到作用。比如QueueC中的block为以为当前是queueC，那么queueA上执行就没问题，实际上这依然会死锁。解决这个问题的办法是，通过GCD提供的功能来设定<strong>队列特定数据</strong>(queue-specific data)，它可以将任意数据以<strong>健值对</strong>的形式<strong>关联</strong>到队列中。最重要的是，如果当前队列没有找到给定健对应的值，那么GCD会<strong>沿着层级系统向上查找直到找到或者到达根队列</strong>：</p>
+<pre><code>dispatch_queue_t queueA = dispatch_queue_create(&quot;queueA&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_queue_t queueB = dispatch_queue_create(&quot;queueB&quot;, DISPATCH_QUEUE_SERIAL);
+dispatch_set_target_queue(queueB, queueA);
+
+static int kSpecific;
+CFStringRef value = CFSTR(&quot;queueA&quot;);
+dispatch_queue_set_specific(queueA, &amp;kSpecific, (void *)value, (dispatch_function_t)CFRelease);
+
+dispatch_sync(queueB, ^{
+    dispatch_block_t block = ^(void) {
+        NSLog(@&quot;No deadlock&quot;);
+    };
+
+    CFStringRef value = dispatch_get_specific(&amp;kSpecific);
+    if (value) {
+        block();
+    } else {
+        dispatch_sync(queueA, block);
+    }
+});
+</code></pre><p>使用队列特定数据提供的这套简单易用的机制，就能避免使用dispatch_get_current_queue时经常遭遇的陷进。</p>
+<hr>
+<h3 id="对自定义内存语义的collection使用无缝桥接-toll-free-bridging"><a href="#对自定义内存语义的collection使用无缝桥接-toll-free-bridging" class="headerlink" title="对自定义内存语义的collection使用无缝桥接(toll-free bridging)"></a>对自定义内存语义的collection使用无缝桥接(toll-free bridging)</h3><p>在使用Foundation的NSDictionary时会遇到一个大问题，那就是key的内存管理是copy，value的内存管理是retian。除非使用强大的无缝桥接技术，否则无法改变其语义。CoreFoudation的字典类型叫做CFDictionary，可变版本为CFMutableDictionary。创建CFMutableDictionary是可以通过下列方法来指定key和value的内存语义：</p>
+<pre><code>CFMutableDictionaryRef CFDictionaryCreateMutable(
+    CFAllocatorRef allocator,
+    CFIndex capacity,
+    const CFDictionaryKeyCallBacks *keyCallBacks,
+    const CFDictionaryValueCallBacks *valueCallBacks
+)
+</code></pre><p><strong>allocator</strong>表示将要使用的内存分配器。CoreFoundation的数据结构需要占用内存，而分配器负责分配及回收这些内存。通常传入NULL，表示使用默认的分配器。<strong>capacity</strong>表示字典初始化大小。<strong>keyCallBacks</strong>和<strong>valueCallBacks</strong>定了许多回调函数，用于指示key和value在遇到各种事件时应该执行何种操作：</p>
+<pre><code>struct CFDictionaryKeyCallBacks {
+    CFIndex version;
+    CFDictionaryRetainCallBack retain;
+    CFDictionaryReleaseCallBack release;
+    CFDictionaryCopyDescriptionCallBack copyDescription;
+    CFDictionaryEqualCallBack equal;
+    CFDictionaryHashCallBack hash;
+};
+
+struct CFDictionaryValueCallBacks {
+    CFIndex version;
+    CFDictionaryRetainCallBack retain;
+    CFDictionaryReleaseCallBack release;
+    CFDictionaryCopyDescriptionCallBack copyDescription;
+    CFDictionaryEqualCallBack equal;
+};
+</code></pre><p>version表示数据结构的版本号，目前为0。结构体中其余都是函数指针，定义了各种事件发生时采用哪个函数来执行相关任务。例如retain函数的原型：</p>
+<pre><code>typedef const void* (*CFDictionaryRetainCallBack) (CFAllocatorRef allocator, const void *value);
+</code></pre><p>其中value表示即将加入字典的key或value，void*表示最终加入字典的值。</p>
+<pre><code>const void* CustomCallback(CFAllocatorRef allocator, const void *value) {
+    return value;
+}
+</code></pre><p>CustomCallback则表示将值照原样返回，如果用它来充当retian的回调函数，那么字典就不会保留key或value了。和无缝桥接搭配起来，就能创造出特殊的NSDictionary对象：</p>
+<pre><code>const void* EOCRetainCallback(CFAllocatorRef allocator, const void *value) {
+    return CFRetain(value);
+}
+const EOCReleaseCallback(CFAllocatorRef allocator, const void *value) {
+    CFRelease(value);
+}
+CFDictionaryKeyCallBacks keyCallbacks = {
+    0,
+    EOCRetainCallback,
+    EOCReleaseCallback,
+    NULL,
+    CFEqual,
+    CFHash
+};
+CFDictionaryValueCallBacks valueCallbacks = {
+    0,
+    EOCRetainCallback,
+    EOCReleaseCallback,
+    NULL,
+    CFEqual
+};
+CFMutableDictionaryRef aCFDictionary = CFDictionaryCreateMutable(NULL,0,&amp;keyCallbacks,&amp;valueCallbacks);
+NSMutableDictionary *anNSDictionary = (__bridge_transfer NSMutableDictionary *)aCFDictionary;
+</code></pre><p>因为NSMutableDictionary默认会copy传入的key，如果key不遵循NSCopying协议，那么会有unrecognized selector运行期错误。但是这个NSDictionary就能对key进行retain而非copy。这对于要求key必须实现NSCopying协议要更实用的多。</p>
+<hr>
+<h3 id="构建缓存时选择NSCache而非NSDictionary"><a href="#构建缓存时选择NSCache而非NSDictionary" class="headerlink" title="构建缓存时选择NSCache而非NSDictionary"></a>构建缓存时选择NSCache而非NSDictionary</h3><p>对于那些重新计算起来很费事儿的对象，比如通过网络或者磁盘获取的对象可以缓存在内存中，来提高程序响应速度。Foundation专门为缓存需求而创建了一个类NSCache，其胜过NSDictionary在于，当系统资源将要耗尽时可以自动根据规则，先行删减最久未使用的缓存。同时NSCache对key不要求copy而是retain，对于不支持NSCopying的对象来说更方便。最重要的是，NSCache是<strong>线程安全</strong>的，多线程可以同时访问NSCache。我们可以调整NSCache行为，一个是<strong>缓存对象总数</strong>，一个是<strong>缓存总开销</strong>。当NSCache总数或者总开销超过上限时，就可能会删减其中的对象。将对象加入NSCache时会要求指定其<strong>开销</strong>，因为使用NSCache的目的就是为了提高程序响应用户操作的速度，所以计算该开销值时不应该很耗时很复杂，比如必须访问磁盘或者数据库才能决定具体数值。</p>
+<p>还有个类叫<strong>NSPurgeablData</strong>，它是NSMutableData的子类实现了NSDiscardableContent协议，在系统资源紧张时可以根据需要随时被丢弃。如果需要访问某个NSPurgeablData，先调用<strong>beginContentAccess</strong>，确保访问期间的有效性，在使用完后调用<strong>endContentAccess</strong>，告诉系统你想丢就丢。这些方法可以嵌套，就像引用计数那样，只有平衡到0时才可以真正能被丢掉。NSCache中的NSPurgeablData对象被系统丢弃时也自动从NSCache中移除，通过<strong>evictsObjectsWithDiscardedContent</strong>来开启或关闭此功能。</p>
+<pre><code>typedef void(^EOCNetworkFetcherCompletionHandler)(NSData *data);
+@interface EOCNetworkFetcher : NSObject
+- (id)initWithURL:(NSURL *)url;
+- (void)startWithCompletionHandler:(EOCNetworkFetcherCompletionHandler)handler;
+@end
+
+@interface EOCCustomer: NSObject
+@end
+@implementation EOCCustomer {
+    NSCache *_cache;
+}
+- (id)init {
+    if (self = [super init]) {
+        _cache = [NSCache new];
+        _cache.countLlimit = 100;
+        _cache.totalCostLimit = 5 * 1024 * 1024;
+    }
+    return self;
+}
+- (void)downloadDataForURL:(NSURL *)url {
+    NSPurgeablData *cachedData = [_cache objectForKey:url];
+    if (cachedData) {
+        [cachedData beginContentAccess];
+        [self useData:cachedData];
+        [cachedData endContentAccess];
+    } else {
+        EOCNetworkFetcher *fetcher = [[EOCNetworkFetcher alloc] initWithURL:url];
+        [fetcher startWithCompletionHandler:^(NSData *data) {
+            NSPurgeablData *purgeablData = [NSPurgeablData dataWithData:data];
+            [_cache setObject:purgeablData forKey:url cost:purgeablData.length];
+            [self useData:data];
+            [purgeablData endContentAccess];
+        }];
+    }
+}
+@end
+</code></pre><hr>
+<h3 id="别忘记NSTimer会保留其target"><a href="#别忘记NSTimer会保留其target" class="headerlink" title="别忘记NSTimer会保留其target"></a>别忘记NSTimer会保留其target</h3><p>创建NSTimer的API都有一个target的参数，NSTimer会保留target直到自己<strong>失效</strong>：对任何timer调用invalidate都会失效，一次性timer完成任务后悔自动失效，重复性timer必须手动调用invalidate才会失效。由于timer会保留target，所以很容易引入循环引用的问题：</p>
+<pre><code>@interface EOCDemo : NSObject
+- (void)startPolling;
+- (void)stopPolling;
+@end
+
+@implementation EOCDemo {
+    NSTimer *_timer;
+}
+- (void)dealloc {
+    [_timer invalidate];
+}
+- (void)startPolling {
+    _timer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(p_doPoll) userInfo:nil repeats:YES];
+}
+- (void)stopPolling {
+    [_timer invalidate]; 
+    _timer = nil;
+}
+- (void)p_doPoll {
+    ...
+}
+</code></pre><p>self保留timer，timer保留self。只有调用stopPolling才能打破循环引用。但是，我们无法保证该类的使用者一定会记得调用stopPolling，万一忘记调用，内部timer是始终保留self的。外界对self的引用释放后，再也没有可以找到self的方法，那么self就成了永远无法寻找的<strong>内存泄漏</strong>。如果p_doPoll方法里还有其它消耗资源的操作，那么就会引出更多的问题。</p>
+<pre><code>@interface NSTimer (EOCBlocksSupport)
++ (NSTimer *)eoc_scheduledTimerWithTimeInterval:(NSTimerIntervavl)interval block:(void(^)())block repeats:(BOOL)repeats;
+@end
+
+@implementation NSTimer (EOCBlocksSupport)
++ (NSTimer *)eoc_scheduledTimerWithTimeInterval:(NSTimerIntervavl)interval block:(void(^)())block repeats:(BOOL)repeats {
+    return [self scheduledTimerWithInterval:interval target:self selector:@selector(eoc_blockInvoke:) userInfo:[block copy] repeats:repeats];
+}
++ (void)eoc_blockInvoke:(NSTimer *)timer {
+     void (^block)() = timer.userInfo;
+     !block ?: block();
+}
+</code></pre><p>外部对象保留timer，timer保留NSTimer类对象。解除原来的循环引用，不过需要注意，timer保留了userInfo，如果block里面直接或间接引用了外部对象的话，还是存在循环引用的问题。不过，这已经是block循环引用的问题了，很好办：</p>
+<pre><code>- (void)startPolling {
+    __weak EOCDemo *weakSelf = self;
+    _timer = [NSTimer eoc_scheduledTimerWithTimeInterval:5.0 block:^{
+        __strong EOCDemo* strongSelf = self;
+        [strongSelf p_doPoll];
+    } repeats:YES];
+}
+</code></pre><p>这样，即使是重复模式，外界释放了对象后，只要block执行完一次，__strong离开作用域也会释放对象，从而实现了内存平衡。</p>
+
+      
+    </div>
+    <footer>
+      
+          
+<!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <span class="jiathis_txt">分享到：</span>
+  <a class="jiathis_button_weixin">微信</a>
+  <a class="jiathis_button_tsina">新浪微博</a>
+  <a class="jiathis_button_renren">人人网</a>
+  <a class="jiathis_button_qzone">QQ空间</a>
+  <a class="jiathis_button_douban">豆瓣</a>
+  <a class="jiathis_button_pocket">Pocket</a>
+  <a href="http://www.jiathis.com/share?uid=901656" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" src="http://v3.jiathis.com/code_mini/jia.js?uid=901656" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+          <div class="clearfix"></div>
+          <nav id="pagination">
+  
+    <a href="/2016/01/24/2016-01-30-2015年总结/" class="alignleft prev"><i class="fa fa-long-arrow-left"></i>Next</a>
+  
+  
+    <a href="/2016/01/17/2016-01-17-Effective-Objective-C读书笔记-中/" class="alignright next">Prev<i class="fa fa-long-arrow-right"></i></a>
+  
+  <div class="clearfix"></div>
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">留言</h1>
+
+  
+      <!-- Duoshuo Comment BEGIN -->
+<div class="ds-thread" data-thread-key="/2016/01/24/2016-01-24-Effective-Objective-C读书笔记-下/"></div>
+<!-- Duoshuo Comment END -->
+  
+</section>
+
+
+
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div>
+  
+  &copy; 2020 hllovesgithub
+  
+</div>
+Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
+
+<div class="clearfix"></div></footer>
+  
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+
+
+
+
+    <script type="text/javascript">
+        (function(){
+
+            $(window).scroll(function(){
+
+                var scrollTop = $(window).scrollTop();
+                if ( scrollTop >200 ){
+                    $("#main-nav").removeClass('normal_mode').addClass('top_mode');
+                } else{
+                    $("#main-nav").removeClass('top_mode').addClass('normal_mode');
+                }
+
+            });
+
+        })();
+    </script>
+
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox({
+      'titlePosition': 'inside'
+    });
+  })(jQuery);
+  </script>
+
+
+
+    
+    <script type="text/javascript">
+      var duoshuoQuery = {short_name:"hl"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = 'http://static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+
+
+<script type="text/javascript">
+  
+  $(function(){
+
+    $('.title').hover(
+      function() {      
+        $(this).stop().animate(
+          {'marginLeft': '10px'}, 200
+        );   
+      }, 
+      function() {       
+        $(this).stop().animate({'marginLeft': '0px'}, 200);      
+      
+    });   
+
+  });
+
+</script>
+
+
+</body>
+</html>

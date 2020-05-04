@@ -91,472 +91,10 @@
   <div class="post-content">
     <header>
       
-      <time datetime="2015-10-07T05:55:11.000Z"><a href="/2015/10/07/2015-10-07[Runtime]/">周三, 10月 7 2015, 1:55:11 下午</a></time>
+      <time datetime="2015-10-01T07:53:46.000Z"><a href="/2015/10/01/2015-10-01-Thread-Runloop/">周四, 10月 1 2015, 3:53:46 下午</a></time>
 
   
-    <h1 class="title"><a href="/2015/10/07/2015-10-07[Runtime]/">Runtime</a></h1>
-  
-
-
-
-  
-  <div class="tags">
-  	<i class="fa fa-tag"></i>
-    <a href="/tags/Tech/">Tech</a>
-  </div>
-
-<div class="clear"></div>
-      
-    </header>
-    <div class="entry">
-      
-        <p><em>Message-Passing is the important part of Smalltalk (from which Objective-C derives), not objects. - Alan Kay</em></p>
-<p>Runtime是一个实现Objc动态特性的C库(<a href="http://www.opensource.apple.com/source/objc4/" target="_blank" rel="noopener">Apple</a>和<a href="http://ftp.gnu.org/gnu/objective-c.README" target="_blank" rel="noopener">GNU</a>分别维护并开源自己的实现)，不像C++那样在编译期间就必须严格确定函数与对象之间的关系，Objc在运行期间才能确定具体的执行函数。可以说Runtime就是对象生成的规范(<strong>内存模型</strong>)和消息执行的判断(<strong>动态绑定</strong>)。程序运行的时候，类型系统可以动态删减，对象父类可以动态改变，对象类型可以动态改变，对象方法可以动态改变，对象方法可以动态删减，对象成员可以动态删减，对象能力可以动态自省。看起来好像一切，都能够改变，都可以改变，因为如此灵活，很多第三方库使用Runtime实现了强大的功能。但是，如果没有深刻的理解和经验的积累，语言的灵活性往往会成为程序的不稳定，所以在不得已的情况下请<strong>谨慎使用</strong>Runtime。</p>
-<h4 id="SEL"><a href="#SEL" class="headerlink" title="SEL"></a>SEL</h4><pre><code>//objc_selector未给出定义
-typedef struct objc_selector *SEL;
-
-SEL sel1 = @selector(test);
-NSLog(@&quot;%s %p&quot;, (char *)sel1, sel1);
-SEL sel2 = sel_registerName([@&quot;test&quot; UTF8String]);
-NSLog(@&quot;%s %p&quot;, (char *)sel2, sel2);
-
-//输出如下:
-2015-10-05 17:20:26.195 Demo[1840:142119] test 0x7fff90c12140
-2015-10-05 17:20:26.195 Demo[1840:142119] test 0x7fff90c12140
-</code></pre><p>编译Objective-C时，编译器根据方法名生成唯一一个表示该方法的ID。<strong>方法名与ID一一对应</strong>。所有方法的SEL构成一个集合，查找某个方法时只需要去找到对应SEL就可以。SEL指向的机构里面应该就存储着一个字符串。</p>
-<h4 id="id"><a href="#id" class="headerlink" title="id"></a>id</h4><pre><code>typedef struct objc_object *id;
-
-struct objc_object { 
-    Class isa;
-};
-</code></pre><p>id指向结构体objc_object，结构体有一个指向Class的指针isa，Runtime根据对象的isa找到它的类型信息。甚至可以这么说，一个结构体，不管里面有没有数据，有多少数据，只要<strong>第一个变量是Class指针</strong>且能通过它找到对应的类型信息，那么这个结构体就<strong>可以看做是一个对象</strong>(当然结构体的数据布局要和类型要求的一样才合法)。isa即是一个，代表抽象关系：一只猫是一个动物，一个对象是一个类。动物提供了猫的基本的信息(脑身腿脚)和抽象的行为(吃喝玩睡)。</p>
-<h4 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h4><pre><code>typedef struct objc_class *Class;
-
-struct objc_class {
-Class isa  OBJC_ISA_AVAILABILITY;
-#if !__OBJC2__
-    Class super_class                                        OBJC2_UNAVAILABLE;
-    const char *name                                         OBJC2_UNAVAILABLE;
-    long version                                             OBJC2_UNAVAILABLE;
-    long info                                                OBJC2_UNAVAILABLE;
-    long instance_size                                       OBJC2_UNAVAILABLE;
-    struct objc_ivar_list *ivars                             OBJC2_UNAVAILABLE;
-    struct objc_method_list **methodLists                    OBJC2_UNAVAILABLE;
-    struct objc_cache *cache                                 OBJC2_UNAVAILABLE;
-    struct objc_protocol_list *protocols                     OBJC2_UNAVAILABLE;
-#endif
-} OBJC2_UNAVAILABLE;
-</code></pre><p>objc_class结构体里存储着父类结构体指针，名称，版本，实例大小，成员变量列表，方法列表，方法缓存，协议列表。因为objc_class结构体里还有isa，由此可见<strong>类也是一个”对象”</strong>，Runtime称之为类对象，而类对象的抽象Runtime称之为<strong>元类(MetaClass)</strong>，而元类的抽象Runtime称之为<strong>根元类(Root Meta Class)</strong>，他们都属于”对象”。对象其实是由类对象的实例方法－对象的类方法－创建出来的。</p>
-<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewradq1at2j20fa0fzdi5.jpg" alt=""></p>
-<h4 id="Ivar"><a href="#Ivar" class="headerlink" title="Ivar"></a>Ivar</h4><pre><code>typedef struct objc_ivar *Ivar;
-
-struct objc_ivar {
-    char *ivar_name                                          OBJC2_UNAVAILABLE;
-    char *ivar_type                                          OBJC2_UNAVAILABLE;
-    int ivar_offset                                          OBJC2_UNAVAILABLE;
-#ifdef __LP64__
-    int space                                                OBJC2_UNAVAILABLE;
-#endif
-} OBJC2_UNAVAILABLE;
-
-//objc_class
-struct objc_ivar_list {
-    int ivar_count                                           OBJC2_UNAVAILABLE;
-#ifdef __LP64__
-    int space                                                OBJC2_UNAVAILABLE;
-#endif
-    /* variable length structure */
-    struct objc_ivar ivar_list[1]                            OBJC2_UNAVAILABLE;
-} OBJC2_UNAVAILABLE;
-</code></pre><p>Ivar是一个指向objc_ivar结构体的指针，objc_ivar结构体存储着变量名、变量类型编码和变量在该类中的字节偏移量，objc_class结构体(也就是类对象)里的objc_ivar_list存储着该类所有的变量。</p>
-<h4 id="健壮性实例变量-Non-Fragile-ivars"><a href="#健壮性实例变量-Non-Fragile-ivars" class="headerlink" title="健壮性实例变量(Non Fragile ivars)"></a>健壮性实例变量(Non Fragile ivars)</h4><p>Runtime目前有Modern和Legacy两个版本。Modern运行在OSX10.5之后和iOS的64位程序中，Legacy运行在OSX10.5之前的32位程序中。最大区别在于更改类的实例变量布局时，Legacy需要重新编译子类，Modern不需要。当一个类被编译时，该类会生成一个ivar布局，<strong>从isa开始</strong>依次根据实例变量大小产生位移，先是<strong>父类布局接着子类布局</strong>。访问变量的ivar地址＝对象地址＋ivar偏移字节。</p>
-<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewragyao98j20cc0393yt.jpg" alt=""></p>
-<p>但有个问题，当父类增加了ivar，原来的布局就出错了，在脆弱性实例变量(Fragile ivars)环境中不得不重新编译子类调整ivar布局。</p>
-<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrah4fqv3j20cf03c3yy.jpg" alt=""></p>
-<p>在健壮性实例变量(Non Fragile ivars)环境中，编译器生成的子类实例变量布局跟以前一样，但程序启动后，如果Runtime检测到子类与父类布局有冲突便会调整子类布局。这样子类的成员变量就被保护起来了，以后不管父类变不变、怎么变都不会影响子类。<strong>访问变量的ivar地址＝对象地址＋基类大小+ivar偏移字节</strong>。</p>
-<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrahb72tgj20ci04rjs3.jpg" alt=""></p>
-<h4 id="Property"><a href="#Property" class="headerlink" title="Property"></a>Property</h4><p>编译时，编译器将Property转换成Ivar，并且添加Setter和Getter。Runtime函数property_getAttributes能获取objc_property的名称和@encode类型字符串：</p>
-<pre><code>//objc_property未给出定义
-typedef struct objc_property *objc_property_t;
-
-typedef struct {
-    const char *name;           /**&lt; The name of the attribute */
-    const char *value;          /**&lt; The value of the attribute (usually empty) */
-} objc_property_attribute_t;
-</code></pre><h4 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h4><pre><code>typedef struct objc_method *Method;
-
-struct objc_method {
-    SEL method_name                                          OBJC2_UNAVAILABLE;
-    char *method_types                                       OBJC2_UNAVAILABLE;
-    IMP method_imp                                           OBJC2_UNAVAILABLE;
-} OBJC2_UNAVAILABLE;
-
-//objc_class
-struct objc_method_list {
-    struct objc_method_list *obsolete                        OBJC2_UNAVAILABLE;
-    int method_count                                         OBJC2_UNAVAILABLE;
-#ifdef __LP64__
-    int space                                                OBJC2_UNAVAILABLE;
-#endif
-    /* variable length structure */
-    struct objc_method method_list[1]                        OBJC2_UNAVAILABLE;
-}
-</code></pre><p>Method代表类中某个方法，它是一个指向objc_method结构体的指针。objc_method结构体存储着一个SEL类型的名字，一个参数和返回值的类型信息，一个真正实现方法的函数地址。objc_class结构体(也就是类对象)的objc_method_list存储着该类所有的方法。</p>
-<h4 id="IMP"><a href="#IMP" class="headerlink" title="IMP"></a>IMP</h4><pre><code>typedef id (*IMP)(id, SEL, ...);
-</code></pre><p>IMP是一个编译器编译生成的函数指针，该函数包含一个接收消息的对象id，对应映射的名字SEL，方法参数，返回值id。<strong>Objc函数都会编译成C函数</strong>，ObjC对象接收消息变成普通C函数调用一样。</p>
-<h4 id="Cache"><a href="#Cache" class="headerlink" title="Cache"></a>Cache</h4><pre><code>typedef struct objc_cache *Cache
-
-//objc_class
-struct objc_cache {
-    unsigned int mask /* total = mask + 1 */                 OBJC2_UNAVAILABLE;
-    unsigned int occupied                                    OBJC2_UNAVAILABLE;
-    Method buckets[1]                                        OBJC2_UNAVAILABLE;
-} OBJC2_UNAVAILABLE;
-</code></pre><p>每次调用方法后，<strong>Runtime会更新cache，根据算法留住最常用的方法</strong>，以提高代码执行效率。mask表示总共缓冲槽(Cache Bucket)数目。occupied表示有效缓冲槽数目。buckets表示缓冲槽，数目可能不超过mask+1，某槽可能为NULL(表示这个槽无效)，有效槽们也可能是不连续的，缓冲槽可能会动态增加。</p>
-<h4 id="Protocol"><a href="#Protocol" class="headerlink" title="Protocol"></a>Protocol</h4><pre><code>typedef struct objc_object *Protocol;
-
-//objc_class
-struct objc_protocol_list {
-    struct objc_protocol_list *next;
-    long count;
-    Protocol *list[1];
-};
-</code></pre><p>Protocol其实是一个对象结构体。类对象的Protocol列表里还有下一个列表的指针，从而让Protocol列表有了继承的能力。</p>
-<h4 id="Category"><a href="#Category" class="headerlink" title="Category"></a>Category</h4><pre><code>typedef struct objc_category *Category;
-
-//A
-struct objc_category {
-    char *category_name                          OBJC2_UNAVAILABLE;
-    char *class_name                             OBJC2_UNAVAILABLE;
-    struct objc_method_list *instance_methods    OBJC2_UNAVAILABLE;
-    struct objc_method_list *class_methods       OBJC2_UNAVAILABLE;
-    struct objc_protocol_list *protocols         OBJC2_UNAVAILABLE;
-} OBJC2_UNAVAILABLE;
-</code></pre><p>objc_category存储了分类名、扩展的类、实例方法、类方法和协议列表。分类的实例方法列表是类的实例方法列表的子集，分类的类方法列表是类的类方法列表的子集。不过在objc-runtime-new.h的定义中：</p>
-<pre><code>//B
-struct category_t {
-    const char *name;
-    classref_t cls;
-    struct method_list_t *instanceMethods;
-    struct method_list_t *classMethods;
-    struct protocol_list_t *protocols;
-    struct property_list_t *instanceProperties;
-};
-</code></pre><p>名字name是要扩展的类名而不是分类名。扩展的类cls<strong>不是在编译期而是在运行期</strong>赋值，由Runtime<strong>通过类名name找到对应的类</strong>。属性列表instanceProperties表示分类所有的properties，这就是可以增减关联变量的原因，不过分类的关联变量和类的实例变量是不一样的。</p>
-<p>程序启动时，libSystem调用_objc_init(objc-os.mm)加载并初始化Runtime，map_images(objc-runtime-new.mm)加载map到内存，_read_images开始初始化map并加载所有Class，Protocol和Category(NSObject的+load在这时调用)，Category的实例方法加入Class的方法列表，Category的类方法加入Meta Class的方法列表。</p>
-<h4 id="receiver-message"><a href="#receiver-message" class="headerlink" title="[receiver message]"></a>[receiver message]</h4><p>编译器会根据语义和返回值选择objc_msgSend, objc_msgSend_stret(<strong>st</strong>ruc <strong>ret</strong>urn), objc_msgSendSuper, objc_msgSendSuper_stret四个中的一个。<strong>传给父类</strong>的消息用带有<strong>Super</strong>的函数；<strong>返回值是数据结构不是简单类型</strong>的消息用带有<strong>stret</strong>的函数。objc_msgSend_fpret(<strong>f</strong>loating <strong>p</strong>oint <strong>ret</strong>urn)在i386平台代替返回类型为浮点数时使用的objc_msgSend，因为返回类型为浮点数的函数ABI(Application Binary Interface)与返回整型的函数ABI不兼容。</p>
-<p>当objc_msgSend找到方法的实现后，Runtime将填充消息接收者receiver到第一位self，填充方法名字message到第二位_cmd，再依次将消息中所有参数按顺序填充。Objc发送的消息直到运行的时候才会动态绑定具体的实现：</p>
-<ul>
-<li>检测这个selector是否可以忽略。MacOSX有垃圾回收的话就不理会retain,release这些selector。</li>
-<li>检测这个target如果是nil则忽略。Objc允许对nil发送任何消息且不Crash。</li>
-<li>如果上面都通过便进入类中查询信息。先从cache里所有Method，找到相等selector匹配的IMP后执行。</li>
-<li>如果cache没找到，再查询方法列表所有Method，找到相等selector匹配的IMP后执行。</li>
-<li>如果方法列表没找到，再到父类以同样的过程找，直到找到NSObject为止。</li>
-<li>如果还没找到，就进入动态方法解析和消息转发的机制。</li>
-</ul>
-<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewraj25j6sg20980f4mx7.gif" alt=""></p>
-<h4 id="消息转发机制"><a href="#消息转发机制" class="headerlink" title="消息转发机制"></a>消息转发机制</h4><p>不能确定对象是否能接收某个消息时，可以自省判断。</p>
-<pre><code>if ([reciver respondsToSelector:@selector(message)]) {
-    [reciver performSelector:@selector(message)];
-}
-</code></pre><p>对象接收到无法接收的消息时，进入消息转发机制，告诉对象如何处理未知的消息。默认情况下，对象接收未知消息后，会触发NSObject的doesNotRecognizeSelector方法抛出异常导致程序崩溃。消息转发机制分为以下几步：</p>
-<p><strong>动态方法解析</strong>  对象接收未知消息时，首先会根据消息的类型调用+resolveInstanceMethod:(实例方法)或者+resolveClassMethod:(类方法)。通过Runtime函数class_addMethod动态添加能够接收未知消息的方法到类里，来实现接收该未知消息(主要用在实现@dynamic)：</p>
-<pre><code>void methodForUnknownMessage(id self, SEL _cmd) {
-   NSLog(@&quot;%@, %p&quot;, self, _cmd);
-}
-
-+ (BOOL)resolveInstanceMethod:(SEL)sel {
-    if ([NSStringFromSelector(sel) isEqualToString:@&quot;methodForUnknownMessage&quot;]) {
-        class_addMethod(self.class, sel, (IMP)methodForUnknownMessage, &quot;@:&quot;);
-        return YES;
-    }
-    return [super resolveInstanceMethod:sel];
-}
-</code></pre><p><strong>备用接收对象</strong>  动态方法解析没能处理未知消息时，Runtime会继续调用forwardingTargetForSelector:返回备用接收对象去接收未知消息。</p>
-<pre><code>- (id)forwardingTargetForSelector:(SEL)aSelector {
-    if(aSelector == @selector(helperCanRespond:)){
-        return helper;
-    }
-    return [super forwardingTargetForSelector:aSelector];
-}
-</code></pre><p><strong>完整转发</strong>  如果没有备用接受对象(返回nil)，Runtime会先用methodSignatureForSelector:获得未知消息的方法签名。</p>
-<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
-    NSMethodSignature *signature = [super methodSignatureForSelector:aSelector];
-    if (!signature) {
-        if ([Helper instancesRespondToSelector:aSelector]) {
-            signature = [Helper instanceMethodSignatureForSelector:aSelector];
-        }
-    }
-    return signature;
-}
-</code></pre><p>Runtime再创建一个封装了全部细节(消息的接收对象target、消息的名字selector和消息附带的参数)的NSInvocation，调用forwardInvocation:(其中可以修改消息内容实现复杂功能，比如修改参数等)选择转发给其它对象。处理完未知消息后NSInvocation会保留结果，Runtime会提取结果并发送给原始接收对象。NSObject的forwardInvocation:只是简单调用doesNotRecognizeSelector:引发异常导致崩溃。</p>
-<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
-    NSMethodSignature *signature = [super methodSignatureForSelector:aSelector];
-    if (!signature) {
-        if ([SUTRuntimeMethodHelper instancesRespondToSelector:aSelector]) {
-            signature = [SUTRuntimeMethodHelper instanceMethodSignatureForSelector:aSelector];
-        }
-    }
-    return signature;
-}
-
-- (void)forwardInvocation:(NSInvocation *)anInvocation {
-    if ([SUTRuntimeMethodHelper instancesRespondToSelector:anInvocation.selector]) {
-        [anInvocation invokeWithTarget:_helper];
-    }
-}
-</code></pre><p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewrf8dufpfj20j60adjs5.jpg" alt=""></p>
-<h4 id="消息转发和多继承"><a href="#消息转发和多继承" class="headerlink" title="消息转发和多继承"></a>消息转发和多继承</h4><p>转发可以允许一个对象<strong>通过依赖其他对象去处理未知消息</strong>，让该对象表面上有处理未知消息的能力。虽然转发能模拟多继承让对象“继承”其它对象的能力，但区别在于多继承会让对象越来越大，转发只是建立对象间联系。虽然转发类似于继承，但Runtime对两者自省判断不一样，respondsToSelector:和isKindOfClass:和conformsToProtocol:能识别继承，不识别转发。如果想让消息转发看起来像继承，需要重写这些方法。</p>
-<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrajxx1xsg20ag06pdfq.gif" alt=""></p>
-<h4 id="Runtime的应用"><a href="#Runtime的应用" class="headerlink" title="Runtime的应用"></a>Runtime的应用</h4><p>Category Ass</p>
-<p>Methods Swizzling</p>
-<p>KVO</p>
-<p>NSZombie</p>
-<hr>
-<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
-<li><a href="http://yulingtianxia.com/blog/2014/11/05/objective-c-runtime/#jtss-tsina" target="_blank" rel="noopener">Objective-C Runtime</a></li>
-<li><a href="http://southpeak.github.io/blog/2014/10/25/objective-c-runtime-yun-xing-shi-zhi-lei-yu-dui-xiang/" target="_blank" rel="noopener">Objective-C Runtime 运行时系列</a></li>
-<li>&lt;a href=<a href="http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective%5Bnil%5Dc-runtime(1)%5Bnil%5D-self-and-super/&gt;刨根问底Objective－C" target="_blank" rel="noopener">http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective%5Bnil%5Dc-runtime(1)%5Bnil%5D-self-and-super/&gt;刨根问底Objective－C</a> Runtime系列</li>
-<li><a href="http://springox.w18.net/2015/09/03/objectivecruntime/" target="_blank" rel="noopener">Objective-C与Runtime</a></li>
-<li><a href="http://blog.sunnyxx.com/2015/09/13/class-ivar-layout/" target="_blank" rel="noopener">Objective-C Class Ivar Layout 探索</a></li>
-<li><a href="http://www.cocoachina.com/industry/20140106/7658.html" target="_blank" rel="noopener">详解Objective-C runtime</a></li>
-<li><a href="http://tech.meituan.com/DiveIntoMethodCache.html" target="_blank" rel="noopener">深入理解Objective-C：方法缓存</a></li>
-</ul>
-
-      
-    </div>
-    <footer>
-      
-        <div class="alignleft">
-            <a href="/2015/10/07/2015-10-07[Runtime]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
-        </div>
-        
-        
-          <div class="alignright"> 
-            <a href="http://hllovesgithub.github.io/2015/10/07/2015-10-07[Runtime]/#comment" class="comment-link">
-              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/07/2015-10-07[Runtime]/">&nbsp;
-              </span>
-            </a>
-          </div>
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
-
-  <article class="post">
-  
-    <div class="gallery">
-  <div class="photoset">
-    
-      <img src="">
-    
-  </div>
-  <div class="control">
-    <div class="prev"></div>
-    <div class="next"></div>
-  </div>
-</div>
-  
-  <div class="post-content">
-    <header>
-      
-      <time datetime="2015-10-04T12:34:55.000Z"><a href="/2015/10/04/2015-10-04[Thread-同步]/">周日, 10月 4 2015, 8:34:55 晚上</a></time>
-
-  
-    <h1 class="title"><a href="/2015/10/04/2015-10-04[Thread-同步]/">Thread 同步</a></h1>
-  
-
-
-
-  
-  <div class="tags">
-  	<i class="fa fa-tag"></i>
-    <a href="/tags/Tech/">Tech</a>
-  </div>
-
-<div class="clear"></div>
-      
-    </header>
-    <div class="entry">
-      
-        <h3 id="同步工具"><a href="#同步工具" class="headerlink" title="同步工具"></a>同步工具</h3><p>涉及线程安全时，一个好的设计是最好的保护。避免共享资源，减少线程交互，这样可以缩小线程间干扰，但是一个完全没有干扰的设计是不可能的，就需要使用同步技术来确保安全。</p>
-<h3 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h3><p>原子操作是同步<strong>简单数据类型</strong>一个非常简单的形式，其优势是<strong>不阻塞线程竞争</strong>。对于简单的操作，比如递增一个计数器，原子操作比锁更有性能优势。MacOSX和iOS包含了许多32位和64位执行基本的数学运算和逻辑运算(比较-交换，测试-设值，测试-清理)的原子操作(/usr/include/libkern/OSAtomic.h)。</p>
-<h3 id="内存屏障和Volatile变量"><a href="#内存屏障和Volatile变量" class="headerlink" title="内存屏障和Volatile变量"></a>内存屏障和Volatile变量</h3><p>编译器优化代码时会<strong>重新排序汇编指令</strong>，来使处理器流水线执行指令以达到最佳性能。其中就可能对访问内存的指令进行(其认为可能不产生错误)重新排序，但事实上编译器几乎不可能检测到所有依赖内存的操作。如果看似独立的变量却是相互影响的，那么优化就可能打乱这些变量内存访问指令的顺序，导致潜在问题。</p>
-<p><strong>内存屏障</strong>(Memory Barrier)是一个确保内存操作按照正确顺序工作、非阻塞的同步工具(OSMemoryBarrier系列函数)。内存屏障就像一个栅栏，处理器<strong>必须先完成障碍前所有的内存读取操作，才能执行屏障后的内存读取操作</strong>，这样内存屏障就能确保一个线程的内存操作总是按照预定顺序执行。</p>
-<p><strong>Volatile</strong>是适用于独立变量的另一种内存限制形式。编译器通过把变量的值加载到寄存器(寄存器的访问速度比内存访问速度快)来实现优化。对于非线程竞争的变量不会有问题，反之则会。volatile变量会<strong>强制编译器每次使用变量时都从内存而非寄存器读取</strong>。如果一个变量的值有编译器无法检测更改的可能，那么可以把它声明为volatile。</p>
-<p>内存屏障和volatile变量降低了编译器优化的程度，因此只在的确需要并确保正确的前提下谨慎使用。</p>
-<h3 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h3><p>锁是保护<strong>临界区(Critical Section)</strong>关键代码在同一个时间只被一个线程访问的最常用同步工具。MacOSX和iOS提供了常使用的锁：</p>
-<p><strong>￼Mutex￼(互斥锁)</strong> 互斥锁扮演着资源保护屏障的角色。如果一个线程尝试获取一个已经被获取的互斥锁，那么该线程会阻塞一直到拥有互斥锁的线程释放互斥锁。如果有多个线程竞争获取互斥锁，每次只有一个能成功。</p>
-<p><strong>Recursive lock(递归锁)</strong> 递归锁是互斥锁的变种。一个递归锁允许同一个线程释放前多次获取，其他线程保持阻塞直到拥有递归锁的线程释放同样次数后。递归锁用在递归语句中，也可用在同一线程的多个需要单独获取递归锁的方法里。</p>
-<p><strong>Read-write lock(读写锁)</strong> 读写锁也被称为共享互斥锁。通常用在大规模操作(经常读偶尔写)保护数据中显着提高性能。一般多个线程可以同时读数据，当有另一个线程要写数据时，写线程阻塞直到所有读线程释放后再获取读写锁，进行写操作。当一个写线程在等待锁时，新来的读线程会阻塞直到写线程结束。系统只对POSIX线程支持读写锁。</p>
-<p><strong>Distributed lock(分布锁)</strong> 一个分布锁提供进程间的互斥访问。和互斥锁不一样的是，分布锁不会阻塞进程或阻止进程运行。它只是简单地在尝试获取已被获取的分布锁时通知进程并让其自己决定如何处理。</p>
-<p><strong>Spin lock(自旋锁)</strong> 一个自旋锁会反复查询其锁定条件直到条件成为真。自旋锁通常用在获取锁预期时间很小的多核系统里。这种情况下，切换上下文和更新线程数据通常比阻塞线程更有效率。系统因为自旋锁特性而没有提供支持，但是在一些特别的情况下很容易实现它。</p>
-<p><strong>Double-checked lock(双重检查锁)</strong> 双重检查锁是一种，通过获锁前测试其标准来减少获取过程开销的尝试。因为双重检查锁是潜在不安全的，系统对该锁没有显式的实现并且不鼓励使用。</p>
-<h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><p>条件是另一种当判断为真时允许线程间互相发送信号的同步工具。条件通常用来<strong>确认资源可以性或者确保任务以特定的顺序执行</strong>。当一个线程测试条件时，它阻塞直到其他线程显式地改变该条件为真。条件和互斥锁虽然都只允许多个线程中的一个通过，但互斥锁是随机选择，条件可以根据指定判断选择。系统用不同的技术对条件提供支持，条件的正确使用需要仔细思考。</p>
-<h3 id="同步的开销和性能"><a href="#同步的开销和性能" class="headerlink" title="同步的开销和性能"></a>同步的开销和性能</h3><p>同步确保正确性，但同时会牺牲性能(甚至在无竞争时)。<strong>锁和原子操作通常使用内存屏障和内核级同步机制来确保关键代码被正确保护</strong>。同步虽然使关键代码安全，但过多同步的多线程程序和单线程程序相比反而可能会降低性能。安全和性能之间寻找平衡需要大量经验累积。在无竞争时互斥锁和原子操作的近似开销：</p>
-<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewoxcqtqfcj21600jetjg.jpg" alt=""></p>
-<h3 id="完全避免同步"><a href="#完全避免同步" class="headerlink" title="完全避免同步"></a>完全避免同步</h3><p>设计代码结构和数据结构来避免使用同步是很好的解决办法。如果整体设计导致特定资源的高竞争，可能设计本身就存在问题。实现并发最好的方法是减少并发任务之间的交互和依赖。如果每个任务在它自己的数据集上面操作，则不需要使用同步来保护这些数据。</p>
-<h3 id="注意正确地同步"><a href="#注意正确地同步" class="headerlink" title="注意正确地同步"></a>注意正确地同步</h3><pre><code>// Code 1
-NSLock* arrayLock = GetArrayLock();
-NSMutableArray* myArray = GetSharedArray();
-id anObject;
-[arrayLock lock];
-anObject = [myArray objectAtIndex:0];
-[arrayLock unlock];
-[anObject doSomething];
-
-// Code 2￼￼
-NSLock* arrayLock = GetArrayLock();
-NSMutableArray* myArray = GetSharedArray();
-id anObject;
-[arrayLock lock];
-￼￼￼anObject = [myArray objectAtIndex:0];
-[anObject doSomething];
-[arrayLock unlock];
-￼￼
-// Code 3
-NSLock* arrayLock = GetArrayLock();
-NSMutableArray* myArray = GetSharedArray();
-id anObject;
-[arrayLock lock];
-anObject = [myArray objectAtIndex:0];
-[anObject retain];
-[arrayLock unlock];
-[anObject doSomething];
-</code></pre><p>Code1中anObject在执行doSomething时有野指针的可能。Code2中确保anObject有效，但是doSomething可能耗时很长，引起其他线程长时间等锁释放。Code3才是正确的写法。尽管这个示例很简单，但说明了非常重要的一点，当同步涉及到正确性时，不仅仅需要考虑问题的表面，内存管理和其他因素都有可能因为多线程而受到影响。此外，应该假设编译器总是出现最坏的情况。这种意识和警惕性，可以帮避免潜在问题，确保关键代码正确运行。</p>
-<h3 id="正确使用Volatile"><a href="#正确使用Volatile" class="headerlink" title="正确使用Volatile"></a>正确使用Volatile</h3><p>使用一个互斥锁来保护一段关键代码后，并不还需要用volatile来保护关键代码段里的重要变量。一个互斥锁包含了内存屏障来确保内存读写操作能正确顺序执行。一个临界区里volatile变量会强制每次读写都在内存。这种同步组合在一些特定区域是必要的，但是同样会导致显著的性能损失。如果互斥锁已经可以保护变量，那么不使用volatile同样很重要。通常情况下，互斥锁和其他同步工具比volatile更好。</p>
-<h3 id="使用原子操作"><a href="#使用原子操作" class="headerlink" title="使用原子操作"></a>使用原子操作</h3><p>原子操作以非阻塞方式执行某些简单类型的同步操作且避免锁的开销。尽管锁是同步线程很好的工具，但即使在无竞争状态下，获取一个锁都相对昂贵。相比而言，许多原子操作花费更少时间也能达到和锁一样的效果。原子操作(/usr/include/libkern/OSAtomic.h)在32位或64位处理器上执行简单的数学运算和逻辑运算，<strong>保证执行的操作在被影响内存再次读写前已经完成</strong>。可以使用原子操作和内存屏障组合使用，来保证多线程间内存正确同步。大部分原子操作行为都如其简单明了的函数名所理解那样。</p>
-<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewp9wuo4z4j20uq0j6gqz.jpg" alt=""></p>
-<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewp9xuqolzj20um148tqq.jpg" alt=""></p>
-<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewp9yb4innj20uo0c6450.jpg" alt=""></p>
-<h3 id="使用POSIX互斥锁"><a href="#使用POSIX互斥锁" class="headerlink" title="使用POSIX互斥锁"></a>使用POSIX互斥锁</h3><pre><code>pthread_mutex_t mutex;
-void MyInitFunction() {
-    pthread_mutex_init(&amp;mutex， NULL);
-}
-void MyLockingFunction() {
-    pthread_mutex_lock(&amp;mutex);
-    // Do work
-    pthread_mutex_unlock(&amp;mutex);
-}
-void MyReleaseFunction() {
-    pthread_mutex_destroy(metex);
-}
-</code></pre><p>以上代码只是简单地展示了POSIX线程互斥锁的过程，应该还要检查函数错误码并做适当处理。</p>
-<h3 id="使用NSLock"><a href="#使用NSLock" class="headerlink" title="使用NSLock"></a>使用NSLock</h3><p><strong>Cocoa所有锁(包括NSLock)都是遵循NSLocking协议(定义了lock和unlock)来获取和释放</strong>。NSLock类除此之外还有tryLock(尝试获取一个锁并马上返回结果)和lockBeforeDate:(尝试获取一个锁，在规定时间内阻塞，最后返回结果)。</p>
-<pre><code>NSLock *theLock = [[NSLock alloc] init];
-while (YES) {
-    if ([theLock tryLock]) {
-        // Do work
-        [theLock unlock];
-        break;
-    }
-}
-</code></pre><h3 id="使用-synchronized"><a href="#使用-synchronized" class="headerlink" title="使用@synchronized"></a>使用@synchronized</h3><p>在Objc代码中，@synchronized是一个非常方便创建互斥锁的方法。@synchronized做和其他互斥锁一样的工作，只是不需要直接创建锁对象。只需要简单使用任意Objc对象作为区别临界区的唯一标志符。</p>
-<pre><code>@synchronized(token) {
-    // Do work
-}
-</code></pre><p>作为预防措施，@synchronized会<strong>隐式地添加一个异常处理代码</strong>起保护作用。该代码会在异常抛出时自动释放互斥锁。这意味着使用@synchronized就必须启用异常处理。如果不想要隐式异常处理代码带来的额外开销，应该考虑使用锁。</p>
-<h3 id="使用NSRecursiveLock"><a href="#使用NSRecursiveLock" class="headerlink" title="使用NSRecursiveLock"></a>使用NSRecursiveLock</h3><p>NSRecursiveLock在同一线程多次获取不造成死锁。一个递归锁会自己统计成功获取次数。只有<strong>获取和释放操作次数平衡时，才可以真正被释放给其他线程获取</strong>。这类锁通常用在递归(也可以是类似的非递归)函数里防止递归造成线程阻塞。因为递归锁直到获取和释放操作平衡后才会被释放，而长时间持有一个锁将会导致其他线程阻塞直到递归完成，所以必须仔细权衡使用递归锁对性能的潜在影响。如果重构代码可以消除递归或者消除使用递归锁，那可能会有更好的性能。</p>
-<pre><code>NSRecursiveLock *theLock = [[NSRecursiveLock alloc] init];
-void MyRecursiveFunction(int value) {
-    [theLock lock];
-    if (value != 0) {
-        --value;
-        MyRecursiveFunction(value);
-    }
-    [theLock unlock];
-}
-MyRecursiveFunction(5);
-</code></pre><h3 id="使用NSConditionLock"><a href="#使用NSConditionLock" class="headerlink" title="使用NSConditionLock"></a>使用NSConditionLock</h3><p>NSConditionLock是一个<strong>使用特定值来获取和释放</strong>的互斥锁，其行为和NSCondition有点类似，但实现非常不同。通常多线程用NSConditionLock实现以特定顺序执行任务，比如生产者消费者模式。NSConditionLock的获取和释放方法可以任意组合：lock和unlockWithCondition:，lockWhenCondition:和unlock 。</p>
-<pre><code>id condLock = [[NSConditionLock alloc] initWithCondition:NO_DATA];
-
-// Thread A
-while(true) {
-    [condLock lock];
-    // Add data to the queue
-    [condLock unlockWithCondition:HAS_DATA];
-}
-
-// Thread B
-while (true) {
-    [condLock lockWhenCondition:HAS_DATA];
-    // Remove data from the queue
-    [condLock unlockWithCondition:(isEmpty ? NO_DATA : HAS_DATA)];
-    // Process the data locally
-}
-</code></pre><h3 id="使用NSCondition"><a href="#使用NSCondition" class="headerlink" title="使用NSCondition"></a>使用NSCondition</h3><p>NSCondition类不仅提供了POSIX条件相同的语义，但又封装互斥锁和条件数据。<strong>可以像互斥锁一样获取和释放它，又可以像条件一样等待它</strong>。可以作为NSLock解决多线程之间的同步问题，但设计出NSCondition更重要的目的是解决线程之间的调度问题（也必须获取锁和释放锁）。某线程调用wait使其阻塞处于等待状态(<strong>其他线程就可以继续进入临界区。这和标准锁不同，标准锁被获取后无论什么情况，只要拥有线程没有释放，其他线程就无法进入临界区</strong>)，直到其他线程调用signal(唤醒多个等待线程中任意一个)或者broadcast(唤醒所有等待线程)才能继续运行。</p>
-<pre><code>// Thread A
-[cocoaCondition lock];
-while (timeToDoWork &lt;= 0)
-    [cocoaCondition wait];
-timeToDoWork--;
-// Do work.
-[cocoaCondition unlock];
-
-// Thread B
-[cocoaCondition lock];
-timeToDoWork++;
-[cocoaCondition signal];
-[cocoaCondition unlock];
-</code></pre><h3 id="Cocoa多线程指南"><a href="#Cocoa多线程指南" class="headerlink" title="Cocoa多线程指南"></a>Cocoa多线程指南</h3><p>Immutable对象一般都是线程安全的，Mutable对象一般不是线程安全的，在多线程中需要同步。对于线程不安全的对象，只要保证同一时间只有一个线程使用，那么整个程序总体而言还是线程安全的。如果使用多线程绘画视图，绘画代码应放在NSView的lockFocusIfCanDraw和unlockFocus之间。</p>
-<hr>
-<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
-<li><a href="https://developer.apple.com/library/prerelease/ios/documentation/Cocoa/Conceptual/Multithreading/ThreadSafety/ThreadSafety.html#//apple_ref/doc/uid/10000057i-CH8-SW1" target="_blank" rel="noopener">Synchronization</a></li>
-<li><a href="http://southpeak.github.io/blog/2014/10/17/osatomicyuan-zi-cao-zuo/" target="_blank" rel="noopener">OSAtomic原子操作</a></li>
-<li><a href="http://www.cnblogs.com/kenshincui/p/3983982.html#synchronized" target="_blank" rel="noopener">iOS开发系列–并行开发其实很容易</a></li>
-</ul>
-
-      
-    </div>
-    <footer>
-      
-        <div class="alignleft">
-            <a href="/2015/10/04/2015-10-04[Thread-同步]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
-        </div>
-        
-        
-          <div class="alignright"> 
-            <a href="http://hllovesgithub.github.io/2015/10/04/2015-10-04[Thread-同步]/#comment" class="comment-link">
-              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/04/2015-10-04[Thread-同步]/">&nbsp;
-              </span>
-            </a>
-          </div>
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
-
-  <article class="post">
-  
-    <div class="gallery">
-  <div class="photoset">
-    
-      <img src="">
-    
-  </div>
-  <div class="control">
-    <div class="prev"></div>
-    <div class="next"></div>
-  </div>
-</div>
-  
-  <div class="post-content">
-    <header>
-      
-      <time datetime="2015-10-01T07:53:46.000Z"><a href="/2015/10/01/2015-10-01[Thread-Runloop]/">周四, 10月 1 2015, 3:53:46 下午</a></time>
-
-  
-    <h1 class="title"><a href="/2015/10/01/2015-10-01[Thread-Runloop]/">Thread RunLoop</a></h1>
+    <h1 class="title"><a href="/2015/10/01/2015-10-01-Thread-Runloop/">Thread RunLoop</a></h1>
   
 
 
@@ -931,13 +469,13 @@ struct __CFRunLoop {
     <footer>
       
         <div class="alignleft">
-            <a href="/2015/10/01/2015-10-01[Thread-Runloop]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+            <a href="/2015/10/01/2015-10-01-Thread-Runloop/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
         </div>
         
         
           <div class="alignright"> 
-            <a href="http://hllovesgithub.github.io/2015/10/01/2015-10-01[Thread-Runloop]/#comment" class="comment-link">
-              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/01/2015-10-01[Thread-Runloop]/">&nbsp;
+            <a href="http://hllovesgithub.github.io/2015/10/01/2015-10-01-Thread-Runloop/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/01/2015-10-01-Thread-Runloop/">&nbsp;
               </span>
             </a>
           </div>
@@ -968,10 +506,10 @@ struct __CFRunLoop {
   <div class="post-content">
     <header>
       
-      <time datetime="2015-09-26T06:58:06.000Z"><a href="/2015/09/26/2015-09-26[Thread-基本概念]/">周六, 9月 26 2015, 2:58:06 下午</a></time>
+      <time datetime="2015-09-26T06:58:06.000Z"><a href="/2015/09/26/2015-09-26-Thread-基本概念/">周六, 9月 26 2015, 2:58:06 下午</a></time>
 
   
-    <h1 class="title"><a href="/2015/09/26/2015-09-26[Thread-基本概念]/">Thread 基本概念</a></h1>
+    <h1 class="title"><a href="/2015/09/26/2015-09-26-Thread-基本概念/">Thread 基本概念</a></h1>
   
 
 
@@ -1064,13 +602,13 @@ struct __CFRunLoop {
     <footer>
       
         <div class="alignleft">
-            <a href="/2015/09/26/2015-09-26[Thread-基本概念]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+            <a href="/2015/09/26/2015-09-26-Thread-基本概念/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
         </div>
         
         
           <div class="alignright"> 
-            <a href="http://hllovesgithub.github.io/2015/09/26/2015-09-26[Thread-基本概念]/#comment" class="comment-link">
-              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/09/26/2015-09-26[Thread-基本概念]/">&nbsp;
+            <a href="http://hllovesgithub.github.io/2015/09/26/2015-09-26-Thread-基本概念/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/09/26/2015-09-26-Thread-基本概念/">&nbsp;
               </span>
             </a>
           </div>
@@ -1101,10 +639,10 @@ struct __CFRunLoop {
   <div class="post-content">
     <header>
       
-      <time datetime="2015-09-19T03:39:30.000Z"><a href="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/">周六, 9月 19 2015, 11:39:30 中午</a></time>
+      <time datetime="2015-09-19T03:39:30.000Z"><a href="/2015/09/19/2015-09-19-iOS-Programming-Guide-2nd-读书笔记/">周六, 9月 19 2015, 11:39:30 中午</a></time>
 
   
-    <h1 class="title"><a href="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/">iOS Programming Guide(2nd) 读书笔记</a></h1>
+    <h1 class="title"><a href="/2015/09/19/2015-09-19-iOS-Programming-Guide-2nd-读书笔记/">iOS Programming Guide(2nd) 读书笔记</a></h1>
   
 
 
@@ -1331,13 +869,13 @@ struct __CFRunLoop {
     <footer>
       
         <div class="alignleft">
-            <a href="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+            <a href="/2015/09/19/2015-09-19-iOS-Programming-Guide-2nd-读书笔记/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
         </div>
         
         
           <div class="alignright"> 
-            <a href="http://hllovesgithub.github.io/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/#comment" class="comment-link">
-              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/09/19/2015-09-19[iOS-Programming-Guide-2nd-读书笔记]/">&nbsp;
+            <a href="http://hllovesgithub.github.io/2015/09/19/2015-09-19-iOS-Programming-Guide-2nd-读书笔记/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/09/19/2015-09-19-iOS-Programming-Guide-2nd-读书笔记/">&nbsp;
               </span>
             </a>
           </div>
@@ -1367,7 +905,7 @@ struct __CFRunLoop {
   </div>
   <footer id="footer" class="inner"><div>
   
-  &copy; 2019 hllovesgithub
+  &copy; 2020 hllovesgithub
   
 </div>
 Powered by <a href="http://zespia.tw/hexo/" title="Hexo" target="_blank" rel="noopener">Hexo</a> and <a href="http://pages.github.com/" title="GitHub Pages" target="_blank" rel="noopener">GitHub Pages</a>
