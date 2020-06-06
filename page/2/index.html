@@ -91,441 +91,6 @@
   <div class="post-content">
     <header>
       
-      <time datetime="2015-12-06T01:55:18.000Z"><a href="/2015/12/06/2015-12-06-Objc高级编程之ARC-读书笔记/">周日, 12月 6 2015, 9:55:18 上午</a></time>
-
-  
-    <h1 class="title"><a href="/2015/12/06/2015-12-06-Objc高级编程之ARC-读书笔记/">Objc高级编程之ARC-读书笔记</a></h1>
-  
-
-
-
-  
-  <div class="tags">
-  	<i class="fa fa-tag"></i>
-    <a href="/tags/Tech/">Tech</a>
-  </div>
-
-<div class="clear"></div>
-      
-    </header>
-    <div class="entry">
-      
-        <h3 id="内存管理原则"><a href="#内存管理原则" class="headerlink" title="内存管理原则"></a>内存管理原则</h3><p>MRC和ARC都使用引用计数方式来对内存进行管理，简单地说就是下面几条原则：</p>
-<ul>
-<li>自己生成的对象，自己所持有。</li>
-<li>非自己生成的对象，自己也能持有。</li>
-<li>自己不再需要持有对象时需要释放。</li>
-<li>非自己持有的对象无法释放。</li>
-</ul>
-<p>以上对对象的操作与Objc方法的映射关系为：</p>
-<ul>
-<li>生成并持有对象 ＝ alloc/new/copy/mutableCopy等</li>
-<li>持有对象 ＝ retain</li>
-<li>释放对象 ＝ release</li>
-<li>销毁对象 ＝ dealloc</li>
-</ul>
-<p>实际上以上这些方法并不是语言本身，而是Cocoa/CocoaTouch Framework的Foundation里面的NSObject的方法。Apple建议所有的Objc对象都继承自NSObject，这样可以依赖已有的稳定安全内存管理不用自己操心。</p>
-<p>GNUstep是一个盒Cocoa Framework兼容的实现，虽然不能期望它是完全和Apple一样实现的，但是它有相同的表现所以实现上也应该很相似。</p>
-<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxjmtzfhj21x41b4duo.jpg" alt=""></p>
-<p>理解了GNUstep的源代码可以帮助我们猜测Apple的Cocoa是如何实现的。以下是<strong>GNUstep</strong>的实现：</p>
-<pre><code>struct obj_layout {
-    NSUInteger retained;
-};
-+ (id)alloc {
-    return [self allocWithZone:NSDefaultMallocZone()];
-}
-+ (id)allocWithZone:(NSZone *)z {
-    return NSAllocateObject(self, 0, z);
-}
-inline id NSAllocateObject(Class aClass, NSUInteger extraBytes, NSZone *zone) {
-    int size = baseBytes + extraBytes
-    id new = NSZoneMalloc(zone, size);
-    memset(new, 0, size);
-    new = (id)&amp;((struct obj_layout *)new)[1];
-}
-</code></pre><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxk6u6tlj218q0mwn0q.jpg" alt=""></p>
-<pre><code>- (NSUInteger)retainCout {
-    return NSExtraRefCount(self) + 1;
-}
-inline NSUInteger NSExtraRefCount(id anObject) {
-    return ((struct obj_layout *)anObject)[-1].retained;
-}
-</code></pre><p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxkkgy1rj215e0oswih.jpg" alt=""></p>
-<pre><code>- (id)retain {
-    NSIncrementExtraRefCount(self);
-    return self;
-}
-inline void NSIncrementExtraRefCount(id anObject) {
-    if (((struct obj_layout *)anObject)[-1].retained == UINT_MAX - 1) {
-        NSString *format = @&quot;NSIncrementExtraRefCount() asked to increment too far&quot;;
-        [NSException raise:NSInternalInconsistencyException format:format];
-    }
-    ((struct obj_layout *)anObject)[-1].retained++;
-}
-
-- (void)release {
-    if (NSDecrementExtraRefCountWasZero(eslf)) {
-        []self dealloc];
-    }
-}
-inline BOOL NSDecrementExtraRefCountWasZero(id anObject) {
-    if (((struct obj_layout *)anObject)[-1].retained == 0) {
-        return YES;
-    } else {
-        ((struct obj_layout *)anObject)[-1].retained--;
-        return NO;
-    }
-}
-
-- (void)dealloc {
-    NSDeallocateObject(self);
-}
-inline void NSDeallocateObject(id anObject) {
-    struct obj_layout *o = &amp;((struct obj_layout *)anObject)[-1];
-    free(o);
-}
-</code></pre><p>可以看出每个Objc对象，在其内存布局前都有一个NSUInteger类型变量，用来表示引用计数。alloc/new/copy/mutableCopy/retain都会增加计数，release会减少计数，当计数减至为0时调用dealloc从内存中销毁该对象。</p>
-<p>研究<strong>Apple</strong>的实现之前因为NSObject的源代码没有公开，通过使用Xcode的调试器(lldb)来研究其实现。在NSObject类的alloc里设置端点，可以发现栈中的调用顺序为：</p>
-<pre><code>+alloc
-+allocWithZone:    
-class_createInstance
-calloc
-</code></pre><p>大体上Apple和GNUstep的实现没有什么差别。同样的方法能够得到retainCount和retain还有release的调用顺序。</p>
-<pre><code>-retainCount
-__CFDoExternRefOperation
-CFBasicHashGetCountOfKey
-
--retain
-__CFDoExternRefOperation
-CFBasicHashAddValue
-
--release
-__CFDoExternRefOperation
-CFBaseHashRemoveValue
-</code></pre><p>在Core Foundation Framework中找到__CFDoExternRefOperation：</p>
-<pre><code>int __CFDoExternRefOperation(uintptr_t op, id obj) {
-    CFBasicHashRef table = get hashtable from obj;
-    int count;
-    switch (op) {
-        case OPERATION_retainCount:
-            count = CFBasicHashGetCountOfKey(table, obj);
-            return count;
-
-        case OPERATION_retain:
-            CFBasicHashAddValue(table, obj);
-            return obj;
-
-        case OPERATION_release:
-            count = CFBasicHashRemoveValue(table, obj);
-            return 0 == count;
-    }
-}
-</code></pre><p>由此可以猜测，retainCount和retain还有release的实现大致是这样：</p>
-<pre><code>- (NSUInteger)retainCount {
-    return (NSUInteger)__CFDoExternRefOperation(OPERATION_retainCount, self);
-}
-- (id)retain {
-    return (id)__CFDoExternRefOperation(OPERATION_retain, self);
-}
-- (void)release {
-    return __CFDoExternRefOperation(OPERATION_release, self);
-}
-</code></pre><p>同时也可以猜测，Apple的实现大概是采用Hash散列表(引用计数表)完成的：</p>
-<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxktjifvj21140twaeo.jpg" alt=""></p>
-<p>GNUstep将引用计数保存在对象内存块头部的变量中，Apple将引用计数保存在一张散列表中。GNUstep的实现看起来简单又高效，但Apple这样实现也必然有它的好处。GNUstep的好处是：少量代码就能实现；引用计数内存和对象内存能统一管理。Apple的好处是：为对象分配内存时无需考虑引用计数，不用担心对象内存块头部问题；散列表用对象内存地址作为Key，这样能追溯各个对象内存块位置，在调试时非常有用。即使出现错误导致对象内存块损坏，只要散列表没问题，就能找到正确的内存块位置。</p>
-<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxl5ffx8j21fw0oodm4.jpg" alt=""></p>
-<p>另外利用Instrument检查内存泄漏时，散列表的记录也有助于帮助检测各对象持有者是否存在。</p>
-<hr>
-<h3 id="GNUstep实现的Autorelease"><a href="#GNUstep实现的Autorelease" class="headerlink" title="GNUstep实现的Autorelease"></a>GNUstep实现的Autorelease</h3><pre><code>- (id)autorelease {
-    [NSAutoreleasePool addObject:self];
-}
-</code></pre><p>实际上，GNUstep应用了IMP缓存技术，缓存了不变的Class，SEL，IMP使得运行效率能满足频繁调用的autorelease</p>
-<pre><code>id autorelease_class = [NSAutoreleasePool class];
-SEL autorelease_sel = @selector(addObject:);
-IMP autorelease_imp = [autorelease_class methodForSelector: autorelease_sel];
-- (id)autorelease {
-    (*autorelease_imp)(autorelease_class, autorelease_sel, self);
-}
-</code></pre><p>NSAutoreleasePool：</p>
-<pre><code>+ (void)addObject:(id)anObj {
-    NSAutoreleasePool *pool = //获取当前的autoreleasePool;
-    if (pool != nil) {
-        [pool addObject:anObj];
-    } else {
-        NSLog(@&quot;autorelease is called without active NSAutoreleasePool.&quot;);
-    }
-}
-- (void)drain {
-    [self dealloc];
-}
-- (void)dealloc {
-    [self emptyPool];
-}
-- (void)emptyPool {
-    for (id obj in array) {
-        [obj release];
-    }
-}
-</code></pre><h3 id="Apple实现的Autorelease"><a href="#Apple实现的Autorelease" class="headerlink" title="Apple实现的Autorelease"></a>Apple实现的Autorelease</h3><pre><code>class AutoreleasePoolPage {
-    static inline void *push() {
-        //生成或持有NSAutoreleasePool对象
-    }
-    static inline void pop(void *token) {
-        //废弃NSAutoreleasePool对象
-        releaseAll();
-    }
-    static inline id autorelease(id obj) {
-        //相当于NSAutoreleasePool的类方法addObject
-        AutoreleasePoolPage *autoreleasePoolPage = //获取当前的autoreleasePool;
-        autoreleasePoolPage-&gt;add(obj);
-    }
-    id *add(id obj) {
-        //添加对象到内部数组
-    }
-    void releaseAll() {
-        //对内部数组里的每一个对象调用release方法
-    }
-};
-void *objc_autoreleasePoolPush(void) {
-    return AutoreleasePoolPage::push();
-}
-void objc_autoreleasePoolPop(void *ctxt) {
-    AutoreleasePoolPage::pop(ctxt);
-}
-id objc_autorelease(id obj) {
-    return AutoreleasePoolPage::autorelease(obj);
-}
-</code></pre><p>使用<strong>extern void _objc_autoreleasePoolPrint()</strong>私有方法可以查看AutoreleasePool的状态。如果对AutoreleasePool对象进行autorelease的话，会产生<strong>NSInvalidArgumentException</strong>的异常。</p>
-<hr>
-<h3 id="所有权"><a href="#所有权" class="headerlink" title="所有权"></a>所有权</h3><p>ARC有效时，objc的对象类型必须附加所有权修饰符，一共有4种：</p>
-<p><strong>__strong</strong>表示对修饰的对象的“强引用”，持有强引用的变量在<strong>超出其作用域时失效</strong>，其引用的对象会被释放。默认情况下，缺省所有权声明的对象类型变量，都隐式声明为<strong>strong类型。通过遵循内存管理原则的</strong>strong修饰符，不必再依赖retain或release，也能正确管理内存。</p>
-<p><strong>__weak</strong>的设计主要是解决循环引用的问题。<strong>weak修饰符与</strong>strong相反，仅仅引用但不持有。同时__weak的另一个优点是，其所引用的对象如果被销毁，该变量将被<strong>自动安全地设置为nil</strong>，再也不会出现指向已经释放的对象内存块的野指针了。</p>
-<p><strong>__unsafe_unretained</strong>正如其名unsafe所示，是<strong>不安全</strong>的所有权修饰符。其基本与__weak表现一致，除了在引用对象销毁时不被自动设置为nil。</p>
-<p><strong>__autoreleasing</strong>修饰符的变量被某对象赋值时，就代表该对象在MRC时调用了autorelease的方法，即对象被注册到了AutoreleasePool里。同时，使用@autoreleasepool{}块代替NSAutoreleasePool的方法调用。</p>
-<h3 id="隐式使用-autoreleasing"><a href="#隐式使用-autoreleasing" class="headerlink" title="隐式使用__autoreleasing"></a>隐式使用__autoreleasing</h3><p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxm9s493j21aq0pwq7y.jpg" alt=""></p>
-<p>获取并持有非自己生成的对象时，该对象已经被注册到了autoreleasepool。这是由于编译器会检查方法名是否以alloc/new/copy/mutableCopy开头，如果不是则自动将方法返回的对象注册到autoreleasepool(当然init方法不会)。这些方法里，return使得对象变量超出其作用域，<strong>strong类型变量会释放其持有的对象，所以编译器会使用</strong>autorelease修饰符将对象注册到autoreleasePool延迟释放。</p>
-<pre><code>+ (id)array {
-    return [[NSArray alloc] init];
-}
-等价于
-+ (id)arrya {
-    __autoreleasing obj = [[NSArray alloc] init];
-    return obj;
-}
-</code></pre><p>使用__weak类变量时，因为该变量只有引用并不持有，而在访问该变量的过程中有被销毁的可能性。如果把指向的对象注册到autoreleasePool中，那么在@autoreleasePool{}结束前都能保证期间对象存在。</p>
-<pre><code>id _weak obj = XXX;
-NSLog(@&quot;Class = %@&quot;, [obj class]);
-等价于
-id _weak obj = XXX;
-id __autoreleasing tmp = obj;
-NSLog(@&quot;Class = %@&quot;, [tmp class]);
-</code></pre><p>默认情况下，缺省所有权声明对象的指针变量，都隐式声明为__autoreleasing。因为编译器将alloc/new/copy/mutableCopy开头的方法产生的新对象看作自己生成并持有，其他情况下产生的新对象都应该看作非自己生成并持有。虽然strong类型变量也能够传递，但还是应该统一遵循内存管理原则。同时，<strong>对象指针的赋值操作时所有权修饰符必须一致</strong>否则编译不通过。</p>
-<pre><code>- (BOOL)doSomething:(NSError *)error {
-    //发生错误
-    *error = [[NSError alloc] init];
-    return NO;
-}
-NSError *error = nil;
-BOOL result = [self doSomething:&amp;error];
-等价于
-- (BOOL)doSomething:(__autoreleasing NSError *)error {
-    //发生错误
-    *error = [[NSError alloc] init];
-    return NO;
-}
-__autoreleasing NSError *error = nil;
-BOOL result = [self doSomething:&amp;error];
-</code></pre><p>另外，在显示地指定__autoreleasing修饰符时，必须注意修饰的对象要为<strong>自动变量</strong>(包括局部变量、方法参数)。</p>
-<h3 id="ARC使用规则"><a href="#ARC使用规则" class="headerlink" title="ARC使用规则"></a>ARC使用规则</h3><p>在ARC有效时必须要遵循以下规则：</p>
-<ul>
-<li>不能使用retain/release/retainCount/autorelease</li>
-<li>不能使用NSAllocateObject/NSDeallocateObject(分别实现了影响内存管理的alloc和dealloc)</li>
-<li>方法命名需遵循内存管理原则</li>
-<li>不再显示调用dealloc(遵循无法显示影响内存管理)</li>
-<li>使用@autoreleasepool{}代替NSAutoreleasePool</li>
-<li>不能使用NSZone</li>
-<li>objc对象类型变量不能作为C语言结构体(struct/union)的成员(没有方法管理C语言结构体成员的生命周期)</li>
-<li>id和void*之间转换需要显示指明所有权变化(C语言类型变量超出ARC对objc对象类型变量的管理范围，需手动指明所有权变化)</li>
-</ul>
-<p><strong>__bridge</strong>对象所有权不变，编译器继续自动管理；</p>
-<p><strong>__bridge_retained</strong>或<strong>CFBridgingRetain</strong>移交对象所有权从编译器到开发者，至此开发者需手动管理；</p>
-<p><strong>__bridge_transfer</strong>或<strong>CFBridgingRelease</strong>移交对象所有权从开发者到编译器，至此编译器能自动管理</p>
-<hr>
-<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>Apple称ARC是“右边一起进行内存管理”的，但实际上只有编译器是无法完全胜任的，在此基础上还需要Runtime的支持。也就是说，ARC是由Clang(LLVM编译器)3.0＋和Objc Runtime493.9＋实现的。编译器选项“-S”运行clang，可以取得程序汇编输出。通过阅读汇编和objc4库源代码，可以模拟ARC是如何实现的。</p>
-<h5 id="strong修饰符"><a href="#strong修饰符" class="headerlink" title="__strong修饰符"></a>__strong修饰符</h5><pre><code>{
-    id __strong obj = [[NSObject alloc] init];
-}
-//编译器模拟代码
-{
-    id obj = objc_msgSend(NSObject, @selector(alloc));
-    objc_msgSend(obj, @selector(init));
-    objc_release(obj);
-}
-</code></pre><p>由此可知，对于自己生成并持有的对象，编译器自动地在作用域结束前插入release。</p>
-<pre><code>+ (id)array
-{
-    return [[NSMutableArray alloc] init];
-}
-
-{
-    id __strong obj = [NSMutableArray array];
-}
-//模拟器代码
-+ (id)array
-{
-    id obj = objc_msgSend(NSMutableArray, @selector(alloc));
-    objc_msgSend(obj, @selector(init));
-    return objc_autoreleaseReturnValue(obj);
-}
-
-{
-    id obc = objc_msgSend(NSMutableArray, @selector(array));
-    objc_retainAutoreleasedReturnValue(obj);
-    objc_release(obj);
-}
-</code></pre><p>由此可知，对于非标准对象生成方法里，编译器自动地在作用域结束前插入<strong>objc_autoreleaseReturnValue</strong>方法(该方法将生成的对象autorelease－即注册到autorelresepool)。而对于非自己生成能持有的对象，和之前一样编译器自动地在作用域结束前插入release，同时在获取对象后，会插入<strong>objc_retainAutoreleasedReturnValue</strong>方法(该方法将持有返回得到的autoreleased对象)。</p>
-<p>不过，objc_autoreleaseReturnValue和objc_autorelase不同的是，前者是要用于最优化程序。objc_retainAutoreleasedReturnValue会检查调用方的执行命令列表(参见<a href="http://hllovesgithub.github.io/2015/11/15/2015-11-15[Autorelease]/">Autorelease</a>)，如果发现调用房在调用非标准对象生成方法(例如+array)后紧结着调用了objc_retainAutoreleasedReturnValue的话，那么就<strong>不</strong>将生成的对象autorelease－即注册到autorelresepool，而是直接返回。同理，且objc_retainAutoreleasedReturnValue和objc_retain不同的是，如果之前调用过objc_autoreleaseReturnValue，那么就<strong>不</strong>将返回的对象retain，而是直接使用。这两个方法共同协作，可以将生成的对象不注册到autoreleasepool中直接使用，省去了2次objc的msgSend方法，达到最优化。同时，也解决了非标准方法在ARC和MRC模块之间传递对象的问题。</p>
-<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxmjmwutj21v418atl5.jpg" alt=""></p>
-<h5 id="weak修饰符"><a href="#weak修饰符" class="headerlink" title="__weak修饰符"></a>__weak修饰符</h5><pre><code>{
-    id __weak obj = another;
-}
-//编译器模拟代码
-{
-    id obj = 0;
-    objc_initWeak(&amp;obj, another);
-    objc_destroyWeak(&amp;obj);
-}
-//等价于
-{
-    id obj = 0;
-    objc_storeWeak(&amp;obj, another);
-    objc_storeWeak(&amp;obj, 0);
-}
-</code></pre><p>objc_storeWeak方法将__weak修饰符变量的地址(即第1个参数)作为Value，将被引用的对象(即第2个参数)作为Key，注册到runtime维护的weak关系映射表(Hash散列表)中，当Key为0时，将Value从对应的weak关系映射表中删除。使用weak表，将销毁的对象进行检索，就能快速地获得weak引用它的所有变量的地址。对象的销毁过程：</p>
-<ul>
-<li>objc_release</li>
-<li>当引用计数为0时而执行dealloc</li>
-<li>_objc_rootDealloc</li>
-<li>object_dispose</li>
-<li>objc_destructInstance</li>
-<li>objc_clear_deallocating</li>
-</ul>
-<p>最后调用objc_clear_deallocating时，首先从weak表中获取销毁对象为Key的所有Value(即所有weak变量的地址)，然后通过指针将weak变量的值设为nil，再在weak表中删除销毁对象对应记录，最后把销毁对象也从计数表中删除对应记录。由此可知，如果有大量<strong>weak修饰符变量，则会在引用的对象被销毁时大量被设置为nil消耗CPU，所以应该尽可能在需要的地方使用</strong>weak。</p>
-<p>使用__weak修饰符变量即是使用autoreleased对象：</p>
-<pre><code>{
-    id __weak obj = another;
-    NSLog(@&quot;%@&quot;, obj);
-}
-//编译器模拟代码
-{
-    id obj = 0;
-    objc_initWeak(&amp;obj, another);
-    id tmp = objc_loadWeakRetained(&amp;ojc);
-    objc_autorelease(tmp);
-    NSLog(@&quot;%@&quot;, tmp);
-    objc_destroyWeak(&amp;obj);
-}
-</code></pre><p><strong>objc_loadWeakRetained</strong>取出<strong>weak修饰符变量引用的对象并持有，objc_autorelease将获取的对象注册到autoreleasepool中延迟释放。所以，</strong>weak引用的对象在@autoreleasepool{}期间都是有效的可以放心使用。但是，如果大量地使用<strong>weak变量，会产生大量的autoreleased对象，因为在使用</strong>weak变量时最好暂时赋值给一个<strong>strong变量再使用</strong>strong。</p>
-<pre><code>{
-    id __weak objc = another;
-    NSLog(@&quot;1 %@&quot;, obj);
-    NSLog(@&quot;2 %@&quot;, obj);
-    NSLog(@&quot;3 %@&quot;, obj);
-}
-//等价于
-{
-    id _weak objc = another;
-    id tmp1 = objc_loadWeakRetained(&amp;ojc);
-    objc_autorelease(tmp1);
-    NSLog(@&quot;1 %@&quot;, tmp1);
-    id tmp2 = objc_loadWeakRetained(&amp;ojc);
-    objc_autorelease(tmp2);
-    NSLog(@&quot;2 %@&quot;, tmp2);
-    id tmp3 = objc_loadWeakRetained(&amp;ojc);
-    objc_autorelease(tmp3);
-    NSLog(@&quot;3 %@&quot;, tmp3);
-}
-
-//使用__strong
-{
-    id __weak objc = another;
-    id __strong tmp = objc;
-    NSLog(@&quot;1 %@&quot;, tmp);
-    NSLog(@&quot;2 %@&quot;, tmp);
-    NSLog(@&quot;3 %@&quot;, tmp);
-}
-//等价于
-{
-    id _weak objc = another;
-    id tmp = objc_loadWeakRetained(&amp;ojc);
-    NSLog(@&quot;1 %@&quot;, tmp);
-    NSLog(@&quot;2 %@&quot;, tmp);
-    NSLog(@&quot;3 %@&quot;, tmp);
-    objc_release(tmp);
-}
-</code></pre><h5 id="autoreleasing修饰符"><a href="#autoreleasing修饰符" class="headerlink" title="__autoreleasing修饰符"></a>__autoreleasing修饰符</h5><pre><code>@autoreleasepool {
-    id __autoreleasing obj = [[NSObject alloc] init];
-}
-@autoreleasepool {
-    id __autoreleasing obj = [NSMutableArray array];
-}
-//等价于
-id pool = objc_autoreleasePoolPush();
-id obj = objc_msgSend(NSObject, @selector(alloc));
-objc_msgSend(obj, @selector(init));
-objc_autorelease(obj);
-objc_autoreleasePoolPop(pool);
-
-id pool = objc_autoreleasePoolPush();
-id obj = objc_msgSend(NSMutableArray, @selector(array));
-objc_retainAutoreleasedReturnValue(obj);
-objc_autorelease(obj);
-objc_autoreleasePoolPop(pool);
-</code></pre><hr>
-<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>ARC虽然不能使用retainCount查看引用计数，但能参考<strong>extern uintptr_t _objc_rootRetainCount(id obj)</strong>私有方法查看。不过也不能够完全信任该方法。对于已经销毁的对象已经地址不正确的对象，有时候也返回“1”。另外，在多线程环境中使用时，因为存在静态条件的问题，所以取得的数值不一定完全可信。</p>
-
-      
-    </div>
-    <footer>
-      
-        <div class="alignleft">
-            <a href="/2015/12/06/2015-12-06-Objc高级编程之ARC-读书笔记/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
-        </div>
-        
-        
-          <div class="alignright"> 
-            <a href="http://hllovesgithub.github.io/2015/12/06/2015-12-06-Objc高级编程之ARC-读书笔记/#comment" class="comment-link">
-              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/12/06/2015-12-06-Objc高级编程之ARC-读书笔记/">&nbsp;
-              </span>
-            </a>
-          </div>
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-  </div>
-</article>
-
-
-
-
-  <article class="post">
-  
-    <div class="gallery">
-  <div class="photoset">
-    
-      <img src="">
-    
-  </div>
-  <div class="control">
-    <div class="prev"></div>
-    <div class="next"></div>
-  </div>
-</div>
-  
-  <div class="post-content">
-    <header>
-      
       <time datetime="2015-12-06T01:20:06.000Z"><a href="/2015/12/06/2015-11-29-Test/">周日, 12月 6 2015, 9:20:06 上午</a></time>
 
   
@@ -2488,6 +2053,421 @@ timeToDoWork++;
           <div class="alignright"> 
             <a href="http://hllovesgithub.github.io/2015/10/04/2015-10-04-Thread-同步/#comment" class="comment-link">
               <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/04/2015-10-04-Thread-同步/">&nbsp;
+              </span>
+            </a>
+          </div>
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+  <article class="post">
+  
+    <div class="gallery">
+  <div class="photoset">
+    
+      <img src="">
+    
+  </div>
+  <div class="control">
+    <div class="prev"></div>
+    <div class="next"></div>
+  </div>
+</div>
+  
+  <div class="post-content">
+    <header>
+      
+      <time datetime="2015-10-01T07:53:46.000Z"><a href="/2015/10/01/2015-10-01-Thread-Runloop/">周四, 10月 1 2015, 3:53:46 下午</a></time>
+
+  
+    <h1 class="title"><a href="/2015/10/01/2015-10-01-Thread-Runloop/">Thread RunLoop</a></h1>
+  
+
+
+
+  
+  <div class="tags">
+  	<i class="fa fa-tag"></i>
+    <a href="/tags/Tech/">Tech</a>
+  </div>
+
+<div class="clear"></div>
+      
+    </header>
+    <div class="entry">
+      
+        <p>一般一个线程一次只执行一个任务，执行完成后就会退出。如果需要一个机制，<strong>让线程能随时响应处理新的任务并长时间存在不退出</strong>，那么它就是RunLoop。</p>
+<p>RunLoop就是一个<strong>不断调度工作和处理事件的事件处理循环</strong>，对事件处理过程进行了更好的抽象和封装，让客户代码不用关心底层琐碎的消息处理实现的同时，能够轻松动态地添加删除执行任务。目的是<strong>让线程有任务时忙碌工作，没任务时休眠节能</strong>。</p>
+<p>RunLoop不是完全自动的。需要给线程设定代码在合适的时候启动并响应事件。Cocoa和Core Foundation都提供了runloop objects帮助配置和管理线程的RunLoop。每个线程都有关联的RunLoop，主线程启动时自动启动，子线程需要显式地启动。</p>
+<h3 id="RunLoop剖析"><a href="#RunLoop剖析" class="headerlink" title="RunLoop剖析"></a>RunLoop剖析</h3><p>RunLoop接收两种不同输入事件：输入源(<em>input source</em>)传递异步事件，通常来自于其他线程或程序。定时源(<em>timer source</em>)传递同步事件，发生在特定时间或者重复的时间间隔。这两种源事件到达时都使用对应回调函数处理。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewmvfz9j1nj20zc0gmgph.jpg" alt=""></p>
+<h5 id="RunLoop模式"><a href="#RunLoop模式" class="headerlink" title="RunLoop模式"></a>RunLoop模式</h5><p>RunLoop<strong>模式</strong>是所有<strong>输入源定时源和观察者(CFRunLoopObserverRef实例)的集合</strong>。RunLoop每次只以某个模式运行，只有相关的源才会被监视、传递、处理事件，只有相关的观察者会被通知。否则，不相关的源不被监视，不相关观察者不被通知。Cocoa和Core Foundation定了一个默认模式和几个常用模式:</p>
+<ul>
+<li><strong>Default</strong>(NSDefaultRunLoopMode-Cocoa ， kCFRunLoopDefaultMode-CoreFoundation) 默认模式是最常用的模式。大部分时间你应该用这种模式启动RunLoop配置事件源。</li>
+<li><strong>Connection</strong>(NSConnectionReplyMode-Cocoa) Cocoa用这个模式结合NSConnection对象来检测网络响应。你自己很少会用到这个模式。</li>
+<li><strong>Modal</strong>(NSModalPanelRunLoopMode-Cocoa) Cocoa用这个模式辨别出模态界面想要的事件。</li>
+<li><strong>Event tracking</strong>(NSEventTrackingRunLoopMode-Cocoa) Cocoa用这个模式在MouseDrag循环中和其他需要跟踪用户的界面循环中限制事件输入。</li>
+<li><strong>Common modes</strong>(NSRunLoopCommonModes-Cocoa， kCFRunLoopCommonModes-CoreFoundation) 这是一个常用模式的可配置组合。关联常用模式就是关联组合里每个模式。Cocoa程序里常用模式默认包括default<br>，modal，event tracking。Core Foundation只有default。你可以用CFRunLoopAddCommonMode添加自定义模式到常用模式中。</li>
+</ul>
+<p>创建自定义模式<strong>必须添加至少一个事件源或者观察者</strong>，否则无效。使用特定模式可以过滤事件。比如大多数时间运行在默认模式上，模态界面运行在”Modal”模式下，此时只有模态模式相关信息能传递给线程。</p>
+<h4 id="输入源"><a href="#输入源" class="headerlink" title="输入源"></a>输入源</h4><p>输入源异步发送消息到线程。事件来源取决于种类：<strong>端口源</strong>和<strong>自定义源</strong>。端口源监听程序相应端口，自定义源监听自定义事件源。区别在于如何触发：<strong>端口源由内核自动发送，自定义源则需要手动从其他线程发送</strong>。</p>
+<h4 id="基于端口的输入源"><a href="#基于端口的输入源" class="headerlink" title="基于端口的输入源"></a>基于端口的输入源</h4><p>Cocoa不需要直接创建输入源，只需要创建NSPort对象并添加到RunLoop，它会自己处理创建和配置属于远。Core Foundation必须手动创建端口和输入源用CFMachPortRef，CFMessagePortRef，FSocketRef来创建合适的对象。</p>
+<h4 id="自定义输入源"><a href="#自定义输入源" class="headerlink" title="自定义输入源"></a>自定义输入源</h4><p>创建自定义输入源使用CFRunLoopSourceRef，使用回调函数来进行配置。Core Foundation会在配置、处理、移除调用回调函数。</p>
+<h4 id="Cocoa执行Selector源"><a href="#Cocoa执行Selector源" class="headerlink" title="Cocoa执行Selector源"></a>Cocoa执行Selector源</h4><p>Cocoa定义了允许你在任何线程执行selector的自定义输入源。和端口源一样，执行selector的请求在目标线程上串行排列，避免许多线程上多个方法一起运行引起的同步问题。不像端口源，<strong>一个selector源执行完后会自动从RunLoop里面移除</strong>。RunLoop每次循环处理所有(而不是一个)排列的selector的调用。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewmy1wfdtgj215w0go47f.jpg" alt=""></p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewmy2ah70rj21620lmwpj.jpg" alt=""></p>
+<h4 id="RunLoop观察者"><a href="#RunLoop观察者" class="headerlink" title="RunLoop观察者"></a>RunLoop观察者</h4><pre><code>typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
+    kCFRunLoopEntry         = (1UL &lt;&lt; 0), // 即将进入Loop
+    kCFRunLoopBeforeTimers  = (1UL &lt;&lt; 1), // 即将处理Timer
+    kCFRunLoopBeforeSources = (1UL &lt;&lt; 2), // 即将处理Source
+    kCFRunLoopBeforeWaiting = (1UL &lt;&lt; 5), // 即将进入休眠
+    kCFRunLoopAfterWaiting  = (1UL &lt;&lt; 6), // 刚从休眠中唤醒
+    kCFRunLoopExit          = (1UL &lt;&lt; 7), // 即将退出Loop
+};
+</code></pre><p>通过使用Core Foundation注册为RunLoop的观察者来接收RunLoop行为的通知。和同步或异步事件发生时才触发的事件源不同，RunLoop观察者是在RunLoop本身运行的特定时刻候触发。和定时器类似，RunLoop观察者(在创建时指定)可以只用一次(RunLoop启动后，观察者会从RunLoop里移除)或循环使用。</p>
+<h4 id="RunLoop事件队列"><a href="#RunLoop事件队列" class="headerlink" title="RunLoop事件队列"></a>RunLoop事件队列</h4><p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewn43j8dc5j21jy168tub.jpg" alt=""></p>
+<h4 id="何时使用RunLoop"><a href="#何时使用RunLoop" class="headerlink" title="何时使用RunLoop"></a>何时使用RunLoop</h4><p>不需要在任何情况下都启动线程的RunLoop。比如，用线程处理一个预先定义的长时间(虽然长)任务就不用。RunLoop只在需更多交互时才需要：</p>
+<ul>
+<li>使用<strong>端口或自定义输入源</strong>来和其他线程<strong>通信</strong></li>
+<li>使用线程的<strong>定时器</strong></li>
+<li>Cocoa中使用任何<strong>performSelector</strong>方法</li>
+<li>使线程<strong>周期性工作</strong></li>
+</ul>
+<h4 id="获得RunLoop对象"><a href="#获得RunLoop对象" class="headerlink" title="获得RunLoop对象"></a>获得RunLoop对象</h4><pre><code>//Cocoa
+NSRunLoop cocoa = [NSRunLoop currentRunLoop];
+
+//Core Foundation
+CFRunLoopRef coreFoundation = CFRunLoopGetCurrent();
+</code></pre><h4 id="配置RunLoop"><a href="#配置RunLoop" class="headerlink" title="配置RunLoop"></a>配置RunLoop</h4><p>子线程运行RunLoop前，<strong>必须添加至少一个事件源</strong>。如果没有任何事件源，RunLoop会在启动之际立马退出。使用CFRunLoopAddObserver将观察者添加到RunLoop:</p>
+<pre><code>- (void)threadMain {
+    NSRunLoop* myRunLoop = [NSRunLoop currentRunLoop];
+    CFRunLoopObserverContext context = {0， self， NULL， NULL， NULL}; 
+    CFRunLoopObserverRef observer = CFRunLoopObserverCreate(kCFAllocatorDefault，kCFRunLoopAllActivities， YES， 0， &amp;myRunLoopObserver， &amp;context);
+    if (observer) {
+        CFRunLoopRef cfLoop = [myRunLoop getCFRunLoop];
+        CFRunLoopAddObserver(cfLoop， observer， kCFRunLoopDefaultMode);
+    }
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(doFireTimer:) userInfo:nil repeats:YES];
+    NSInteger loopCount = 10;
+    do {
+        [myRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+        loopCount--;            ￼￼￼￼
+    } while (loopCount);
+}
+</code></pre><h4 id="启动RunLoop"><a href="#启动RunLoop" class="headerlink" title="启动RunLoop"></a>启动RunLoop</h4><p><strong>无条件的</strong>启动RunLoop最简单的，但也最不推荐。因为这会使线程永久循环，失去控制。虽然可以添加或删除事件源，但是退出RunLoop的唯一方法是杀死它，也没有任何办法可以让RunLoop运行在自定义模式下。</p>
+<p>更好的办法是用<strong>设置超时时间</strong>来启动RunLoop，这样RunLoop运作直到事件到达或者规定时间超时。如果是事件到达，RunLoop会传递消息给相应的处理方法然后退出。如果是规定时间超时直接退出。重新启动RunLoop进行下一次循环。</p>
+<p><strong>特定模式</strong>启动RunLoop可以限制传递给RunLoop的事件源的类型。</p>
+<pre><code>- (void)skeletonThreadMain {
+    BOOL done = NO;
+    do {
+        SInt32 result = CFRunLoopRunInMode(kCFRunLoopDefaultMode， 10， YES);
+        if ((result == kCFRunLoopRunStopped) || (result == kCFRunLoopRunFinished)) {
+            done = YES;
+        }
+    } while (!done);
+}
+</code></pre><h4 id="退出RunLoop"><a href="#退出RunLoop" class="headerlink" title="退出RunLoop"></a>退出RunLoop</h4><p>如果可以，尽量使用<strong>设置超时时</strong>，它让RunLoop退出前完成所有正常操作，包括通知观察者。<strong>显式停止</strong>(CFRunLoopStop)和超时结果相似，Runloop把所有剩余的通知发送出去再退出。与设置超时的不同的是，显式停止可以在无条件启动的Runloop里面使用。</p>
+<p>尽管移除所有事件源也能导致RunLoop退出，但这并不可靠。系统会添加输入源来处理所需事件。因为移除事件源未必会考虑到这些输入源，可能导致无法退出RunLoop。</p>
+<h4 id="线程安全和RunLoop对象"><a href="#线程安全和RunLoop对象" class="headerlink" title="线程安全和RunLoop对象"></a>线程安全和RunLoop对象</h4><p>线程的否安全取决于API操纵RunLoop的API。<strong>Core Foundation的函数是线程安全的</strong>，可以被任意线程调用。修改RunLoop配置并执行操作，<strong>最好在RunLoop所属线程完成</strong>。</p>
+<p><strong>Cocoa的NSRunLoop则不具有线程安全性</strong>。 如果使用NSRunLoop来修改RunLoop，<strong>应该在RunLoop所属线程完成</strong>。给其他线程的RunLoop添加事件源可能导致崩溃或产生不可预知的行为。</p>
+<h4 id="创建配置自定义输入源"><a href="#创建配置自定义输入源" class="headerlink" title="创建配置自定义输入源"></a>创建配置自定义输入源</h4><ul>
+<li>输入源要处理的信息。</li>
+<li>一个联系客户代码和输入源的调度方法。</li>
+<li>一个处理客户代码请求的执行方法。</li>
+<li>一个使输入源无效的取消方法。</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewntcgsy3aj20yk0f0whi.jpg" alt=""></p>
+<p>主线程给子线程分发任务时，主线程给命令缓冲区填充命令和信息(主线程和拥有输入源的子线程必须同步访问命令缓冲区)，然后通知(会唤醒)子线程RunLoop开始工作，子线程RunLoop会调用输入源处理函数来执行命令缓冲区中相应的命令。</p>
+<pre><code>// These are the CFRunLoopSourceRef callback functions.
+void RunLoopSourceScheduleRoutine (void *info， CFRunLoopRef rl， CFStringRef mode);
+void RunLoopSourceCancelRoutine (void *info， CFRunLoopRef rl， CFStringRef mode);
+void RunLoopSourcePerformRoutine (void *info);
+
+@interface RunLoopSource : NSObject
+- (instancetype)init;
+- (void)addToCurrentRunLoop;
+- (void)invalidate;
+- (void)sourceFired;
+- (void)addCommand:(NSInteger)command withData:(id)data;
+- (void)fireCommandsOnRunLoop:(CFRunLoopRef)runloop;
+@end
+@implementation RunLoopSource {
+    CFRunLoopSourceRef _runLoopSource;
+    NSMutableArray *_commands;
+}
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        CFRunLoopSourceContext context = {
+            0，
+            (__bridge void *)(self)，
+            NULL，
+            NULL，
+            NULL，
+            NULL，
+            NULL，
+            RunLoopSourceScheduleRoutine，
+            RunLoopSourceCancelRoutine，
+            RunLoopSourcePerformRoutine
+        };
+        _runLoopSource = CFRunLoopSourceCreate(NULL， 0， &amp;context);
+        _commands = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+- (void)addToCurrentRunLoop {
+    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+    CFRunLoopAddSource(runLoop， _runLoopSource， kCFRunLoopDefaultMode);
+}
+- (void)invalidate {}
+- (void)sourceFired {}
+- (void)addCommand:(NSInteger)command withData:(id)data {}
+- (void)fireCommandsOnRunLoop:(CFRunLoopRef)runloop {
+    CFRunLoopSourceSignal(_runLoopSource);
+    CFRunLoopWakeUp(runloop);
+}
+@end
+
+@interface RunLoopContext : NSObject
+@property (readonly) CFRunLoopRef runLoop;
+@property (readonly) RunLoopSource* source;
+- (instancetype)initWithSource:(RunLoopSource *)src andLoop:(CFRunLoopRef)loop;
+@end
+@implementation RunLoopContext {
+    RunLoopSource *_source;
+    CFRunLoopRef _runLoop;
+}
+- (instancetype)initWithSource:(RunLoopSource *)src andLoop:(CFRunLoopRef)loop {
+    self = [super init];
+    if (self) {
+        _source = src;
+        _runLoop = loop;
+    }
+    return self;
+}
+@end
+
+void RunLoopSourceScheduleRoutine (void *info， CFRunLoopRef rl， CFStringRef mode) {
+    id appDelegate = [[NSApplication sharedApplication] delegate];
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    RunLoopContext *theContext = [[RunLoopContext alloc] initWithSource:obj andLoop:rl];
+    [appDelegate performSelectorOnMainThread:@selector(registerSource:) withObject:theContext waitUntilDone:NO];
+}
+void RunLoopSourceCancelRoutine (void *info， CFRunLoopRef rl， CFStringRef mode) {
+    id del = [[NSApplication sharedApplication] delegate];
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    RunLoopContext *theContext = [[RunLoopContext alloc] initWithSource:obj andLoop:rl];
+    [del performSelectorOnMainThread:@selector(removeSource:) withObject:theContext waitUntilDone:YES];
+}
+void RunLoopSourcePerformRoutine (void *info) {
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    [obj sourceFired];
+}
+</code></pre><h4 id="配置定时源"><a href="#配置定时源" class="headerlink" title="配置定时源"></a>配置定时源</h4><pre><code>//Cocoa
+- (void)addTimer {
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(timeFeedback:) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+}
+- (void)timeFeedback:(NSTimer *)timer {}
+
+//Core Foundation
+- (void)addTimer {
+    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+    CFRunLoopTimerContext context = {0， NULL， NULL， NULL， NULL};
+    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault， CFAbsoluteTimeGetCurrent()， 0.3， 0， 0， &amp;myCFTimerCallback， &amp;context);
+    CFRunLoopAddTimer(runLoop， timer， kCFRunLoopCommonModes);
+}
+myCFTimerCallback(CFRunLoopTimerRef timer， void *info) {}
+</code></pre><hr>
+<h4 id="RunLoop与线程"><a href="#RunLoop与线程" class="headerlink" title="RunLoop与线程"></a>RunLoop与线程</h4><p>Apple不允许直接创建RunLoop，只提供了两个自动获取API：CFRunLoopGetMain()和CFRunLoopGetCurrent()，大致如下：</p>
+<pre><code>static CFMutableDictionaryRef loopsDic;
+static CFSpinLock_t loopsLock;
+
+CFRunLoopRef _CFRunLoopGet(pthread_t thread) {
+    OSSpinLockLock(&amp;loopsLock);
+    if (!loopsDic) {
+        loopsDic = CFDictionaryCreateMutable();
+        CFRunLoopRef mainLoop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, pthread_main_thread_np(), mainLoop);
+    }
+
+    CFRunLoopRef loop = CFDictionaryGetValue(loopsDic, thread));
+    if (!loop) {
+        loop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, thread, loop);
+        //注册回调在线程销毁的时候销毁RunLoop
+        _CFSetTSD(..., thread, loop, __CFFinalizeRunLoop);
+    }        
+    OSSpinLockUnLock(&amp;loopsLock);
+    return loop;
+}
+
+CFRunLoopRef CFRun    LoopGetMain() {
+    return _CFRunLoopGet(pthread_main_thread_np());
+}
+CFRunLoopRef CFRunLoopGetCurrent() {
+    return _CFRunLoopGet(pthread_self());
+}
+</code></pre><p>从代码看出，线程和RunLoop是一一对应的，映射关系保存在一个全局的Dictionary里。线程的RunLoop不自动创建，只有线程主动获取时才创建(第一次调用会确保主线程的RunLoop创建)，在对应线程销毁时销毁。</p>
+<h4 id="RunLoop的Public-API"><a href="#RunLoop的Public-API" class="headerlink" title="RunLoop的Public API"></a>RunLoop的Public API</h4><p>CoreFoundation有5个类：</p>
+<ul>
+<li>CFRunLoopRef</li>
+<li>CFRunLoopModeRef</li>
+<li>CFRunLoopSourceRef</li>
+<li>CFRunLoopTimerRef</li>
+<li>CFRunLoopObserverRef</li>
+</ul>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewo1cebznfj20pa0ju75l.jpg" alt=""></p>
+<p>一个RunLoop有若干个Mode，一个Mode有若干个Source|Timer|Observer(统称为<strong>Mode Item</strong>)。RunLoop每次只能运行在一个Mode中。切换Mode必须先退出运行，再以Mode进入。</p>
+<p>CFRunLoopSourceRef分Source0和Source1：<strong>Source0只有一个回调函数</strong>。需要先CFRunLoopSourceSignal(source)标记带处理，再CFRunLoopWakeUp(runloop)唤醒runloop，以此实现自定义输入源。<strong>Source1有一个mach_port和一个回调函数</strong>，以此实现基于端口的输入源。</p>
+<h4 id="RunLoop的Mode"><a href="#RunLoop的Mode" class="headerlink" title="RunLoop的Mode"></a>RunLoop的Mode</h4><p>CFRunLoopMode和CFRunLoop的大致结构：</p>
+<pre><code>struct __CFRunLoopMode {
+    CFStringRef _name;            // Mode Name, 例如 @&quot;kCFRunLoopDefaultMode&quot;
+    CFMutableSetRef _sources0;    // Set&lt;CFRunLoopSourceRef&gt;
+    CFMutableSetRef _sources1;    // Set&lt;CFRunLoopSourceRef&gt;
+    CFMutableArrayRef _observers; // Array&lt;CFRunLoopObserverRef&gt;
+    CFMutableArrayRef _timers;    // Array&lt;CFRunLoopTimerRef&gt;
+    ...
+};
+
+struct __CFRunLoop {
+    CFMutableSetRef _commonModes;     // Set&lt;CFStringRef&gt;
+    CFMutableSetRef _commonModeItems; // Set&lt;Source/Observer/Timer&gt;
+    CFRunLoopModeRef _currentMode;    // Current Runloop Mode
+    CFMutableSetRef _modes;           // Set&lt;CFRunLoopModeRef&gt;
+    ...
+};
+</code></pre><p>通过将Mode的_name添加到RunLoop的_commonModes中使其成为commonMode。<strong>当RunLoop内容变化时，RunLoop都会自动将_commonModeItems里的ModeItem同步到所有Common Mode里</strong>。</p>
+<h4 id="App启动后RunLoop的状态："><a href="#App启动后RunLoop的状态：" class="headerlink" title="App启动后RunLoop的状态："></a>App启动后RunLoop的状态：</h4><pre><code>CFRunLoop {
+    current mode = kCFRunLoopDefaultMode
+    common modes = {
+        UITrackingRunLoopMode
+        kCFRunLoopDefaultMode
+    }
+
+    common mode items = {
+
+        // source0 (manual)
+        CFRunLoopSource {order =-1, {
+            callout = _UIApplicationHandleEventQueue}}
+        CFRunLoopSource {order =-1, {
+            callout = PurpleEventSignalCallback }}
+        CFRunLoopSource {order = 0, {
+            callout = FBSSerialQueueRunLoopSourceHandler}}
+
+        // source1 (mach port)
+        CFRunLoopSource {order = 0,  {port = 17923}}
+        CFRunLoopSource {order = 0,  {port = 12039}}
+        CFRunLoopSource {order = 0,  {port = 16647}}
+        CFRunLoopSource {order =-1, {
+            callout = PurpleEventCallback}}
+        CFRunLoopSource {order = 0, {port = 2407,
+            callout = _ZL20notify_port_callbackP12__CFMachPortPvlS1_}}
+        CFRunLoopSource {order = 0, {port = 1c03,
+            callout = __IOHIDEventSystemClientAvailabilityCallback}}
+        CFRunLoopSource {order = 0, {port = 1b03,
+            callout = __IOHIDEventSystemClientQueueCallback}}
+        CFRunLoopSource {order = 1, {port = 1903,
+            callout = __IOMIGMachPortPortCallback}}
+
+        // Ovserver
+        CFRunLoopObserver {order = -2147483647, activities = 0x1, // Entry
+            callout = _wrapRunLoopWithAutoreleasePoolHandler}
+        CFRunLoopObserver {order = 0, activities = 0x20,          // BeforeWaiting
+            callout = _UIGestureRecognizerUpdateObserver}
+        CFRunLoopObserver {order = 1999000, activities = 0xa0,    // BeforeWaiting | Exit
+            callout = _afterCACommitHandler}
+        CFRunLoopObserver {order = 2000000, activities = 0xa0,    // BeforeWaiting | Exit
+            callout = _ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv}
+        CFRunLoopObserver {order = 2147483647, activities = 0xa0, // BeforeWaiting | Exit
+            callout = _wrapRunLoopWithAutoreleasePoolHandler}
+
+        // Timer
+        CFRunLoopTimer {firing = No, interval = 3.1536e+09, tolerance = 0,
+            next fire date = 453098071 (-4421.76019 @ 96223387169499),
+            callout = _ZN2CAL14timer_callbackEP16__CFRunLoopTimerPv (QuartzCore.framework)}
+    },
+
+    modes ＝ {
+        CFRunLoopMode  {
+            sources0 =  { /* same as &apos;common mode items&apos; */ },
+            sources1 =  { /* same as &apos;common mode items&apos; */ },
+            observers = { /* same as &apos;common mode items&apos; */ },
+            timers =    { /* same as &apos;common mode items&apos; */ },
+        },
+
+        CFRunLoopMode  {
+            sources0 =  { /* same as &apos;common mode items&apos; */ },
+            sources1 =  { /* same as &apos;common mode items&apos; */ },
+            observers = { /* same as &apos;common mode items&apos; */ },
+            timers =    { /* same as &apos;common mode items&apos; */ },
+        },
+
+        CFRunLoopMode  {
+            sources0 = {
+                CFRunLoopSource {order = 0, {
+                    callout = FBSSerialQueueRunLoopSourceHandler}}
+            },
+            sources1 = (null),
+            observers = {
+                CFRunLoopObserver &gt;{activities = 0xa0, order = 2000000,
+                    callout = _ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv}
+            )},
+            timers = (null),
+        },
+
+        CFRunLoopMode  {
+            sources0 = {
+                CFRunLoopSource {order = -1, {
+                    callout = PurpleEventSignalCallback}}
+            },
+            sources1 = {
+                CFRunLoopSource {order = -1, {
+                    callout = PurpleEventCallback}}
+            },
+            observers = (null),
+            timers = (null),
+        },
+
+        CFRunLoopMode  {
+            sources0 = (null),
+            sources1 = (null),
+            observers = (null),
+            timers = (null),
+        }
+    }
+}
+</code></pre><h4 id="AutoreleasePool"><a href="#AutoreleasePool" class="headerlink" title="AutoreleasePool"></a>AutoreleasePool</h4><p>App启动后，Apple在主线程RunLoop里注册了两个Observer，其回调都是_wrapRunLoopWithAutoreleasePoolHandler()。第一个Observer监视Entry(即将进入Loop)，其回调内会调用_objc_autoreleasePoolPush()创建自动释放池。<strong>其优先级最高，保证创建行为发生在其他所有回调之前</strong>。第二个Observer监视了两个事件：BeforeWaiting(即将进入休眠)时调用_objc_autoreleasePoolPop()和_objc_autoreleasePoolPush()从而释放旧池创建新池；Exit(即将退出Loop) 时调用_objc_autoreleasePoolPop()来释放旧池。<strong>其优先级最低，保证释放行为生在其他所有回调之后</strong>。RunLoop处理事件过程中的代码被自动释放池的创建和释放环绕着，所以不会出现内存泄漏。</p>
+<h4 id="事件响应"><a href="#事件响应" class="headerlink" title="事件响应"></a>事件响应</h4><p>App启动后，Apple在主线程RunLoop里注册了一个Source1(基于mach port的)用来接收系统事件，其回调函数为__IOHIDEventSystemClientQueueCallback()。当一个硬件事件(触摸/锁屏/摇晃等)发生后，首先IOKit.framework生成一个IOHIDEvent事件，发送给SpringBoard(接收按键(锁屏/静音等)，触摸，加速，接近传感器等几种Event)，SpringBoard再用mach port转发给对应的App。随后该Source1会被触发并回调_UIApplicationHandleEventQueue()，把IOHIDEvent处理封装成UIEvent分发给UIWindow等。</p>
+<h4 id="手势识别"><a href="#手势识别" class="headerlink" title="手势识别"></a>手势识别</h4><p>当_UIApplicationHandleEventQueue()识别了一个手势时，其首先会调用Cancel打断当前touchesBegin/Move/End，随后将对应UIGestureRecognizer标记为待处理。App启动后，Apple在主线程RunLoop注册了一个Observer监测BeforeWaiting(即将进入休眠)，其回调内会调用_UIGestureRecognizerUpdateObserver()获取所有待处理的 GestureRecognizer并执行回调。</p>
+<h4 id="界面更新"><a href="#界面更新" class="headerlink" title="界面更新"></a>界面更新</h4><p>当在操作UI(改变Frame、更新UIView/CALayer层次)或者手动调用UIView/CALayer的setNeedsLayout/setNeedsDisplay后，这个<strong>UIView/CALayer被标记为待处理，并被提交到一个全局容器</strong>。App启动后，Apple在主线程RunLoop里注册了一个Observer监听BeforeWaiting(即将进入休眠)和Exit(即将退出Loop)，其回调内会调用_ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv()去遍历所有待处理的UIView/CAlayer并执行绘制和调整，最后更新UI界面。</p>
+<h4 id="定时器"><a href="#定时器" class="headerlink" title="定时器"></a>定时器</h4><p>NSTimer即(toll-free bridged)CFRunLoopTimerRef。一个NSTimer注册到RunLoop时会在未来重复时间点提前注册好事件，<strong>不过为了节省资源，并不会非常准确触发。Timer有个属性Tolerance(宽容度)表示时间点容许的最大误差</strong>。如果某个时间点被错过了，比如在执行一个长任务，那么对应的回调也会跳过去，不会延后执行。CADisplayLink是一个和屏幕刷新率一致的定时器(和NSTimer不一样，其用Source实现，且原理更复杂）。如果两次屏幕刷新之间在执行一个长任务，那么其中一帧就被跳过(和NSTimer相似)，造成界面卡顿的感觉。在快速滑动TableView时，即使一帧的卡顿也会有所察觉。Facebook开源的AsyncDisplayLink(内部也用到RunLoop)就是为了解决界面卡顿的问题。</p>
+<h4 id="PerformSelecter"><a href="#PerformSelecter" class="headerlink" title="PerformSelecter"></a>PerformSelecter</h4><p>调用performSelector系列方法时，实际都会创建一个Timer并添加到对应线程RunLoop中，如果对应线程没有RunLoop则该方法会失效。</p>
+<h4 id="关于GCD"><a href="#关于GCD" class="headerlink" title="关于GCD"></a>关于GCD</h4><p>实际上RunLoop底层也会用到GCD，比如RunLoop是用dispatch_source_t实现的Timer。同时GCD的某些接口也用到RunLoop，例如dispatch_async()。当调用dispatch_async(dispatch_get_main_queue(), block)时，libDispatch会向主线程RunLoop发送消息，主线程RunLoop被唤醒并从消息中取得block，在回调<strong>CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE</strong>()里执行这个block。但仅限于dispatch到主线程，dispatch到其他线程仍然是由libDispatch处理的。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="https://developer.apple.com/library/prerelease/ios/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html#//apple_ref/doc/uid/10000057i-CH16-SW1" target="_blank" rel="noopener">Run Loops</a></li>
+<li><a href="http://blog.ibireme.com/2015/05/18/runloop/" target="_blank" rel="noopener">深入理解RunLoop</a></li>
+</ul>
+
+      
+    </div>
+    <footer>
+      
+        <div class="alignleft">
+            <a href="/2015/10/01/2015-10-01-Thread-Runloop/#more" class="more-link"><i class="fa fa-chevron-right"></i>Read More</a>
+        </div>
+        
+        
+          <div class="alignright"> 
+            <a href="http://hllovesgithub.github.io/2015/10/01/2015-10-01-Thread-Runloop/#comment" class="comment-link">
+              <i class="fa fa-comments"></i><span class="ds-thread-count" data-thread-key="/2015/10/01/2015-10-01-Thread-Runloop/">&nbsp;
               </span>
             </a>
           </div>
