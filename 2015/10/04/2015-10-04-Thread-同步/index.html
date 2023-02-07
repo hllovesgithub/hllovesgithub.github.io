@@ -1,0 +1,763 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="同步工具涉及线程安全时，一个好的设计是最好的保护。避免共享资源，减少线程交互，这样可以缩小线程间干扰，但是一个完全没有干扰的设计是不可能的，就需要使用同步技术来确保安全。 原子操作原子操作是同步简单数据类型一个非常简单的形式，其优势是不阻塞线程竞争。对于简单的操作，比如递增一个计数器，原子操作比锁更有性能优势。MacOSX和iOS包含了许多32位和64位执行基本的数学运算和逻辑运算(比较-交换，测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Thread 同步">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/10/04/2015-10-04-Thread-%E5%90%8C%E6%AD%A5/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="同步工具涉及线程安全时，一个好的设计是最好的保护。避免共享资源，减少线程交互，这样可以缩小线程间干扰，但是一个完全没有干扰的设计是不可能的，就需要使用同步技术来确保安全。 原子操作原子操作是同步简单数据类型一个非常简单的形式，其优势是不阻塞线程竞争。对于简单的操作，比如递增一个计数器，原子操作比锁更有性能优势。MacOSX和iOS包含了许多32位和64位执行基本的数学运算和逻辑运算(比较-交换，测">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewoxcqtqfcj21600jetjg.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewp9wuo4z4j20uq0j6gqz.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewp9xuqolzj20um148tqq.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewp9yb4innj20uo0c6450.jpg">
+<meta property="article:published_time" content="2015-10-04T12:34:55.000Z">
+<meta property="article:modified_time" content="2015-11-15T06:11:38.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewoxcqtqfcj21600jetjg.jpg">
+  
+  
+  
+  <title>Thread 同步 - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Thread 同步"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-10-04 20:34" pubdate>
+          2015年10月4日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Thread 同步</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="同步工具"><a href="#同步工具" class="headerlink" title="同步工具"></a>同步工具</h3><p>涉及线程安全时，一个好的设计是最好的保护。避免共享资源，减少线程交互，这样可以缩小线程间干扰，但是一个完全没有干扰的设计是不可能的，就需要使用同步技术来确保安全。</p>
+<h3 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h3><p>原子操作是同步<strong>简单数据类型</strong>一个非常简单的形式，其优势是<strong>不阻塞线程竞争</strong>。对于简单的操作，比如递增一个计数器，原子操作比锁更有性能优势。MacOSX和iOS包含了许多32位和64位执行基本的数学运算和逻辑运算(比较-交换，测试-设值，测试-清理)的原子操作(/usr/include/libkern/OSAtomic.h)。</p>
+<h3 id="内存屏障和Volatile变量"><a href="#内存屏障和Volatile变量" class="headerlink" title="内存屏障和Volatile变量"></a>内存屏障和Volatile变量</h3><p>编译器优化代码时会<strong>重新排序汇编指令</strong>，来使处理器流水线执行指令以达到最佳性能。其中就可能对访问内存的指令进行(其认为可能不产生错误)重新排序，但事实上编译器几乎不可能检测到所有依赖内存的操作。如果看似独立的变量却是相互影响的，那么优化就可能打乱这些变量内存访问指令的顺序，导致潜在问题。</p>
+<p><strong>内存屏障</strong>(Memory Barrier)是一个确保内存操作按照正确顺序工作、非阻塞的同步工具(OSMemoryBarrier系列函数)。内存屏障就像一个栅栏，处理器<strong>必须先完成障碍前所有的内存读取操作，才能执行屏障后的内存读取操作</strong>，这样内存屏障就能确保一个线程的内存操作总是按照预定顺序执行。</p>
+<p><strong>Volatile</strong>是适用于独立变量的另一种内存限制形式。编译器通过把变量的值加载到寄存器(寄存器的访问速度比内存访问速度快)来实现优化。对于非线程竞争的变量不会有问题，反之则会。volatile变量会<strong>强制编译器每次使用变量时都从内存而非寄存器读取</strong>。如果一个变量的值有编译器无法检测更改的可能，那么可以把它声明为volatile。</p>
+<p>内存屏障和volatile变量降低了编译器优化的程度，因此只在的确需要并确保正确的前提下谨慎使用。</p>
+<h3 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h3><p>锁是保护**临界区(Critical Section)**关键代码在同一个时间只被一个线程访问的最常用同步工具。MacOSX和iOS提供了常使用的锁：</p>
+<p><strong>￼Mutex￼(互斥锁)</strong> 互斥锁扮演着资源保护屏障的角色。如果一个线程尝试获取一个已经被获取的互斥锁，那么该线程会阻塞一直到拥有互斥锁的线程释放互斥锁。如果有多个线程竞争获取互斥锁，每次只有一个能成功。</p>
+<p><strong>Recursive lock(递归锁)</strong> 递归锁是互斥锁的变种。一个递归锁允许同一个线程释放前多次获取，其他线程保持阻塞直到拥有递归锁的线程释放同样次数后。递归锁用在递归语句中，也可用在同一线程的多个需要单独获取递归锁的方法里。</p>
+<p><strong>Read-write lock(读写锁)</strong> 读写锁也被称为共享互斥锁。通常用在大规模操作(经常读偶尔写)保护数据中显着提高性能。一般多个线程可以同时读数据，当有另一个线程要写数据时，写线程阻塞直到所有读线程释放后再获取读写锁，进行写操作。当一个写线程在等待锁时，新来的读线程会阻塞直到写线程结束。系统只对POSIX线程支持读写锁。</p>
+<p><strong>Distributed lock(分布锁)</strong> 一个分布锁提供进程间的互斥访问。和互斥锁不一样的是，分布锁不会阻塞进程或阻止进程运行。它只是简单地在尝试获取已被获取的分布锁时通知进程并让其自己决定如何处理。</p>
+<p><strong>Spin lock(自旋锁)</strong> 一个自旋锁会反复查询其锁定条件直到条件成为真。自旋锁通常用在获取锁预期时间很小的多核系统里。这种情况下，切换上下文和更新线程数据通常比阻塞线程更有效率。系统因为自旋锁特性而没有提供支持，但是在一些特别的情况下很容易实现它。</p>
+<p><strong>Double-checked lock(双重检查锁)</strong> 双重检查锁是一种，通过获锁前测试其标准来减少获取过程开销的尝试。因为双重检查锁是潜在不安全的，系统对该锁没有显式的实现并且不鼓励使用。</p>
+<h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><p>条件是另一种当判断为真时允许线程间互相发送信号的同步工具。条件通常用来<strong>确认资源可以性或者确保任务以特定的顺序执行</strong>。当一个线程测试条件时，它阻塞直到其他线程显式地改变该条件为真。条件和互斥锁虽然都只允许多个线程中的一个通过，但互斥锁是随机选择，条件可以根据指定判断选择。系统用不同的技术对条件提供支持，条件的正确使用需要仔细思考。</p>
+<h3 id="同步的开销和性能"><a href="#同步的开销和性能" class="headerlink" title="同步的开销和性能"></a>同步的开销和性能</h3><p>同步确保正确性，但同时会牺牲性能(甚至在无竞争时)。<strong>锁和原子操作通常使用内存屏障和内核级同步机制来确保关键代码被正确保护</strong>。同步虽然使关键代码安全，但过多同步的多线程程序和单线程程序相比反而可能会降低性能。安全和性能之间寻找平衡需要大量经验累积。在无竞争时互斥锁和原子操作的近似开销：</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewoxcqtqfcj21600jetjg.jpg" srcset="/img/loading.gif" lazyload></p>
+<h3 id="完全避免同步"><a href="#完全避免同步" class="headerlink" title="完全避免同步"></a>完全避免同步</h3><p>设计代码结构和数据结构来避免使用同步是很好的解决办法。如果整体设计导致特定资源的高竞争，可能设计本身就存在问题。实现并发最好的方法是减少并发任务之间的交互和依赖。如果每个任务在它自己的数据集上面操作，则不需要使用同步来保护这些数据。</p>
+<h3 id="注意正确地同步"><a href="#注意正确地同步" class="headerlink" title="注意正确地同步"></a>注意正确地同步</h3><pre><code>// Code 1
+NSLock* arrayLock = GetArrayLock();
+NSMutableArray* myArray = GetSharedArray();
+id anObject;
+[arrayLock lock];
+anObject = [myArray objectAtIndex:0];
+[arrayLock unlock];
+[anObject doSomething];
+
+// Code 2￼￼
+NSLock* arrayLock = GetArrayLock();
+NSMutableArray* myArray = GetSharedArray();
+id anObject;
+[arrayLock lock];
+￼￼￼anObject = [myArray objectAtIndex:0];
+[anObject doSomething];
+[arrayLock unlock];
+￼￼
+// Code 3
+NSLock* arrayLock = GetArrayLock();
+NSMutableArray* myArray = GetSharedArray();
+id anObject;
+[arrayLock lock];
+anObject = [myArray objectAtIndex:0];
+[anObject retain];
+[arrayLock unlock];
+[anObject doSomething];
+</code></pre>
+<p>Code1中anObject在执行doSomething时有野指针的可能。Code2中确保anObject有效，但是doSomething可能耗时很长，引起其他线程长时间等锁释放。Code3才是正确的写法。尽管这个示例很简单，但说明了非常重要的一点，当同步涉及到正确性时，不仅仅需要考虑问题的表面，内存管理和其他因素都有可能因为多线程而受到影响。此外，应该假设编译器总是出现最坏的情况。这种意识和警惕性，可以帮避免潜在问题，确保关键代码正确运行。</p>
+<h3 id="正确使用Volatile"><a href="#正确使用Volatile" class="headerlink" title="正确使用Volatile"></a>正确使用Volatile</h3><p>使用一个互斥锁来保护一段关键代码后，并不还需要用volatile来保护关键代码段里的重要变量。一个互斥锁包含了内存屏障来确保内存读写操作能正确顺序执行。一个临界区里volatile变量会强制每次读写都在内存。这种同步组合在一些特定区域是必要的，但是同样会导致显著的性能损失。如果互斥锁已经可以保护变量，那么不使用volatile同样很重要。通常情况下，互斥锁和其他同步工具比volatile更好。</p>
+<h3 id="使用原子操作"><a href="#使用原子操作" class="headerlink" title="使用原子操作"></a>使用原子操作</h3><p>原子操作以非阻塞方式执行某些简单类型的同步操作且避免锁的开销。尽管锁是同步线程很好的工具，但即使在无竞争状态下，获取一个锁都相对昂贵。相比而言，许多原子操作花费更少时间也能达到和锁一样的效果。原子操作(/usr/include/libkern/OSAtomic.h)在32位或64位处理器上执行简单的数学运算和逻辑运算，<strong>保证执行的操作在被影响内存再次读写前已经完成</strong>。可以使用原子操作和内存屏障组合使用，来保证多线程间内存正确同步。大部分原子操作行为都如其简单明了的函数名所理解那样。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewp9wuo4z4j20uq0j6gqz.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewp9xuqolzj20um148tqq.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewp9yb4innj20uo0c6450.jpg" srcset="/img/loading.gif" lazyload></p>
+<h3 id="使用POSIX互斥锁"><a href="#使用POSIX互斥锁" class="headerlink" title="使用POSIX互斥锁"></a>使用POSIX互斥锁</h3><pre><code>pthread_mutex_t mutex;
+void MyInitFunction() &#123;
+    pthread_mutex_init(&amp;mutex， NULL);
+&#125;
+void MyLockingFunction() &#123;
+    pthread_mutex_lock(&amp;mutex);
+    // Do work
+    pthread_mutex_unlock(&amp;mutex);
+&#125;
+void MyReleaseFunction() &#123;
+    pthread_mutex_destroy(metex);
+&#125;
+</code></pre>
+<p>以上代码只是简单地展示了POSIX线程互斥锁的过程，应该还要检查函数错误码并做适当处理。</p>
+<h3 id="使用NSLock"><a href="#使用NSLock" class="headerlink" title="使用NSLock"></a>使用NSLock</h3><p><strong>Cocoa所有锁(包括NSLock)都是遵循NSLocking协议(定义了lock和unlock)来获取和释放</strong>。NSLock类除此之外还有tryLock(尝试获取一个锁并马上返回结果)和lockBeforeDate:(尝试获取一个锁，在规定时间内阻塞，最后返回结果)。</p>
+<pre><code>NSLock *theLock = [[NSLock alloc] init];
+while (YES) &#123;
+    if ([theLock tryLock]) &#123;
+        // Do work
+        [theLock unlock];
+        break;
+    &#125;
+&#125;
+</code></pre>
+<h3 id="使用-synchronized"><a href="#使用-synchronized" class="headerlink" title="使用@synchronized"></a>使用@synchronized</h3><p>在Objc代码中，@synchronized是一个非常方便创建互斥锁的方法。@synchronized做和其他互斥锁一样的工作，只是不需要直接创建锁对象。只需要简单使用任意Objc对象作为区别临界区的唯一标志符。</p>
+<pre><code>@synchronized(token) &#123;
+    // Do work
+&#125;
+</code></pre>
+<p>作为预防措施，@synchronized会<strong>隐式地添加一个异常处理代码</strong>起保护作用。该代码会在异常抛出时自动释放互斥锁。这意味着使用@synchronized就必须启用异常处理。如果不想要隐式异常处理代码带来的额外开销，应该考虑使用锁。</p>
+<h3 id="使用NSRecursiveLock"><a href="#使用NSRecursiveLock" class="headerlink" title="使用NSRecursiveLock"></a>使用NSRecursiveLock</h3><p>NSRecursiveLock在同一线程多次获取不造成死锁。一个递归锁会自己统计成功获取次数。只有<strong>获取和释放操作次数平衡时，才可以真正被释放给其他线程获取</strong>。这类锁通常用在递归(也可以是类似的非递归)函数里防止递归造成线程阻塞。因为递归锁直到获取和释放操作平衡后才会被释放，而长时间持有一个锁将会导致其他线程阻塞直到递归完成，所以必须仔细权衡使用递归锁对性能的潜在影响。如果重构代码可以消除递归或者消除使用递归锁，那可能会有更好的性能。</p>
+<pre><code>NSRecursiveLock *theLock = [[NSRecursiveLock alloc] init];
+void MyRecursiveFunction(int value) &#123;
+    [theLock lock];
+    if (value != 0) &#123;
+        --value;
+        MyRecursiveFunction(value);
+    &#125;
+    [theLock unlock];
+&#125;
+MyRecursiveFunction(5);
+</code></pre>
+<h3 id="使用NSConditionLock"><a href="#使用NSConditionLock" class="headerlink" title="使用NSConditionLock"></a>使用NSConditionLock</h3><p>NSConditionLock是一个<strong>使用特定值来获取和释放</strong>的互斥锁，其行为和NSCondition有点类似，但实现非常不同。通常多线程用NSConditionLock实现以特定顺序执行任务，比如生产者消费者模式。NSConditionLock的获取和释放方法可以任意组合：lock和unlockWithCondition:，lockWhenCondition:和unlock 。</p>
+<pre><code>id condLock = [[NSConditionLock alloc] initWithCondition:NO_DATA];
+
+// Thread A
+while(true) &#123;
+    [condLock lock];
+    // Add data to the queue
+    [condLock unlockWithCondition:HAS_DATA];
+&#125;
+
+// Thread B
+while (true) &#123;
+    [condLock lockWhenCondition:HAS_DATA];
+    // Remove data from the queue
+    [condLock unlockWithCondition:(isEmpty ? NO_DATA : HAS_DATA)];
+    // Process the data locally
+&#125;
+</code></pre>
+<h3 id="使用NSCondition"><a href="#使用NSCondition" class="headerlink" title="使用NSCondition"></a>使用NSCondition</h3><p>NSCondition类不仅提供了POSIX条件相同的语义，但又封装互斥锁和条件数据。<strong>可以像互斥锁一样获取和释放它，又可以像条件一样等待它</strong>。可以作为NSLock解决多线程之间的同步问题，但设计出NSCondition更重要的目的是解决线程之间的调度问题（也必须获取锁和释放锁）。某线程调用wait使其阻塞处于等待状态(<strong>其他线程就可以继续进入临界区。这和标准锁不同，标准锁被获取后无论什么情况，只要拥有线程没有释放，其他线程就无法进入临界区</strong>)，直到其他线程调用signal(唤醒多个等待线程中任意一个)或者broadcast(唤醒所有等待线程)才能继续运行。</p>
+<pre><code>// Thread A
+[cocoaCondition lock];
+while (timeToDoWork &lt;= 0)
+    [cocoaCondition wait];
+timeToDoWork--;
+// Do work.
+[cocoaCondition unlock];
+
+// Thread B
+[cocoaCondition lock];
+timeToDoWork++;
+[cocoaCondition signal];
+[cocoaCondition unlock];
+</code></pre>
+<h3 id="Cocoa多线程指南"><a href="#Cocoa多线程指南" class="headerlink" title="Cocoa多线程指南"></a>Cocoa多线程指南</h3><p>Immutable对象一般都是线程安全的，Mutable对象一般不是线程安全的，在多线程中需要同步。对于线程不安全的对象，只要保证同一时间只有一个线程使用，那么整个程序总体而言还是线程安全的。如果使用多线程绘画视图，绘画代码应放在NSView的lockFocusIfCanDraw和unlockFocus之间。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.apple.com/library/prerelease/ios/documentation/Cocoa/Conceptual/Multithreading/ThreadSafety/ThreadSafety.html#//apple_ref/doc/uid/10000057i-CH8-SW1">Synchronization</a></li>
+<li><a target="_blank" rel="noopener" href="http://southpeak.github.io/blog/2014/10/17/osatomicyuan-zi-cao-zuo/">OSAtomic原子操作</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/kenshincui/p/3983982.html#synchronized">iOS开发系列–并行开发其实很容易</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Thread 同步</div>
+      <div>https://hllovesgithub.github.io/2015/10/04/2015-10-04-Thread-同步/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年10月4日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/10/07/2015-10-07-Runtime/" title="Runtime">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Runtime</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/10/01/2015-10-01-Thread-Runloop/" title="Thread RunLoop">
+                        <span class="hidden-mobile">Thread RunLoop</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

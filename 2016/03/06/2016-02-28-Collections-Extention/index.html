@@ -1,0 +1,709 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="NSPointerFunctiosnThe functions specified by an instance of NSPointerFunctions are separated into two clusters—those that define “personality” such as “object” or “C-string”, and those that describe m">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Collections Extention">
+<meta property="og:url" content="https://hllovesgithub.github.io/2016/03/06/2016-02-28-Collections-Extention/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="NSPointerFunctiosnThe functions specified by an instance of NSPointerFunctions are separated into two clusters—those that define “personality” such as “object” or “C-string”, and those that describe m">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-03-06T07:40:06.000Z">
+<meta property="article:modified_time" content="2016-03-06T23:56:57.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Collections Extention - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Collections Extention"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2016-03-06 15:40" pubdate>
+          2016年3月6日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          26 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Collections Extention</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="NSPointerFunctiosn"><a href="#NSPointerFunctiosn" class="headerlink" title="NSPointerFunctiosn"></a>NSPointerFunctiosn</h3><p>The functions specified by an instance of NSPointerFunctions are separated into two clusters—those that define “<strong>personality</strong>” such as “object” or “C-string”, and those that describe <strong>memory management issues</strong> such as a memory deallocation function.</p>
+<p>NSPointerArray、NSMapTable和NSHashTable使用NSPointerFunctions对象为存储其中的对象定义了获取和保留行为。内存和个性选项分为两大组：<strong>内存选项</strong>决定了内存管理，<strong>个性选项</strong>决定了哈希和相等。</p>
+<ul>
+<li><p><strong>NSPointerFunctionsStrongMemory</strong>(10.5~)</p>
+<p>  使用strong写屏障后备存储，默认的内存选项。配合对象个性选项，使用retain和release；配合非对象选项，那就和NSPointerFunctionsMallocMemory一样。</p>
+</li>
+<li><p><strong>NSPointerFunctionsZeroingWeakMemory</strong>(10.5~10.8)</p>
+<p>  使用弱读写屏障，保留一个non-retained对象指针。</p>
+</li>
+<li><p><strong>NSPointerFunctionsOpaqueMemory</strong>(10.5~)</p>
+<p>  指针删除时没有任何操作，通常用来保留任意指针。获取内存方法只用于copy-in，释放内存方法没有任何动作。这个选项对于对象而言不是一个好选择。</p>
+</li>
+<li><p><strong>NSPointerFunctionsMallocMemory</strong>(10.5~)</p>
+<p>  用calloc()拷贝，用free()释放。</p>
+</li>
+<li><p><strong>NSPointerFunctionsMachVirtualMemory</strong>(10.5~)</p>
+<p>  用Mach内存</p>
+</li>
+<li><p><strong>NSPointerFunctionsWeakMemory</strong>(10.8~)</p>
+<p>  在ARC中使用weak读写屏障，释放后指针变为NULL。</p>
+</li>
+<li><p><strong>NSPointerFunctionsObjectPersonality</strong>(10.5~)</p>
+<p>  用hash实现哈希，用isEqual实现相等，用description实现描述，默认的个性选项。配合强内存选项，使用retain和release。</p>
+</li>
+<li><p><strong>NSPointerFunctionsOpaquePersonality</strong>(10.5~)</p>
+<p>  用移位指针实现哈希，用指针值实现相等。</p>
+</li>
+<li><p><strong>NSPointerFunctionsObjectPointerPersonality</strong>(10.5~)</p>
+<p>  用移位指针实现哈希，用指针值实现相等，用description实现描述。配合强内存选项，使用retain和release。</p>
+</li>
+<li><p><strong>NSPointerFunctionsCStringPersonality</strong>(10.5~)</p>
+<p>  用字符串的哈希方法实现哈希，用strcmp实现相等，用’%s’实现描述。</p>
+</li>
+<li><p><strong>NSPointerFunctionsStructPersonality</strong>(10.5~)</p>
+<p>  用内存哈希方法实现哈希，用memcmp实现相等。</p>
+</li>
+<li><p><strong>NSPointerFunctionsIntegerPersonality</strong>(10.5~)</p>
+<p>  用移位指针实现哈希，用指针值实现相等。</p>
+</li>
+<li><p><strong>NSPointerFunctionsCopyIn</strong>(10.5~)</p>
+<p>  把实体加入到集合中时，使用获取内存方法开辟内存并拷贝实体。</p>
+</li>
+</ul>
+<hr>
+<h3 id="NSPointerArray"><a href="#NSPointerArray" class="headerlink" title="NSPointerArray"></a>NSPointerArray</h3><p>NSPointerArray is a mutable collection modeled after <strong>NSArray</strong> but it can also <strong>hold NULL</strong> values, which can be inserted or extracted (and which contribute to the object’s count). Moreover, unlike traditional arrays, you can set the count of the array directly.</p>
+<p>方便的构造函数：</p>
+<ul>
+<li>strongObjectsPointerArray(强对象数组)</li>
+<li>weakObjectsPointerArray(若对象数组)</li>
+</ul>
+<p>所有涉及到index的API，都需要注意其值不应该大于count，否则会有异常。allObjects方法可以将存储的所有有效对象(NULL被过滤)构建成一个NSArray，其中非对象实体会产生异常因为retain。</p>
+<p>在性能方面，NSPointerArray真的非常非常慢，所以打算在一个很大的数据集合上使用它的时候一定要三思。</p>
+<hr>
+<h3 id="NSMapTable"><a href="#NSMapTable" class="headerlink" title="NSMapTable"></a>NSMapTable</h3><p>NSMapTable is a mutable collection modeled after <strong>NSDictionary</strong> but provides different options: </p>
+<ul>
+<li>The major option is to have keys and/or values held “<strong>weakly</strong>” in a manner that entries are removed when one of the objects is reclaimed.</li>
+<li>Its keys or values may be <strong>copied</strong> on input or may use pointer identity for <strong>equality</strong> and <strong>hashing</strong>.</li>
+<li>It can contain <strong>arbitrary pointers</strong> (its contents are not constrained to being objects).</li>
+</ul>
+<p>方便的构造函数：</p>
+<ul>
+<li>strongToStrongObjectsMapTable(强key强value)</li>
+<li>weakToStrongObjectsMapTable(弱key强value)</li>
+<li>strongToWeakObjectsMapTable(强key弱value)</li>
+<li>weakToWeakObjectsMapTable(弱key弱value)</li>
+</ul>
+<p>除了NSPointerFunctionsCopyIn，默认行为都会strong-retain(或weak-assign)key而不会copy，与CFDictionary行为相同而与NSDictionary不同。当需要一个字典，它的键没实现NSCopying协议时候非常有用。</p>
+<p>NSMapTable只比NSDictionary略微慢一点。如果需要一个不retain键的字典，放弃CFDictionary使用它吧。</p>
+<hr>
+<h3 id="NSHashTable"><a href="#NSHashTable" class="headerlink" title="NSHashTable"></a>NSHashTable</h3><p>NSHashTable is modeled after <strong>NSSet</strong> but provides different options, in particular to support weak relationships:</p>
+<ul>
+<li>It can hold <strong>weak</strong> references to its members.</li>
+<li>Its members may be copied on input or may use pointer identity for <strong>equality</strong> and <strong>hashing</strong>.</li>
+<li>It can contain <strong>arbitrary pointers</strong> (its members are not constrained to being objects).</li>
+</ul>
+<p>方便的构造函数：</p>
+<ul>
+<li>weakObjectsHashTable(弱对象哈希表)</li>
+<li>hashTableWithOptions:(某类型哈希表)</li>
+</ul>
+<p>哈希表可以保持对对象的弱引用并在对象被销毁之后正确的将其移除 — 一些手动添加到NSSet的时候非常恶心的事情。</p>
+<p>如果只是需要NSSet的特性，请坚持使用NSSet。NSHashTable在添加对象时花费了将近2倍的时间，但是其他方面的效率却非常相近。</p>
+<hr>
+<h3 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h3><p><a target="_blank" rel="noopener" href="http://objcio.com/blog/2014/01/20/the-foundation-collection-classes/">基础集合类</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Collections Extention</div>
+      <div>https://hllovesgithub.github.io/2016/03/06/2016-02-28-Collections-Extention/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2016年3月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/04/2020-05-04-Products/" title="Products">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Products</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2016/01/24/2016-01-24-Effective-Objective-C%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-%E4%B8%8B/" title="Effective Objective-C 读书笔记-下">
+                        <span class="hidden-mobile">Effective Objective-C 读书笔记-下</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

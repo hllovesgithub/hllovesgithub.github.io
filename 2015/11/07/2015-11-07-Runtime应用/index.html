@@ -1,0 +1,885 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Runtime的能力很强大，有很多优秀的第三方库基于Runtime实现了不可思议的功能。Apple也有原生框架使用Runtime使得奇妙的技术得以被自然合理地使用。这里介绍4种：Associated Object、Method Swizzling(Aspect Oriented Programming)、KVO和NSZombie。 Associated Objects对象关联(或称为关联引用)是R">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Runtime应用">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/11/07/2015-11-07-Runtime%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="Runtime的能力很强大，有很多优秀的第三方库基于Runtime实现了不可思议的功能。Apple也有原生框架使用Runtime使得奇妙的技术得以被自然合理地使用。这里介绍4种：Associated Object、Method Swizzling(Aspect Oriented Programming)、KVO和NSZombie。 Associated Objects对象关联(或称为关联引用)是R">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1extbrpbvxvj213r0m8aex.jpg">
+<meta property="article:published_time" content="2015-11-07T01:21:03.000Z">
+<meta property="article:modified_time" content="2015-11-15T06:13:36.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1extbrpbvxvj213r0m8aex.jpg">
+  
+  
+  
+  <title>Runtime应用 - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Runtime应用"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-11-07 09:21" pubdate>
+          2015年11月7日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          86 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Runtime应用</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>Runtime的能力很强大，有很多优秀的第三方库基于Runtime实现了不可思议的功能。Apple也有原生框架使用Runtime使得奇妙的技术得以被自然合理地使用。这里介绍4种：Associated Object、Method Swizzling(Aspect Oriented Programming)、KVO和NSZombie。</p>
+<h3 id="Associated-Objects"><a href="#Associated-Objects" class="headerlink" title="Associated Objects"></a>Associated Objects</h3><p>对象关联(或称为关联引用)是Runtime2.0(起始于OSX10.5和iOS4)的一个特性，它允许你在运行时向对象动态赋值关联、获取关联和删除关联：</p>
+<ul>
+<li>objc_setAssociatedObject</li>
+<li>objc_getAssociatedObject</li>
+<li>objc_removeAssociatedObjects</li>
+</ul>
+<p>这意味着可以对已经存在的类在Category中添加自定义属性，这几乎弥补了Objc最大的缺点。对于第2个参数key而言，通常应该是常量、唯一的、在适用范围内用getter和setter访问到的：</p>
+<pre><code>static char kAssociatedObjectKey;
+objc_getAssociatedObject(self, &amp;kAssociatedObjectKey);
+</code></pre>
+<p>但是，因为SEL被编译器确保了其是常量又是唯一的，所以更简单的方式是用SEL实现：</p>
+<pre><code>@interface NSObject (AssociatedObject)
+@property (nonatomic, strong) id associatedObject;
+@end
+@implementation NSObject (AssociatedObject)
+@dynamic associatedObject;
+- (void)setAssociatedObject:(id)object &#123;
+    objc_setAssociatedObject(self, @selector(associatedObject), object, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+&#125;
+- (id)associatedObject &#123;
+    return objc_getAssociatedObject(self, @selector(associatedObject));
+&#125;
+@end
+</code></pre>
+<p>而对象的关联策略由类型objc_AssociationPolicy指定：</p>
+<ul>
+<li>OBJC_ASSOCIATION_ASSIGN ＝ @property(assign)或者@property(unsafe_unretained)</li>
+<li>OBJC_ASSOCIATION_RETAIN_NONATOMIC = @property (nonatomic,strong)</li>
+<li>OBJC_ASSOCIATION_COPY_NONATOMIC = @property (nonatomic, copy)</li>
+<li>OBJC_ASSOCIATION_RETAIN = @property (atomic, strong)</li>
+<li>OBJC_ASSOCIATION_COPY = @property (atomic, copy)</li>
+</ul>
+<p>删除关联时，根据文档描述不要使用objc_removeAssociatedObjects，因为这样是删除所有关联，也许别的关联使用者添加过你不知道的关联过早被一起删除了。正确的方法是使用objc_setAssociatedObject将对应的关联设置为nil。</p>
+<p>无论是帮助内部实现的私有属性，还是帮助外部调用的公有属性，在已有类需要属性时能实现这种需求。但是关联不是万能药，再有适合需求更好的实现时(比如Delegate，NSNotification，KVO或者Subclass)，关联应该被视为最后的选择。</p>
+<h3 id="Method-Swizzling-Aspect-Oriented-Programming"><a href="#Method-Swizzling-Aspect-Oriented-Programming" class="headerlink" title="Method Swizzling(Aspect Oriented Programming)"></a>Method Swizzling(Aspect Oriented Programming)</h3><p>类(Class)维护一张调度表(dispatch table)在运行时解析消息；表中每项(entry)都是一个方法(Method)，其key是一个唯一的名字选择器(SEL)-字符串，对应着一个方法实现(IMP)-指向标准C函数的指针。Method swizzling通过Runtime，改变类调度表里选择器与方法实现之间的映射关系，从而让消息解析时从一个选择器对应到另外一个的实现：</p>
+<ul>
+<li>class_addMethod</li>
+<li>class_replaceMethod</li>
+<li>method_exchangeImplementations</li>
+</ul>
+<p>举个例子：</p>
+<pre><code>#import &lt;objc/runtime.h&gt;
+@implementation UIViewController (Tracking)
++ (void)load &#123;
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^&#123;
+        Class class = [self class];
+        
+        // When swizzling a class method, use the following:
+        // Class class = object_getClass((id)self);
+        
+        SEL originalSelector = @selector(viewWillAppear:);
+        SEL swizzledSelector = @selector(xxx_viewWillAppear:);
+        
+        Method originalMethod = class_getInstanceMethod(class, originalSelector);
+        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+        
+        BOOL didAddMethod =
+        class_addMethod(class,
+                        originalSelector,
+                        method_getImplementation(swizzledMethod),
+                        method_getTypeEncoding(swizzledMethod));
+        
+        if (didAddMethod) &#123;
+            class_replaceMethod(class,
+                                swizzledSelector,
+                                method_getImplementation(originalMethod),
+                                method_getTypeEncoding(originalMethod));
+        &#125; else &#123;
+            method_exchangeImplementations(originalMethod, swizzledMethod);
+        &#125;
+    &#125;);
+&#125;
+- (void)xxx_viewWillAppear:(BOOL)animated &#123;
+    [self xxx_viewWillAppear:animated]; 
+    NSLog(@&quot;viewWillAppear: %@&quot;, self); 
+&#125;
+@end
+</code></pre>
+<p>因为Method Swizzling影响全局，所以减少冒险情况就很重要。+load能够保证类初始化时就被调用，这为改变系统行为提供了统一性。而+initialize并不能保证在何时被调用直到第一次调用类的方法，这使得不同类之间没有统一性。所以Swizzling应该在+load方法中实现。同时，为了确保Swizzling即使在多线程时也只被执行一次，Swizzling应该在dispatch_once中实现。</p>
+<p>乱用Swizzling容易导致不可预料的行为和结果，在没有足够的沟通的前提下，很容易造成看似理所当然实则莫名其妙的问题。除了显示说明和沟通以外，应用时始终调用原始实现能够保证至少正常API功能，同时给替换方法添加前缀避免和其他地方的代码产生冲突。</p>
+<blockquote>
+<p>An aspect can alter the behavior of the base code by applying advice (additional behavior) at various join points (points in a program) specified in a quantification or query called a pointcut (that detects whether a given join point matches).   —Wikipedia</p>
+</blockquote>
+<p>AOP是对OOP的一个补充，利用Runtime和AOP，可以把琐碎事务逻辑从主逻辑中分离出来，作为单独模块。有很多方式可以实现AOP，Method Swizzling就是其中之一。<a target="_blank" rel="noopener" href="https://github.com/steipete/Aspects">Aspects</a>就是一个不错的AOP库。</p>
+<h3 id="KVO"><a href="#KVO" class="headerlink" title="KVO"></a>KVO</h3><p>KVO是观察者模式在Objc的实现，是MVC中解耦MC通信的方法，是实现Cocoa Bindings的基础。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1extbrpbvxvj213r0m8aex.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>KVO的优美在于，使用时的自然合理是建立在Runtime底层一系列复杂处理换来的。简单来说，当某个对象第一次被观察时，Runtime会创建一个新的原类子类，重写所有被观察key的setter方法，并将该对象isa指向子类变成子类的实例。被重写的方法实现了如何通知观察者。有趣的是，Apple甚至也重写了-class方法，使得子类依旧返回原类，让使用者看起来什么都没发生一样。举个例子：</p>
+<pre><code>#import &lt;Foundation/Foundation.h&gt;
+#import &lt;objc/runtime.h&gt;
+
+@interface TestClass : NSObject
+@property int x;
+@property int y;
+@property int z;
+@end
+@implementation TestClass
+@end
+
+static NSArray *ClassMethodNames(Class c) &#123;
+    NSMutableArray *array = [NSMutableArray array];
+    unsigned int methodCount = 0;
+    Method *methodList = class_copyMethodList(c, &amp;methodCount);
+    for(unsigned int i = 0; i &lt; methodCount; i++) &#123;
+        [array addObject: NSStringFromSelector(method_getName(methodList[i]))];
+    &#125;
+    free(methodList);
+    return array;
+&#125;
+
+static void PrintDescription(NSString *name, id obj) &#123;
+    NSString *str = [NSString stringWithFormat:
+                     @&quot;%@: %@\n\tNSObject class %s\n\tlibobjc class %s\n\timplements methods &lt;%@&gt;&quot;,
+                     name,
+                     obj,
+                     class_getName([obj class]),
+                     class_getName(object_getClass(obj)),
+                     [ClassMethodNames(object_getClass(obj)) componentsJoinedByString:@&quot;, &quot;]];
+    printf(&quot;%s\n&quot;, [str UTF8String]);
+&#125;
+
+int main(int argc, char **argv) &#123;
+    [NSAutoreleasePool new];
+    
+    TestClass *x = [[TestClass alloc] init];
+    TestClass *y = [[TestClass alloc] init];
+    TestClass *xy = [[TestClass alloc] init];
+    TestClass *control = [[TestClass alloc] init];
+    
+    [x addObserver:x forKeyPath:@&quot;x&quot; options:0 context:NULL];
+    [xy addObserver:xy forKeyPath:@&quot;x&quot; options:0 context:NULL];
+    [y addObserver:y forKeyPath:@&quot;y&quot; options:0 context:NULL];
+    [xy addObserver:xy forKeyPath:@&quot;y&quot; options:0 context:NULL];
+    
+    PrintDescription(@&quot;control&quot;, control);
+    PrintDescription(@&quot;x&quot;, x);
+    PrintDescription(@&quot;y&quot;, y);
+    PrintDescription(@&quot;xy&quot;, xy);
+    
+    SEL setX = @selector(setX:);
+    printf(&quot;Using NSObject methods, normal setX: is %p, overridden setX: is %p\n&quot;,
+           [control methodForSelector:setX], [x methodForSelector:setX]);
+    printf(&quot;Using libobjc functions, normal setX: is %p, overridden setX: is %p\n&quot;,
+           method_getImplementation(class_getInstanceMethod(object_getClass(control), setX)),
+           method_getImplementation(class_getInstanceMethod(object_getClass(x), setX)));
+    
+    return 0;
+&#125;
+</code></pre>
+<p>执行结果为(测试结果在撰写原文和本文时不一样，本文的methodForSelector:结果没有隐藏修改，但是为了阐述KVO知识，我还是引用原文的结果)：</p>
+<pre><code>control: &lt;TestClass: 0x104b20&gt;
+    NSObject class TestClass
+    libobjc class TestClass
+    implements methods &lt;setX:, x, setY:, y, setZ:, z&gt;
+x: &lt;TestClass: 0x103280&gt;
+    NSObject class TestClass
+    libobjc class NSKVONotifying_TestClass
+    implements methods &lt;setY:, setX:, class, dealloc, _isKVOA&gt;
+y: &lt;TestClass: 0x104b00&gt;
+    NSObject class TestClass
+    libobjc class NSKVONotifying_TestClass
+    implements methods &lt;setY:, setX:, class, dealloc, _isKVOA&gt;
+xy: &lt;TestClass: 0x104b10&gt;
+    NSObject class TestClass
+    libobjc class NSKVONotifying_TestClass
+    implements methods &lt;setY:, setX:, class, dealloc, _isKVOA&gt;
+Using NSObject methods, normal setX: is 0x195e, overridden setX: is 0x195e
+Using libobjc functions, normal setX: is 0x195e, overridden setX: is 0x96a1a550
+</code></pre>
+<p>可以看出，没有被Observer过的对象control它的信息没有改变，无论是类型还是方法。被观察过的对象，无论被观察的property有多少，类型都会被动态地修改为另一个动态创建的子类NSKVONotifying_TestClass。这个子类重写了所有被观察property的setter方法，其内部除了调用父类实现以外，还通知观察者。</p>
+<pre><code>(lldb)p (IMP)0x96a1a550
+$1 = 0x96a1a550 (Foundation`_NSSetIntValueAndNotify)
+</code></pre>
+<p>所以，子类内部应该会有一份维护property映射观察者们的数据结构(根据文档，观察者和被观察者都没有内存retain，只是简单的映射关系。比如add不remove且观察者已经release，再有property变化时就会crash)，也需要重写dealloc方法至少清理该数据结构。而class的重写是为了封装变化，让使用者感到自然。_isKVOA看起来像是一个私有方法。NSObject的addObserver和removeObserver内部除了动态创建NSKVONotifying_Class子类以外，应该还有添加和删除观察者到子类中。</p>
+<p>另外，Foundation中有一系列这样的函数：</p>
+<pre><code>__NSSetBoolValueAndNotify
+__NSSetCharValueAndNotify
+__NSSetDoubleValueAndNotify
+__NSSetFloatValueAndNotify
+__NSSetIntValueAndNotify
+__NSSetLongLongValueAndNotify
+__NSSetLongValueAndNotify
+__NSSetObjectValueAndNotify
+__NSSetPointValueAndNotify
+__NSSetRangeValueAndNotify
+__NSSetRectValueAndNotify
+__NSSetShortValueAndNotify
+__NSSetSizeValueAndNotify
+__NSSetUnsignedCharValueAndNotify
+__NSSetUnsignedIntValueAndNotify
+__NSSetUnsignedLongLongValueAndNotify
+__NSSetUnsignedLongValueAndNotify
+__NSSetUnsignedShortValueAndNotify
+</code></pre>
+<p>Apple为每一种primitive type都写了对应的实现。object会用到的其实只有__NSSetObjectValueAndNotify，但看起来也没有实现完全，比如long dobule或通用指针类型(generic pointer type)提供方法。所以，不在这个方法列表里的属性其实是不支持KVO的。</p>
+<h3 id="NSZombie"><a href="#NSZombie" class="headerlink" title="NSZombie"></a>NSZombie</h3><p>僵尸对象(NSZombie)用于调试内存管理问题的时相当有用，具体是当发送消息到已经释放的对象时，僵尸对象就能检测到。一个比较常见的就是”use after free”错误。</p>
+<p>通常情况下，对象释放后，其内存内容或者被重写或者不变。无论是哪种结果，都是无效会引发冲突。如果说这段内存恰好重写成一个新对象，那么消息可能就会发送给与原来风马牛不相及的对象，而且往往会由于无法识别选择器而抛出异常，假如这个错误的对象恰好也有该方法的话，那么就会发生更奇怪的问题。如果对象没有被重写尚未改变，处于将被销毁的状态，那么这会引起更匪夷所思的错误，比如多次调用释放占有的资源。</p>
+<p>而僵尸对象会与对象的dealloc挂钩，最后一步不是真正释放所占内存，而是将其动态改为一个僵尸类对象，并拦截所有发送给该对象的消息。这样，再有任何消息发给该对象时都会检测到，而不是像正常调试下那样出现五花八门的状况。</p>
+<p><strong>如何拦截信息？</strong></p>
+<p>一个空的对象什么方法都不实现，对它发送消息后，Runtime会启动消息转发机制，所以重写forwardInvocation:是拦截消息的最佳位置。而与其对应的，需要实现methodSignatureForSelector:。</p>
+<p><strong>如何保留类型？</strong></p>
+<p>通过动态创建Zombie类型，指明其类名和原类产生映射，比如NSZombie_Class，这样保持原始大小，Zombie类不用额外的空间保留原类型引用。</p>
+<p><strong>如何改变类型？</strong></p>
+<p>Zombie主要是检测错误向已释放对象发送消息的问题，所以在原类型对象的dealloc处最适合动态修改对象类型。而重写所有对象的dealloc，需要用到上面的Method Swizzling。</p>
+<p>总而言之，对于类型系统中原本没有的Zombie类型，通过Swizzling修改NSObject的dealloc方法，使得在运行期间任意类型对象dealloc时，动态创建和注册包含该类名信息的Zombie子类，动态添加methodSignatureForSelector:和forwardInvocation:的实现，再将原本要释放的对象的类型设置为Zombie子类。这样如果还有消息发送给本已无效的僵尸对象时，都会根据Runtime的消息转发机制最终找不到实现而产生异常(可观察释放对象信息)不至于直接crash。</p>
+<pre><code>#import &lt;Foundation/Foundation.h&gt;
+#import &lt;objc/runtime.h&gt;
+
+void EmptyIMP(id obj, SEL _cmd) &#123;&#125;
+
+NSMethodSignature *ZombieMethodSignatureForSelector(id obj, SEL _cmd, SEL selector) &#123;
+    Class class = object_getClass(obj);
+    NSString *className = NSStringFromClass(class);
+    className = [className substringFromIndex: [@&quot;MAZombie_&quot; length]];
+    NSLog(@&quot;Selector %@ sent to deallocated instance %p of class %@&quot;, NSStringFromSelector(selector), obj, className);
+    abort();
+&#125;
+
+Class ZombifyClass(Class class) &#123;
+    NSString *className = NSStringFromClass(class);
+    NSString *zombieClassName = [@&quot;MAZombie_&quot; stringByAppendingString: className];
+    Class zombieClass = NSClassFromString(zombieClassName);
+    if(zombieClass) return zombieClass;
+    zombieClass = objc_allocateClassPair(nil, [zombieClassName UTF8String], 0);
+    class_addMethod(zombieClass, @selector(methodSignatureForSelector:), (IMP)ZombieMethodSignatureForSelector, &quot;@@::&quot;);
+    class_addMethod(object_getClass(zombieClass), @selector(initialize), (IMP)EmptyIMP, &quot;v@:&quot;);
+    objc_registerClassPair(zombieClass);
+    return zombieClass;
+&#125;
+
+void ZombieDealloc(id obj, SEL _cmd) &#123;
+    Class c = ZombifyClass(object_getClass(obj));
+    object_setClass(obj, c);
+&#125;
+
+void EnableZombies(void) &#123;
+    Method m = class_getInstanceMethod([NSObject class], @selector(dealloc));
+    method_setImplementation(m, (IMP)ZombieDealloc);
+&#125;
+
+int main(int argc, const char * argv[]) &#123;
+    EnableZombies();
+    NSObject *test = [[NSObject alloc] init];
+    [test release];
+    [test description];
+    return 0;
+&#125;
+</code></pre>
+<p>每个类及其子类在被第一次发送消息前都会先调用+initialize，从而使其能够初始化本身。如果Runtime发现该类没有实现+initialize方法，就会将消息转发。如果在此让消息转发的话，Zombie类也就没什么用了。所以需要添加一个空的+initialize方法来避免这个问题。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://nshipster.cn/associated-objects/">Associated Objects</a></li>
+<li><a target="_blank" rel="noopener" href="http://nshipster.com/method-swizzling/">Method Swizzling</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.mikeash.com/pyblog/friday-qa-2009-01-23.html">How KVO is actually implemented</a></li>
+<li><a target="_blank" rel="noopener" href="https://mikeash.com/pyblog/friday-qa-2011-05-20-the-inner-life-of-zombies.html">The Inner Life of Zombies</a></li>
+<li><a target="_blank" rel="noopener" href="https://mikeash.com/pyblog/friday-qa-2014-11-07-lets-build-nszombie.html">Let’s Build NSZombie</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Runtime应用</div>
+      <div>https://hllovesgithub.github.io/2015/11/07/2015-11-07-Runtime应用/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年11月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/11/15/2015-11-15-Autorelease/" title="Autorelease">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Autorelease</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/10/31/2015-11-01-Block/" title="Block">
+                        <span class="hidden-mobile">Block</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

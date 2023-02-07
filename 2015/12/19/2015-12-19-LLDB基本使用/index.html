@@ -1,0 +1,913 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="LLDB是一个有着REPL(Read-Eval-Print-Loop)的特性和C++、Python插件的开源调试器。LLDB内置于Xcode，存在于主窗口底部的控制台中。调试器允许你在程序运行的特定时暂停它，你可以查看变量的值，执行自定的指令，并且按照你所认为合适的步骤来操作程序的进展。 LLDB命令结构&lt;command&gt; [&lt;subcommand&gt; [&lt;subcom">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLDB基本使用">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/12/19/2015-12-19-LLDB%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="LLDB是一个有着REPL(Read-Eval-Print-Loop)的特性和C++、Python插件的开源调试器。LLDB内置于Xcode，存在于主窗口底部的控制台中。调试器允许你在程序运行的特定时暂停它，你可以查看变量的值，执行自定的指令，并且按照你所认为合适的步骤来操作程序的进展。 LLDB命令结构&lt;command&gt; [&lt;subcommand&gt; [&lt;subcom">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5zykcmevj20gb07ajsw.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5xzqmt7fj204605k3ym.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5xzwlkgpj20h0098gn8.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y02isz8j20qk09a0uy.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y0a8e44j20r60fqn1c.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y0flvipj20ek070taj.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y0lk2cxj20qw092gp3.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ez5y17e5zoj20ek06odhl.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y1cwc3ej20qq0bq77x.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y8kj751j20e8080dhl.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y1ineehj20ji05m0ts.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y1os0ztj20jk05k0tt.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y223hmvj20ly05675m.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ez5y287542j20j205g75u.jpg">
+<meta property="article:published_time" content="2015-12-19T05:38:55.000Z">
+<meta property="article:modified_time" content="2015-12-23T15:26:01.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5zykcmevj20gb07ajsw.jpg">
+  
+  
+  
+  <title>LLDB基本使用 - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LLDB基本使用"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-12-19 13:38" pubdate>
+          2015年12月19日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          63 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">LLDB基本使用</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>LLDB是一个有着REPL(Read-Eval-Print-Loop)的特性和C++、Python插件的开源调试器。LLDB内置于Xcode，存在于主窗口底部的控制台中。调试器允许你在程序运行的特定时暂停它，你可以查看变量的值，执行自定的指令，并且按照你所认为合适的步骤来操作程序的进展。</p>
+<h3 id="LLDB命令结构"><a href="#LLDB命令结构" class="headerlink" title="LLDB命令结构"></a>LLDB命令结构</h3><pre><code>&lt;command&gt; [&lt;subcommand&gt; [&lt;subcommand&gt;...]] &lt;action&gt; [-options [option-value]] [argument [argument...]]
+</code></pre>
+<ul>
+<li>command和subcommand：LLDB调试命令的名称。命令和子命令按层级结构来排列，一个命令为其子命令创建上下文，子命令又为其子命令创建上下文，依此类推。</li>
+<li>action：在前面的命令序列上下文中执行的一些操作。</li>
+<li>options：行为修改器(action modifiers)。</li>
+<li>argument：不同命令上下文表示不同意义的参数。</li>
+</ul>
+<p>LLBD命令解析后再执行。上面这些元素之间通过空格分割，如果某一元素自身含有空格，则可以使用双引用；而如果元素中又包含双引号，则可以使用反斜杠；或者元素使用单引号。</p>
+<pre><code>(lldb) command [subcommand] -option &quot;some \&quot;quoted\&quot; string&quot;
+(lldb) command [subcommand] -option &#39;some &quot;quoted&quot; string&#39;
+</code></pre>
+<h3 id="命令选项"><a href="#命令选项" class="headerlink" title="命令选项"></a>命令选项</h3><p>LLDB中的命令选项有<strong>规范</strong>形式和<strong>缩写</strong>形式两种格式。以设置断点的命令breakpoint set为例，括号中的是规范形式：</p>
+<pre><code>breakpoint set
+   -M &lt;method&gt; (--method &lt;method&gt;)
+   -S &lt;selector&gt; (--selector &lt;selector&gt;)
+   -b &lt;function-name&gt; (--basename &lt;function-name&gt;)
+   -f &lt;filename&gt; (--file &lt;filename&gt;)
+   -l &lt;linenum&gt; (--line &lt;linenum&gt;)
+   -n &lt;function-name&gt; (--name &lt;function-name&gt;)
+</code></pre>
+<p>各选项的顺序是任意的。如果后面的参数是以”-“开头的，则在选项后面添加”–”作为选项的终止信号。</p>
+<pre><code>(lldb) process launch --stop-at-entry -- -program_arg_1 value -program_arg_2 value
+</code></pre>
+<p>–stop-at-entry是命令选项，-program_arg_1和-program_arg_2是参数，中间使用”–”区分。</p>
+<h3 id="唯一匹配原则"><a href="#唯一匹配原则" class="headerlink" title="唯一匹配原则"></a>唯一匹配原则</h3><p>LLDB的命令遵循唯一匹配原则：假如根据前n个字母已经能唯一匹配到某个命令，则只写前n个字母等效于写下完整的命令，比如：</p>
+<pre><code>breakpoint set -n main
+等价于
+br s -n main
+</code></pre>
+<h3 id="lldbinit"><a href="#lldbinit" class="headerlink" title="~/.lldbinit"></a>~/.lldbinit</h3><p>LLDB有了一个启动时加载的文件~/.lldbinit，每次启动都会加载。所以初始化的事儿，比如命令别名，都可以写入其中，但由于这事lldb还没有开始调试，所以有些操作无法进行，比如设置断点。</p>
+<hr>
+<h3 id="在命令行中调试"><a href="#在命令行中调试" class="headerlink" title="在命令行中调试"></a>在命令行中调试</h3><h5 id="程序："><a href="#程序：" class="headerlink" title="程序："></a>程序：</h5><pre><code>$ lldb /Projects/Sketch/build/Debug/Sketch.app
+或者
+$ lldb
+(lldb) file /Projects/Sketch/build/Debug/Sketch.app
+
+一旦指定了调试哪个程序，并为其设置了一些断点后，就可以开始运行程序了
+(lldb) process launch
+(lldb) run
+
+同样可以使用进程ID或进程名来连接一个已经运行的程序
+(lldb) process attach --pid 123
+(lldb) process attach --name Sketch
+</code></pre>
+<h5 id="断点："><a href="#断点：" class="headerlink" title="断点："></a>断点：</h5><pre><code>如果想在某个文件中的某行设置一个断点
+(lldb) breakpoint set --file foo.c --line 12
+
+如果想给某个C函数设置断点
+(lldb) breakpoint set --name foo
+
+如果想给C++中所有命名为foo的方法设置断点
+(lldb) breakpoint set --method foo
+
+如果想给Objec中所有命名为alignLeftEdges:的选择器设置断点
+(lldb) breakpoint set --selector alignLeftEdges:
+
+如果想在一个特定的可执行库中某个C函数设置断点
+(lldb) breakpoint set --shlib foo.dylib --name foo
+
+如果想查看所有断点
+(lldb) breakpoint list
+Current breakpoints:
+1: file = , line = , locations = , resolved = , hit count = 
+  1.1: where = , address = , resolved, hit count = 
+</code></pre>
+<p>每个断点都有一个整数标识，如上所示的1。每个断点有至少一个断点位置，每个位置也会有一个标识，如上所示的1.1。<strong>resolved</strong>标识表示当与之相关的文件地址被加载到程序进行调试时，其位置是已解析的。例如，如果在共享库中设置的断点之后被卸载了，则断点的位置还会保留，但其不能再被解析。</p>
+<h5 id="观察点："><a href="#观察点：" class="headerlink" title="观察点："></a>观察点：</h5><p>Watchpoint是一个用来监听变量的值的变化或者内存地址的变化的工具，发生变化时会在debugger中触发一个暂停。对于那些不知道如何准确跟踪的状态问题，可以利用这个工具来解决。值得注意的是，硬件资源对观察点有数目限制，一般为4个。对那些设置失败的观察点需要禁用或者删除来释放资源。</p>
+<pre><code>添加变量观察点
+(lldb)watchpoint set variable
+
+添加地址观察点
+(lldb)watchpoint set expression
+
+查看所有观察点
+(lldb)watchpoint list
+</code></pre>
+<h5 id="控制："><a href="#控制：" class="headerlink" title="控制："></a>控制：</h5><pre><code>启动程序后，LLDB允许程序在到达断点前继续运行。LLDB中流程控制的命令都在thread命令层级中
+(lldb)thread continue (=c)
+(lldb)thread step-in (=s)
+(lldb)thread step-over (=n)
+(lldb)thread step-out (=finish)
+(lldb)thread step-inst (=si =stepi)
+(lldb)thread step-over-inst (=ni =nexti)
+
+使得当前函数立即以某值返回(可能会使内存出错)
+(lldb)thread return 
+
+LLDB还提供了run until line按步调度模式
+(lldb) thread until 100
+这条命令会运行当前线程，直到当前帧(frame)所在文件的第100行。
+</code></pre>
+<h5 id="线程："><a href="#线程：" class="headerlink" title="线程："></a>线程：</h5><pre><code>获取当前所有线程
+(lldb) thread list
+* thread #1: tid = , where = , stop reason = , queue =
+  thread #1: tid = , where = , stop reason = , queue = 
+  thread #1: tid = , where = , stop reason = , queue = 
+
+星号(*)表示thread #1为当前线程。获取线程调用栈
+(lldb) thread backtrace (=bt)
+
+获取当前线程信息
+(lldb) thread info
+
+获取调用栈当前帧可见变量
+(lldb) frame variable
+
+获取调用栈当前帧信息
+(lldb) frame info
+
+切换调用栈的当前帧
+(lldb) frame select (=f)
+</code></pre>
+<h5 id="内存："><a href="#内存：" class="headerlink" title="内存："></a>内存：</h5><pre><code>读出指定地址内存内容
+(lldb)memory read
+(lldb)x (=memory read)
+
+写入指定地址内存内容
+(lldb)memory write
+</code></pre>
+<h5 id="表达式："><a href="#表达式：" class="headerlink" title="表达式："></a>表达式：</h5><p>expression/<a target="_blank" rel="noopener" href="https://sourceware.org/gdb/onlinedocs/gdb/Output-Formats.html">格式</a>：</p>
+<pre><code>在LLDB中执行一个表达式
+(lldb)expression
+
+执行没有返回值的表达式
+(lldb)call (=&#39;expression --&#39;)
+
+执行基本类型的表达式
+(lldb)p (=&#39;expression --&#39;)
+
+执行objc对象类型的表达式
+(lldb)po (=&#39;expression -o --&#39;)
+
+同p
+(lldb)print (=&#39;expression --&#39;)
+</code></pre>
+<h5 id="寄存器："><a href="#寄存器：" class="headerlink" title="寄存器："></a>寄存器：</h5><pre><code>获取调用栈当前帧的寄存器值
+(lldb) register read
+
+异常中断时，通过访问寄存器(Mac和Simulator用$rax，Device用$r0)获得异常信息
+(lldb) po [$rax class]
+(lldb) po [$rax name]
+(lldb) po [$rax reason]
+</code></pre>
+<h5 id="目标模块："><a href="#目标模块：" class="headerlink" title="目标模块："></a>目标模块：</h5><pre><code>(lldb)image (=target modules)
+
+查看程序和依赖共享库
+(lldb)image list
+
+查看程序和依赖共享库的信息
+(lldb)image lookup
+
+当程序崩溃时，可以使用image来查找崩溃所在的具体位置
+NSArray *array = @[@1, @2];
+NSLog(@&quot;item 3: %@&quot;, array[2]);
+这段代码运行后会抛出异常：
+ 0 CoreFoundation   0x00007fff8e06f66c __exceptionPreprocess + 172
+ 1 libobjc.A.dylib  0x00007fff886ad76e objc_exception_throw + 43
+ 2 CoreFoundation   0x00007fff8df487de -[__NSArrayI objectAtIndex:] + 190
+ 3 test             0x0000000100000de0 main + 384
+ 4 libdyld.dylib    0x00007fff8f1b65c9 start + 1
+根据以上信息，能判断崩溃在模块test中，要想知道具体文件具体位置
+(lldb) image lookup --address 0x0000000100000de0
+Address: test[0x0000000100000de0] (test.__TEXT.__text + 384)
+Summary: test`main + 384 at main.m:23
+
+当想查看一个符号的信息时，可以使用image来查找
+(lldb) image lookup --name
+
+当想查看一个类型的信息时，可以使用image来查找
+(lldb) image lookup --type
+</code></pre>
+<h5 id="目标暂停钩子："><a href="#目标暂停钩子：" class="headerlink" title="目标暂停钩子："></a>目标暂停钩子：</h5><p>使用LLDB进行调试时，大多数时候需要让程序暂停，不管是breakpoint还是watchpoint。需要在每次stop时执行的命令可以使用暂停钩子实现(只对breakpoint和watchpoint的程序stop生效，对直接点击Xcode上的pause或者debug view hierarchy不会生效)：</p>
+<pre><code>添加暂停钩子
+(lldb) target stop-hook add (=display)
+
+删除暂停钩子
+(lldb) target stop-hook delete (=undisplay)
+
+查看钩子所有暂停钩子
+(lldb) target stop-hook list
+
+启用暂停钩子
+(lldb) target stop-hook enable
+
+禁用暂停钩子
+(lldb) target stop-hook disable
+</code></pre>
+<h5 id="目标符号："><a href="#目标符号：" class="headerlink" title="目标符号："></a>目标符号：</h5><p>程序要运行之前，都会编译成二进制文件，同时会生成dSYM文件(记录了源代码和二进制映射关系)，这样对代码打断点就会对应到二进制上。当Xcode找不着dSYM文件时无法调试，通过手动地将对应的dSYM文件添加到对应的目标，建立源代码和二进制的关映射系：</p>
+<pre><code>(lldb) image symbol add (=add-sym)
+</code></pre>
+<h5 id="别名系统："><a href="#别名系统：" class="headerlink" title="别名系统："></a>别名系统：</h5><p>LLDB的别名机制能为常用的命令创建一个别名，方便使用：</p>
+<pre><code>(lldb) breakpoint set --file foo.c --line 12
+等价于：
+(lldb) command alias bfl breakpoint set -f %1 -l %2
+(lldb) bfl foo.c 12
+如果不想要已有的别名了，可以取消：
+(lldb) command unalias b
+</code></pre>
+<h5 id="常见问题："><a href="#常见问题：" class="headerlink" title="常见问题："></a>常见问题：</h5><p>LLDB的expression parser有一个bug，不兼容非ASCII字符，需要处理一下才行，否则会报错“An Objective-C constant string’s string initializer is not an array”</p>
+<pre><code>(lldb) expression @&quot;哈哈&quot;
+Internal error [IRForTarget]: An Objective-C constant string&#39;s string initializer is not an array
+error: 0 errors parsing expression
+error: The expression could not be prepared to run in the target
+(lldb) expression [NSString stringWithUTF8String:&quot;哈哈&quot;]
+(__NSCFString *) $5 = 0x0000618000025ca0 @&quot;哈哈&quot;
+</code></pre>
+<p>类型不明或不匹配</p>
+<pre><code>(lldb) p NSLog(@&quot;%@&quot;,[self.view  viewWithTag:1001])
+error: &#39;NSLog&#39; has unknown return type; cast the call to its declared return type
+error: 1 errors parsing expression
+
+如果在使用LLDB命令中发现有unknown type的类似错误(多见于id类型)，就必须显式声明类型。
+p (void)NSLog(@&quot;%@&quot;,[self.view  viewWithTag:1001])
+</code></pre>
+<p>找不到方法</p>
+<pre><code>(lldb) po self.view.frame
+error: unsupported expression with unknown type
+error: unsupported expression with unknown type
+error: 2 errors parsing expression
+
+无法通过点属性访问的方法
+(lldb) p (CGRect)[self.view frame]
+(CGRect) $0 = origin=(x=0, y=0) size=(width=320, height=480)
+</code></pre>
+<p>不过已经有解决方法了</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5zykcmevj20gb07ajsw.jpg" srcset="/img/loading.gif" lazyload></p>
+<hr>
+<h3 id="在Xcode中调试"><a href="#在Xcode中调试" class="headerlink" title="在Xcode中调试"></a>在Xcode中调试</h3><p>Xcode集成了LLDB(代替了原来的GDB)，在Xcode启动Run时自动将App关联到LLDB并启动调试。LLDB的调试窗口在ConsoleView，那里可以输入LLDB的命令进行调试。下面从Xcode的UI调试说起。</p>
+<h5 id="一般断点-Normal-Breakpoint-："><a href="#一般断点-Normal-Breakpoint-：" class="headerlink" title="一般断点(Normal Breakpoint)："></a>一般断点(Normal Breakpoint)：</h5><p>快捷键Command+\</p>
+<p>在代码编译器左边的行数栏处，可以用鼠标点击生成一个断点标签。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5xzqmt7fj204605k3ym.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>右键标签对断点进行编辑、禁用启用、删除。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5xzwlkgpj20h0098gn8.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>在编辑里，可以添加响应条件、忽略次数、执行动作和暂停继续。这些都可以在命令行设置。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y02isz8j20qk09a0uy.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>执行的动作包括执行Apple脚本、截取GPU参数、LLDB命令、日志信息、Shell命令和发声。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y0a8e44j20r60fqn1c.jpg" srcset="/img/loading.gif" lazyload></p>
+<h5 id="异常断点-Exception-Breakpoint-："><a href="#异常断点-Exception-Breakpoint-：" class="headerlink" title="异常断点(Exception Breakpoint)："></a>异常断点(Exception Breakpoint)：</h5><p>Objc中的异常是一个常被忽略的地方，大部分错误信息，系统框架都会以异常的形式throw出来。添加异常断点后，每次当程序发生了异常时，会被中断并定位在异常产生的代码，有利于跟踪定位。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y0flvipj20ek070taj.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>在编辑里，可以选择异常种类(Objc和C++)、响应时机、执行动作和暂停继续。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y0lk2cxj20qw092gp3.jpg" srcset="/img/loading.gif" lazyload></p>
+<h5 id="符号断点-Symbolic-Breakpoint-："><a href="#符号断点-Symbolic-Breakpoint-：" class="headerlink" title="符号断点(Symbolic Breakpoint)："></a>符号断点(Symbolic Breakpoint)：</h5><p>快捷键Option+Command+\</p>
+<p>符号断点是指在某个特定的函数或方法<strong>开始</strong>的地方，暂停程序执行，通过这种方式添加断点，就不需要知道在源文件中添加，也不需要知道断点设置在文件的第几行。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ez5y17e5zoj20ek06odhl.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>在编辑里，可以选择响应符号(C函数或C++方法或Objc选择器的名字)、响应模块、相应条件、忽略次数、执行动作和暂停继续。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y1cwc3ej20qq0bq77x.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>常用的符号有**”objc_exception_throw”<strong>(等价于异常断点)和</strong>“-[NSObject(NSObject) doesNotRecognizeSelector:]”**(跟踪objc方法调用失败)。</p>
+<h5 id="测试断点："><a href="#测试断点：" class="headerlink" title="测试断点："></a>测试断点：</h5><p>在测试用例编辑器或者断点导航栏里添加，这个类型的断点会在测试用例失败时，暂停程序执行并定位在失败的地方。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y8kj751j20e8080dhl.jpg" srcset="/img/loading.gif" lazyload></p>
+<h5 id="观察点：-1"><a href="#观察点：-1" class="headerlink" title="观察点："></a>观察点：</h5><p>观察点也可以在Xcode设置，不过不像断点在编辑器里，观察点在Variable View里。右键点击想要观察的点，选择Watch。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ez5y1ineehj20ji05m0ts.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>观察点同样列在了断点导航器里面进行管理。注意，Xcode默认是创建的读写观察，如果想要只读和只写观察，还是得用命令行。同时，无效的观察点记得及时禁用或者删除，因为观察点数目有限很珍贵，也可以减少不必要的中断。</p>
+<h5 id="内存：-1"><a href="#内存：-1" class="headerlink" title="内存："></a>内存：</h5><p>除了在命令行里使用x或者memory read读取指定地址的内存外，也可以在Xcode设置。同观察点一样，内存查看在Variable View里。右键点击想要观察的变量，选择View Memory。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y1os0ztj20jk05k0tt.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>或者Debug-&gt;Debug Workflow-&gt;View Memory或者快捷键Shift+Command+M。这里你可以输入任何想要查看的内存地址，查看的篇幅，以后翻页。</p>
+<h5 id="界面："><a href="#界面：" class="headerlink" title="界面："></a>界面：</h5><p>Xcode6前有许多第三方的界面调试工具，比如最著名的Reveal。Xcode6后提供了DebugViewHierarchy功能，它可以让开发者在程序运行时，动态的查看当前界面的显示情况，包括视图的层次，控件的大小和位置，而且会以3D效果显示当前视图的层次。虽然功能没有Reveal丰富，但是足够使用，界面调试以后再专门学习介绍。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ez5y223hmvj20ly05675m.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>或者在调试导航栏里选择查看方法为UI。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ez5y287542j20j205g75u.jpg" srcset="/img/loading.gif" lazyload></p>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>对于lldb相关的调试项，在Xcode开始就可以设置好一些断点，比如全局的异常断点，常用的符号断点-[NSObject(NSObject) doesNotRecognizeSelector:]，并设置好action和sound，这样能在运行时截获大部分常见的错误，也能获取详细的信息和形象的提醒。在命令行中使用<a target="_blank" rel="noopener" href="https://github.com/facebook/chisel"><strong>Chisel</strong></a>能帮助提升调试效率。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://www.cocoachina.com/industry/20130701/6514.html">Xcode中断点的威力</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.starfelix.com/blog/2014/03/17/lldbdiao-shi-ming-ling-chu-tan/">LLDB调试命令初探</a></li>
+<li><a target="_blank" rel="noopener" href="http://southpeak.github.io/blog/2015/01/25/tool-lldb/">LLDB调试器使用简介</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cocoachina.com/ios/20150803/12805.html">breakpoints、lldb 和 chisel 的使用</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.jianshu.com/p/e89af3e9a8d7">小笨狼与LLDB的故事</a></li>
+<li><a target="_blank" rel="noopener" href="http://objccn.io/issue-19-1/">调试：案例学习</a></li>
+<li><a target="_blank" rel="noopener" href="http://objccn.io/issue-19-2/">与调试器共舞 - LLDB 的华尔兹</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LLDB基本使用</div>
+      <div>https://hllovesgithub.github.io/2015/12/19/2015-12-19-LLDB基本使用/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年12月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/12/25/2015-12-25-Xcode-Debug/" title="Xcode Debug">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Xcode Debug</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/12/12/2015-12-12-Objc%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B9%8BBlock-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" title="Objc高级编程之Block-读书笔记">
+                        <span class="hidden-mobile">Objc高级编程之Block-读书笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,861 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Message-Passing is the important part of Smalltalk (from which Objective-C derives), not objects. - Alan Kay Runtime是一个实现Objc动态特性的C库(Apple和GNU分别维护并开源自己的实现)，不像C++那样在编译期间就必须严格确定函数与对象之间的关系，Objc在运行期间才能确定具">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Runtime">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/10/07/2015-10-07-Runtime/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="Message-Passing is the important part of Smalltalk (from which Objective-C derives), not objects. - Alan Kay Runtime是一个实现Objc动态特性的C库(Apple和GNU分别维护并开源自己的实现)，不像C++那样在编译期间就必须严格确定函数与对象之间的关系，Objc在运行期间才能确定具">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewradq1at2j20fa0fzdi5.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewragyao98j20cc0393yt.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrah4fqv3j20cf03c3yy.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrahb72tgj20ci04rjs3.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewraj25j6sg20980f4mx7.gif">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewrf8dufpfj20j60adjs5.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrajxx1xsg20ag06pdfq.gif">
+<meta property="article:published_time" content="2015-10-07T05:55:11.000Z">
+<meta property="article:modified_time" content="2015-11-15T06:12:36.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewradq1at2j20fa0fzdi5.jpg">
+  
+  
+  
+  <title>Runtime - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Runtime"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-10-07 13:55" pubdate>
+          2015年10月7日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          74 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Runtime</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><em>Message-Passing is the important part of Smalltalk (from which Objective-C derives), not objects. - Alan Kay</em></p>
+<p>Runtime是一个实现Objc动态特性的C库(<a target="_blank" rel="noopener" href="http://www.opensource.apple.com/source/objc4/">Apple</a>和<a target="_blank" rel="noopener" href="http://ftp.gnu.org/gnu/objective-c.README">GNU</a>分别维护并开源自己的实现)，不像C++那样在编译期间就必须严格确定函数与对象之间的关系，Objc在运行期间才能确定具体的执行函数。可以说Runtime就是对象生成的规范(<strong>内存模型</strong>)和消息执行的判断(<strong>动态绑定</strong>)。程序运行的时候，类型系统可以动态删减，对象父类可以动态改变，对象类型可以动态改变，对象方法可以动态改变，对象方法可以动态删减，对象成员可以动态删减，对象能力可以动态自省。看起来好像一切，都能够改变，都可以改变，因为如此灵活，很多第三方库使用Runtime实现了强大的功能。但是，如果没有深刻的理解和经验的积累，语言的灵活性往往会成为程序的不稳定，所以在不得已的情况下请<strong>谨慎使用</strong>Runtime。</p>
+<h4 id="SEL"><a href="#SEL" class="headerlink" title="SEL"></a>SEL</h4><pre><code>//objc_selector未给出定义
+typedef struct objc_selector *SEL;
+
+SEL sel1 = @selector(test);
+NSLog(@&quot;%s %p&quot;, (char *)sel1, sel1);
+SEL sel2 = sel_registerName([@&quot;test&quot; UTF8String]);
+NSLog(@&quot;%s %p&quot;, (char *)sel2, sel2);
+
+//输出如下:
+2015-10-05 17:20:26.195 Demo[1840:142119] test 0x7fff90c12140
+2015-10-05 17:20:26.195 Demo[1840:142119] test 0x7fff90c12140
+</code></pre>
+<p>编译Objective-C时，编译器根据方法名生成唯一一个表示该方法的ID。<strong>方法名与ID一一对应</strong>。所有方法的SEL构成一个集合，查找某个方法时只需要去找到对应SEL就可以。SEL指向的机构里面应该就存储着一个字符串。</p>
+<h4 id="id"><a href="#id" class="headerlink" title="id"></a>id</h4><pre><code>typedef struct objc_object *id;
+
+struct objc_object &#123; 
+    Class isa;
+&#125;;
+</code></pre>
+<p>id指向结构体objc_object，结构体有一个指向Class的指针isa，Runtime根据对象的isa找到它的类型信息。甚至可以这么说，一个结构体，不管里面有没有数据，有多少数据，只要<strong>第一个变量是Class指针</strong>且能通过它找到对应的类型信息，那么这个结构体就<strong>可以看做是一个对象</strong>(当然结构体的数据布局要和类型要求的一样才合法)。isa即是一个，代表抽象关系：一只猫是一个动物，一个对象是一个类。动物提供了猫的基本的信息(脑身腿脚)和抽象的行为(吃喝玩睡)。</p>
+<h4 id="Class"><a href="#Class" class="headerlink" title="Class"></a>Class</h4><pre><code>typedef struct objc_class *Class;
+
+struct objc_class &#123;
+Class isa  OBJC_ISA_AVAILABILITY;
+#if !__OBJC2__
+    Class super_class                                        OBJC2_UNAVAILABLE;
+    const char *name                                         OBJC2_UNAVAILABLE;
+    long version                                             OBJC2_UNAVAILABLE;
+    long info                                                OBJC2_UNAVAILABLE;
+    long instance_size                                       OBJC2_UNAVAILABLE;
+    struct objc_ivar_list *ivars                             OBJC2_UNAVAILABLE;
+    struct objc_method_list **methodLists                    OBJC2_UNAVAILABLE;
+    struct objc_cache *cache                                 OBJC2_UNAVAILABLE;
+    struct objc_protocol_list *protocols                     OBJC2_UNAVAILABLE;
+#endif
+&#125; OBJC2_UNAVAILABLE;
+</code></pre>
+<p>objc_class结构体里存储着父类结构体指针，名称，版本，实例大小，成员变量列表，方法列表，方法缓存，协议列表。因为objc_class结构体里还有isa，由此可见**类也是一个”对象”<strong>，Runtime称之为类对象，而类对象的抽象Runtime称之为</strong>元类(MetaClass)<strong>，而元类的抽象Runtime称之为</strong>根元类(Root Meta Class)**，他们都属于”对象”。对象其实是由类对象的实例方法－对象的类方法－创建出来的。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewradq1at2j20fa0fzdi5.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Ivar"><a href="#Ivar" class="headerlink" title="Ivar"></a>Ivar</h4><pre><code>typedef struct objc_ivar *Ivar;
+
+struct objc_ivar &#123;
+    char *ivar_name                                          OBJC2_UNAVAILABLE;
+    char *ivar_type                                          OBJC2_UNAVAILABLE;
+    int ivar_offset                                          OBJC2_UNAVAILABLE;
+#ifdef __LP64__
+    int space                                                OBJC2_UNAVAILABLE;
+#endif
+&#125; OBJC2_UNAVAILABLE;
+
+//objc_class
+struct objc_ivar_list &#123;
+    int ivar_count                                           OBJC2_UNAVAILABLE;
+#ifdef __LP64__
+    int space                                                OBJC2_UNAVAILABLE;
+#endif
+    /* variable length structure */
+    struct objc_ivar ivar_list[1]                            OBJC2_UNAVAILABLE;
+&#125; OBJC2_UNAVAILABLE;
+</code></pre>
+<p>Ivar是一个指向objc_ivar结构体的指针，objc_ivar结构体存储着变量名、变量类型编码和变量在该类中的字节偏移量，objc_class结构体(也就是类对象)里的objc_ivar_list存储着该类所有的变量。</p>
+<h4 id="健壮性实例变量-Non-Fragile-ivars"><a href="#健壮性实例变量-Non-Fragile-ivars" class="headerlink" title="健壮性实例变量(Non Fragile ivars)"></a>健壮性实例变量(Non Fragile ivars)</h4><p>Runtime目前有Modern和Legacy两个版本。Modern运行在OSX10.5之后和iOS的64位程序中，Legacy运行在OSX10.5之前的32位程序中。最大区别在于更改类的实例变量布局时，Legacy需要重新编译子类，Modern不需要。当一个类被编译时，该类会生成一个ivar布局，<strong>从isa开始</strong>依次根据实例变量大小产生位移，先是<strong>父类布局接着子类布局</strong>。访问变量的ivar地址＝对象地址＋ivar偏移字节。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewragyao98j20cc0393yt.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>但有个问题，当父类增加了ivar，原来的布局就出错了，在脆弱性实例变量(Fragile ivars)环境中不得不重新编译子类调整ivar布局。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrah4fqv3j20cf03c3yy.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>在健壮性实例变量(Non Fragile ivars)环境中，编译器生成的子类实例变量布局跟以前一样，但程序启动后，如果Runtime检测到子类与父类布局有冲突便会调整子类布局。这样子类的成员变量就被保护起来了，以后不管父类变不变、怎么变都不会影响子类。<strong>访问变量的ivar地址＝对象地址＋基类大小+ivar偏移字节</strong>。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrahb72tgj20ci04rjs3.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Property"><a href="#Property" class="headerlink" title="Property"></a>Property</h4><p>编译时，编译器将Property转换成Ivar，并且添加Setter和Getter。Runtime函数property_getAttributes能获取objc_property的名称和@encode类型字符串：</p>
+<pre><code>//objc_property未给出定义
+typedef struct objc_property *objc_property_t;
+
+typedef struct &#123;
+    const char *name;           /**&lt; The name of the attribute */
+    const char *value;          /**&lt; The value of the attribute (usually empty) */
+&#125; objc_property_attribute_t;
+</code></pre>
+<h4 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h4><pre><code>typedef struct objc_method *Method;
+
+struct objc_method &#123;
+    SEL method_name                                          OBJC2_UNAVAILABLE;
+    char *method_types                                       OBJC2_UNAVAILABLE;
+    IMP method_imp                                           OBJC2_UNAVAILABLE;
+&#125; OBJC2_UNAVAILABLE;
+
+//objc_class
+struct objc_method_list &#123;
+    struct objc_method_list *obsolete                        OBJC2_UNAVAILABLE;
+    int method_count                                         OBJC2_UNAVAILABLE;
+#ifdef __LP64__
+    int space                                                OBJC2_UNAVAILABLE;
+#endif
+    /* variable length structure */
+    struct objc_method method_list[1]                        OBJC2_UNAVAILABLE;
+&#125;
+</code></pre>
+<p>Method代表类中某个方法，它是一个指向objc_method结构体的指针。objc_method结构体存储着一个SEL类型的名字，一个参数和返回值的类型信息，一个真正实现方法的函数地址。objc_class结构体(也就是类对象)的objc_method_list存储着该类所有的方法。</p>
+<h4 id="IMP"><a href="#IMP" class="headerlink" title="IMP"></a>IMP</h4><pre><code>typedef id (*IMP)(id, SEL, ...);
+</code></pre>
+<p>IMP是一个编译器编译生成的函数指针，该函数包含一个接收消息的对象id，对应映射的名字SEL，方法参数，返回值id。<strong>Objc函数都会编译成C函数</strong>，ObjC对象接收消息变成普通C函数调用一样。</p>
+<h4 id="Cache"><a href="#Cache" class="headerlink" title="Cache"></a>Cache</h4><pre><code>typedef struct objc_cache *Cache
+
+//objc_class
+struct objc_cache &#123;
+    unsigned int mask /* total = mask + 1 */                 OBJC2_UNAVAILABLE;
+    unsigned int occupied                                    OBJC2_UNAVAILABLE;
+    Method buckets[1]                                        OBJC2_UNAVAILABLE;
+&#125; OBJC2_UNAVAILABLE;
+</code></pre>
+<p>每次调用方法后，<strong>Runtime会更新cache，根据算法留住最常用的方法</strong>，以提高代码执行效率。mask表示总共缓冲槽(Cache Bucket)数目。occupied表示有效缓冲槽数目。buckets表示缓冲槽，数目可能不超过mask+1，某槽可能为NULL(表示这个槽无效)，有效槽们也可能是不连续的，缓冲槽可能会动态增加。</p>
+<h4 id="Protocol"><a href="#Protocol" class="headerlink" title="Protocol"></a>Protocol</h4><pre><code>typedef struct objc_object *Protocol;
+
+//objc_class
+struct objc_protocol_list &#123;
+    struct objc_protocol_list *next;
+    long count;
+    Protocol *list[1];
+&#125;;
+</code></pre>
+<p>Protocol其实是一个对象结构体。类对象的Protocol列表里还有下一个列表的指针，从而让Protocol列表有了继承的能力。</p>
+<h4 id="Category"><a href="#Category" class="headerlink" title="Category"></a>Category</h4><pre><code>typedef struct objc_category *Category;
+
+//A
+struct objc_category &#123;
+    char *category_name                          OBJC2_UNAVAILABLE;
+    char *class_name                             OBJC2_UNAVAILABLE;
+    struct objc_method_list *instance_methods    OBJC2_UNAVAILABLE;
+    struct objc_method_list *class_methods       OBJC2_UNAVAILABLE;
+    struct objc_protocol_list *protocols         OBJC2_UNAVAILABLE;
+&#125; OBJC2_UNAVAILABLE;
+</code></pre>
+<p>objc_category存储了分类名、扩展的类、实例方法、类方法和协议列表。分类的实例方法列表是类的实例方法列表的子集，分类的类方法列表是类的类方法列表的子集。不过在objc-runtime-new.h的定义中：</p>
+<pre><code>//B
+struct category_t &#123;
+    const char *name;
+    classref_t cls;
+    struct method_list_t *instanceMethods;
+    struct method_list_t *classMethods;
+    struct protocol_list_t *protocols;
+    struct property_list_t *instanceProperties;
+&#125;;
+</code></pre>
+<p>名字name是要扩展的类名而不是分类名。扩展的类cls<strong>不是在编译期而是在运行期</strong>赋值，由Runtime<strong>通过类名name找到对应的类</strong>。属性列表instanceProperties表示分类所有的properties，这就是可以增减关联变量的原因，不过分类的关联变量和类的实例变量是不一样的。</p>
+<p>程序启动时，libSystem调用_objc_init(objc-os.mm)加载并初始化Runtime，map_images(objc-runtime-new.mm)加载map到内存，_read_images开始初始化map并加载所有Class，Protocol和Category(NSObject的+load在这时调用)，Category的实例方法加入Class的方法列表，Category的类方法加入Meta Class的方法列表。</p>
+<h4 id="receiver-message"><a href="#receiver-message" class="headerlink" title="[receiver message]"></a>[receiver message]</h4><p>编译器会根据语义和返回值选择objc_msgSend, objc_msgSend_stret(<strong>st</strong>ruc <strong>ret</strong>urn), objc_msgSendSuper, objc_msgSendSuper_stret四个中的一个。<strong>传给父类</strong>的消息用带有<strong>Super</strong>的函数；<strong>返回值是数据结构不是简单类型</strong>的消息用带有<strong>stret</strong>的函数。objc_msgSend_fpret(<strong>f</strong>loating <strong>p</strong>oint <strong>ret</strong>urn)在i386平台代替返回类型为浮点数时使用的objc_msgSend，因为返回类型为浮点数的函数ABI(Application Binary Interface)与返回整型的函数ABI不兼容。</p>
+<p>当objc_msgSend找到方法的实现后，Runtime将填充消息接收者receiver到第一位self，填充方法名字message到第二位_cmd，再依次将消息中所有参数按顺序填充。Objc发送的消息直到运行的时候才会动态绑定具体的实现：</p>
+<ul>
+<li>检测这个selector是否可以忽略。MacOSX有垃圾回收的话就不理会retain,release这些selector。</li>
+<li>检测这个target如果是nil则忽略。Objc允许对nil发送任何消息且不Crash。</li>
+<li>如果上面都通过便进入类中查询信息。先从cache里所有Method，找到相等selector匹配的IMP后执行。</li>
+<li>如果cache没找到，再查询方法列表所有Method，找到相等selector匹配的IMP后执行。</li>
+<li>如果方法列表没找到，再到父类以同样的过程找，直到找到NSObject为止。</li>
+<li>如果还没找到，就进入动态方法解析和消息转发的机制。</li>
+</ul>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewraj25j6sg20980f4mx7.gif" srcset="/img/loading.gif" lazyload></p>
+<h4 id="消息转发机制"><a href="#消息转发机制" class="headerlink" title="消息转发机制"></a>消息转发机制</h4><p>不能确定对象是否能接收某个消息时，可以自省判断。</p>
+<pre><code>if ([reciver respondsToSelector:@selector(message)]) &#123;
+    [reciver performSelector:@selector(message)];
+&#125;
+</code></pre>
+<p>对象接收到无法接收的消息时，进入消息转发机制，告诉对象如何处理未知的消息。默认情况下，对象接收未知消息后，会触发NSObject的doesNotRecognizeSelector方法抛出异常导致程序崩溃。消息转发机制分为以下几步：</p>
+<p><strong>动态方法解析</strong>  对象接收未知消息时，首先会根据消息的类型调用+resolveInstanceMethod:(实例方法)或者+resolveClassMethod:(类方法)。通过Runtime函数class_addMethod动态添加能够接收未知消息的方法到类里，来实现接收该未知消息(主要用在实现@dynamic)：</p>
+<pre><code>void methodForUnknownMessage(id self, SEL _cmd) &#123;
+   NSLog(@&quot;%@, %p&quot;, self, _cmd);
+&#125;
+
++ (BOOL)resolveInstanceMethod:(SEL)sel &#123;
+    if ([NSStringFromSelector(sel) isEqualToString:@&quot;methodForUnknownMessage&quot;]) &#123;
+        class_addMethod(self.class, sel, (IMP)methodForUnknownMessage, &quot;@:&quot;);
+        return YES;
+    &#125;
+    return [super resolveInstanceMethod:sel];
+&#125;
+</code></pre>
+<p><strong>备用接收对象</strong>  动态方法解析没能处理未知消息时，Runtime会继续调用forwardingTargetForSelector:返回备用接收对象去接收未知消息。</p>
+<pre><code>- (id)forwardingTargetForSelector:(SEL)aSelector &#123;
+    if(aSelector == @selector(helperCanRespond:))&#123;
+        return helper;
+    &#125;
+    return [super forwardingTargetForSelector:aSelector];
+&#125;
+</code></pre>
+<p><strong>完整转发</strong>  如果没有备用接受对象(返回nil)，Runtime会先用methodSignatureForSelector:获得未知消息的方法签名。</p>
+<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector &#123;
+    NSMethodSignature *signature = [super methodSignatureForSelector:aSelector];
+    if (!signature) &#123;
+        if ([Helper instancesRespondToSelector:aSelector]) &#123;
+            signature = [Helper instanceMethodSignatureForSelector:aSelector];
+        &#125;
+    &#125;
+    return signature;
+&#125;
+</code></pre>
+<p>Runtime再创建一个封装了全部细节(消息的接收对象target、消息的名字selector和消息附带的参数)的NSInvocation，调用forwardInvocation:(其中可以修改消息内容实现复杂功能，比如修改参数等)选择转发给其它对象。处理完未知消息后NSInvocation会保留结果，Runtime会提取结果并发送给原始接收对象。NSObject的forwardInvocation:只是简单调用doesNotRecognizeSelector:引发异常导致崩溃。</p>
+<pre><code>- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector &#123;
+    NSMethodSignature *signature = [super methodSignatureForSelector:aSelector];
+    if (!signature) &#123;
+        if ([SUTRuntimeMethodHelper instancesRespondToSelector:aSelector]) &#123;
+            signature = [SUTRuntimeMethodHelper instanceMethodSignatureForSelector:aSelector];
+        &#125;
+    &#125;
+    return signature;
+&#125;
+
+- (void)forwardInvocation:(NSInvocation *)anInvocation &#123;
+    if ([SUTRuntimeMethodHelper instancesRespondToSelector:anInvocation.selector]) &#123;
+        [anInvocation invokeWithTarget:_helper];
+    &#125;
+&#125;
+</code></pre>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewrf8dufpfj20j60adjs5.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="消息转发和多继承"><a href="#消息转发和多继承" class="headerlink" title="消息转发和多继承"></a>消息转发和多继承</h4><p>转发可以允许一个对象<strong>通过依赖其他对象去处理未知消息</strong>，让该对象表面上有处理未知消息的能力。虽然转发能模拟多继承让对象“继承”其它对象的能力，但区别在于多继承会让对象越来越大，转发只是建立对象间联系。虽然转发类似于继承，但Runtime对两者自省判断不一样，respondsToSelector:和isKindOfClass:和conformsToProtocol:能识别继承，不识别转发。如果想让消息转发看起来像继承，需要重写这些方法。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewrajxx1xsg20ag06pdfq.gif" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Runtime的应用"><a href="#Runtime的应用" class="headerlink" title="Runtime的应用"></a>Runtime的应用</h4><p>Category Ass</p>
+<p>Methods Swizzling</p>
+<p>KVO</p>
+<p>NSZombie</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://yulingtianxia.com/blog/2014/11/05/objective-c-runtime/#jtss-tsina">Objective-C Runtime</a></li>
+<li><a target="_blank" rel="noopener" href="http://southpeak.github.io/blog/2014/10/25/objective-c-runtime-yun-xing-shi-zhi-lei-yu-dui-xiang/">Objective-C Runtime 运行时系列</a></li>
+<li><a href=http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective%5Bnil%5Dc-runtime(1)%5Bnil%5D-self-and-super/>刨根问底Objective－C Runtime系列</a></li>
+<li><a target="_blank" rel="noopener" href="http://springox.w18.net/2015/09/03/objectivecruntime/">Objective-C与Runtime</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.sunnyxx.com/2015/09/13/class-ivar-layout/">Objective-C Class Ivar Layout 探索</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cocoachina.com/industry/20140106/7658.html">详解Objective-C runtime</a></li>
+<li><a target="_blank" rel="noopener" href="http://tech.meituan.com/DiveIntoMethodCache.html">深入理解Objective-C：方法缓存</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Runtime</div>
+      <div>https://hllovesgithub.github.io/2015/10/07/2015-10-07-Runtime/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年10月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/10/18/2015-10-18-GCD%E5%9F%BA%E6%9C%AC/" title="GCD 基本">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">GCD 基本</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/10/04/2015-10-04-Thread-%E5%90%8C%E6%AD%A5/" title="Thread 同步">
+                        <span class="hidden-mobile">Thread 同步</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

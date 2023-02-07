@@ -1,0 +1,714 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="它的意义对于Apple开发而言，ARC已经没有MRC容易内存出错了。在MRC的年代，一切都需要手动写，而计算机永远不会犯错，犯错的总是人，说不定在某个时刻大脑短路了或者打了一下哈欠，忘记少加了或者无意多加了个retain或者release，或者在业务逻辑交错复杂，或者在代码量显著增加，都有可能出一点小错。虽然MRC的年代已经有Static Analyse的工具，但是也不能确保是万能的。 我在MRC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Autorelease">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/11/15/2015-11-15-Autorelease/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="它的意义对于Apple开发而言，ARC已经没有MRC容易内存出错了。在MRC的年代，一切都需要手动写，而计算机永远不会犯错，犯错的总是人，说不定在某个时刻大脑短路了或者打了一下哈欠，忘记少加了或者无意多加了个retain或者release，或者在业务逻辑交错复杂，或者在代码量显著增加，都有可能出一点小错。虽然MRC的年代已经有Static Analyse的工具，但是也不能确保是万能的。 我在MRC">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ey1kylimp0j20f109m3zl.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ey1kyxf74jj20dy0cx756.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ey1kz6ifh1j20ji0dewff.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ey1kzc7yvdj20dz0bqdgi.jpg">
+<meta property="article:published_time" content="2015-11-15T03:59:57.000Z">
+<meta property="article:modified_time" content="2015-11-21T10:41:14.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ey1kylimp0j20f109m3zl.jpg">
+  
+  
+  
+  <title>Autorelease - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Autorelease"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-11-15 11:59" pubdate>
+          2015年11月15日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Autorelease</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="它的意义"><a href="#它的意义" class="headerlink" title="它的意义"></a>它的意义</h3><p>对于Apple开发而言，ARC已经没有MRC容易内存出错了。在MRC的年代，一切都需要手动写，而计算机永远不会犯错，犯错的总是人，说不定在某个时刻大脑短路了或者打了一下哈欠，忘记少加了或者无意多加了个retain或者release，或者在业务逻辑交错复杂，或者在代码量显著增加，都有可能出一点小错。虽然MRC的年代已经有Static Analyse的工具，但是也不能确保是万能的。</p>
+<p>我在MRC年代学习Autorelease时，觉得它的意义是方便内存使用：</p>
+<pre><code>- (void)foo &#123;
+    id objc1 = [[NSObject alloc] init];
+    // 逻辑1
+    return;
+    
+    // 逻辑2
+    if (flag1) &#123;
+        id objc2 = [[NSObject alloc] init];
+        // ...
+        return;
+    &#125;
+    
+    // 逻辑3
+    while (flag2) &#123;
+        // ...
+    &#125;
+&#125;
+</code></pre>
+<p>在一个方法中，根据业务逻辑很可能出现多个分支，而有的分支会提前返回(对于方法返回的出口本身就是个值得研究且有争议的话题，我个人认为出口尽量越少越好)。对于MRC而言，如果有多个分支，就要做到在该分支结束返回前，把所有经过该分支上手动生成的内存全部手动释放掉。但是，所有这些因素都会引起方法中内存管理出错：</p>
+<ul>
+<li>业务逻辑波动可能性大导致分支结构不稳定。</li>
+<li>方法可能过长导致追溯检查生成对象很麻烦。</li>
+<li>多个分支出有相同对象释放会引诱代码拷贝。</li>
+</ul>
+<h3 id="良好习惯"><a href="#良好习惯" class="headerlink" title="良好习惯"></a>良好习惯</h3><p>代码也是给人看的，代码是由人写的，养成良好的编码习惯，避免问题远比解决问题更有意义。比如打开关闭文件，好的习惯是open和close一起写，然后再在中间写其他逻辑。成对写好open和close后，大脑就可以放下文件管理的问题，不用在写中间逻辑时提心吊胆地不断提醒自己不要忘记close文件(往往还就真容易忘记)。这个确保了大脑逻辑最简单最清晰的时候，最安全可靠地尽早完成该完成的任务。</p>
+<p>对于Coder，概念越抽象越好，规则越简单越好，牵挂越稀少越好。所以，反观和文件管理一样的内存管理，Autorelease(在机制上是<strong>延迟释放</strong>内存，所以内存管理还是平衡的)就能做到，在你生成对象内存的时候，就提前相应做好释放对象内存，而不用在以后的任何地方再去操心内存释放问题。有了[[[Class alloc] init] autorelease]之后，你想怎么飞就怎么飞，不用管何时返回，不用管分支有多少，不用管业务逻辑怎么变化。</p>
+<p>同样的良好习惯的应用，还有<a target="_blank" rel="noopener" href="https://github.com/jspahrsummers/libextobjc">libextobjc</a>中的@onExit功能(用到了GCC编译的功能，设置了方法返回后的调用)，在方法开头就写好返回收尾的工作，确保了安全工作就可以任性地飞，这个库以后再介绍。</p>
+<h3 id="言归正传"><a href="#言归正传" class="headerlink" title="言归正传"></a>言归正传</h3><p>autorelease的主要作用是，和其他语言能够返回创建的临时对象一样，返回方法创建的对象。</p>
+<ul>
+<li>MRC：方法内部栈上变量会在方法返回后被回收，而objc对象都在堆上，不存在返回后对象被释放。</li>
+<li>ARC：方法内部所有strong指向的对象都会在{}作用域结束时被释放。</li>
+</ul>
+<p>当然，无论MRC还是ARC，autorelease都保证对象延迟释放，方法的调用者不用操心获返回对象的内存管理，放心的使用。而延迟释放的时机就在<a href="http://hllovesgithub.github.io/2015/10/01/2015-10-01[Thread-Runloop]/">Runloop</a>。主线程会自动创建Runloop，每有一个系统事件时，Runloop都会调用一次对应的处理方法，但是进行任何处理之前会先创建autoreleasepool，在所有所有处理结束后，会drain掉autoreleasepool里所有的对象。所以能够保证，autorelease的对象在使用期间保证有效，使用之后也安全销毁。使用autorelease一般遇到的问题是，大量延迟释放的对象需要尽早销毁而不是等到Runloop这一次处理结束，从而让内存消耗平滑，常见于大量循环内部。不过，很简单，在需要的地方内嵌autoreleasepool即可。另外，Apple很多带有block的API都默认有局部autoreleasepool。</p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><p>ARC中使用@autoreleasepool{}来使用autoreleasepool，编译器将它编译成如下：</p>
+<pre><code>void *context = objc_autoreleasePoolPush();
+// &#123;&#125;中的代码
+objc_autoreleasePoolPop(context);
+</code></pre>
+<p>这2个方法都试对AutoreleasePoolPage(一个C++实现的类)的简单封装。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ey1kylimp0j20f109m3zl.jpg" srcset="/img/loading.gif" lazyload></p>
+<ul>
+<li>AutoreleasePool由多个AutoreleasePoolPage组合的双向链表(parent和child)</li>
+<li>AutoreleasePool和线程一一对应(每个Page中thread的值都相同)</li>
+<li>AutoreleasePoolPage每个对象会开辟4096字节内存(虚拟内存一页的大小)，低地址空间存放以上成员变量，其余全部储存注册的autorelease对象地址</li>
+<li>next指针指向存放下一个add进来autorelease对象地址的位置</li>
+<li>当一个Page空间被占满时，再新建一个Page并设好以前关系，以后add的autorelease对象将在新page中</li>
+</ul>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ey1kyxf74jj20dy0cx756.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>每当调用objc_autoreleasePoolPush时，runtime向当前的Page中add进一个<strong>哨兵对象</strong>，值为0(=nil)，其方法的返回值正是哨兵对象的地址，在调用objc_autoreleasePoolPop时作为内存释放的目的位置：</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ey1kz6ifh1j20ji0dewff.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>释放时，将整个双向链表中从最新的Page起到哨兵对象所处的Page，所有晚于哨兵的autorelease对象都发送一次release消息，并移动next到正确位置：</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ey1kzc7yvdj20dz0bqdgi.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>嵌套的AutoreleasePool就非常简单了，pop的时候总会释放到上次push的位置为止，多层的pool就是多个哨兵对象。</p>
+<h3 id="ARC"><a href="#ARC" class="headerlink" title="ARC"></a>ARC</h3><p><strong>Thread Local Storage</strong>(TLS)线程局部存储，将一块内存作为线程专有存储，以key-value形式进行读写，比如在非arm架构下，使用pthread提供的方法实现：</p>
+<pre><code>void* pthread_getspecific(pthread_key_t);
+int pthread_setspecific(pthread_key_t , const void *);
+</code></pre>
+<p>ARC对autorelease返回值有优化：</p>
+<pre><code>// 编译前
++ (instancetype)createSark &#123;
+    return [self new]; 
+&#125;
+// caller
+Sark *sark = [Sark createSark];
+
+// 编译后
++ (instancetype)createSark &#123;
+    id tmp = [self new];
+    return objc_autoreleaseReturnValue(tmp); // 代替我们调用autorelease
+&#125;
+// caller
+id tmp = objc_retainAutoreleasedReturnValue([Sark createSark]) // 代替我们调用retain
+Sark *sark = tmp;
+objc_storeStrong(&amp;sark, nil); // 相当于代替我们调用了release
+</code></pre>
+<p>编译后的代码使用<strong>objc_autoreleaseReturnValue</strong>和<strong>objc_retainAutoreleasedReturnValue</strong>代替原来将对象放入AutoreleasePool中。其中objc_autoreleaseReturnValue将返回对象储存在TLS中，然后直接返回这个object(不调用autorelease)。外部接收返回值的objc_retainAutoreleasedReturnValue发现TLS中正好存了这个对象，那么直接返回这个object(不调用retain)。</p>
+<p>但调用方不是ARC呢？通过**__builtin_return_address**得到方法的返回地址。加上偏移量能够定位到调用方在调用方法后的代码，根据代码判断调用方是否为ARC。如果是，则按照此优化处理，否则按照原来autorelease方法处理。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://blog.sunnyxx.com/2014/10/15/behind-autorelease/">黑幕背后的Autorelease</a></li>
+<li>《Objective-C高级编程 iOS与OS X多线程和内存管理》</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Autorelease</div>
+      <div>https://hllovesgithub.github.io/2015/11/15/2015-11-15-Autorelease/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年11月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/11/21/2015-11-21-NSNotification/" title="NSNotification">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">NSNotification</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/11/07/2015-11-07-Runtime%E5%BA%94%E7%94%A8/" title="Runtime应用">
+                        <span class="hidden-mobile">Runtime应用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

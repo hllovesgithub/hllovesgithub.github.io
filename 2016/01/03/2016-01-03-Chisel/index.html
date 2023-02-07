@@ -1,0 +1,1159 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="chisel是facebook开发的用于提高LLDB使用效率的工具。这篇文章对chisel的命令写得很详细，我不再做重复的工作，转发作为参考手册在使用时方便阅读。  Autolayoutautolayout中有一种bug叫Ambiguous Layouts，意思是你设置的约束不足以确定view的位置或大小。比如你只设置了X轴的位置，没有设置Y轴的位置。  hasAmbiguousLayout -">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Chisel">
+<meta property="og:url" content="https://hllovesgithub.github.io/2016/01/03/2016-01-03-Chisel/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="chisel是facebook开发的用于提高LLDB使用效率的工具。这篇文章对chisel的命令写得很详细，我不再做重复的工作，转发作为参考手册在使用时方便阅读。  Autolayoutautolayout中有一种bug叫Ambiguous Layouts，意思是你设置的约束不足以确定view的位置或大小。比如你只设置了X轴的位置，没有设置Y轴的位置。  hasAmbiguousLayout -">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmcz1p8eaj206y0dk0sm.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ezmcz9efa1g209q0330r9.gif">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ezmcziflf5j20kq07ujr6.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmczorxsgj20ko02ka9v.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmczvy6ufj20kk02qmx0.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ezmd034xwxj20ko02mt8i.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd0aq6t3j20kq02sdfl.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ezmd0ghv9lj20kk02e3yb.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ezmd0nval3g20ad032glo.gif">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd0upccmg20ad032745.gif">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd10m7ppj20h00h00v0.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd17evopj20xa052dg5.jpg">
+<meta property="article:published_time" content="2016-01-03T06:40:38.000Z">
+<meta property="article:modified_time" content="2016-01-03T08:56:20.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmcz1p8eaj206y0dk0sm.jpg">
+  
+  
+  
+  <title>Chisel - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Chisel"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2016-01-03 14:40" pubdate>
+          2016年1月3日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          13k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          112 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Chisel</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><a target="_blank" rel="noopener" href="https://github.com/gkassabli/chisel">chisel</a>是facebook开发的用于提高LLDB使用效率的工具。这篇文章对chisel的命令写得很详细，我不再做重复的工作，转发作为参考手册在使用时方便阅读。</p>
+<hr>
+<h2 id="Autolayout"><a href="#Autolayout" class="headerlink" title="Autolayout"></a>Autolayout</h2><p>autolayout中有一种bug叫<a target="_blank" rel="noopener" href="https://developer.apple.com/library/tvos/documentation/UserExperience/Conceptual/AutolayoutPG/AmbiguousLayouts.html#//apple_ref/doc/uid/TP40010853-CH18-SW1">Ambiguous Layouts</a>，意思是你设置的约束不足以确定view的位置或大小。比如你只设置了X轴的位置，没有设置Y轴的位置。</p>
+<blockquote>
+<p><strong>hasAmbiguousLayout</strong> - Available for both iOS and OS X. Call this method on a misplaced view. It returns YES if the view’s frame is ambiguous. Otherwise, it returns NO. <strong>_autolayoutTrace</strong> - Available as a private method in iOS. Call this method on a view. It returns a string with diagnostic information about the entire view hierarchy containing that view. Ambiguous views are labeled, and so are views that have translatesAutoresizingMaskIntoConstraints set to YES.</p>
+</blockquote>
+<p>由此可知，hasAmbiguousLayout用于判断是否存在Ambiguous Layouts，_autolayoutTrace用于查找存在的Ambiguous Layouts。但是即使有查找的方法，真正去做这个事儿也比较费时费力的，这时候chisel给我们提供了更为方便的命令。</p>
+<h4 id="alamborder"><a href="#alamborder" class="headerlink" title="alamborder"></a>alamborder</h4><p>给存在Ambiguous Layouts的view加上border，方便查找哪些View存在问题。</p>
+<pre><code>语法:
+Syntax: alamborder [--color=color] [--width=width]
+说明:
+--color/-c: border的颜色，参数为string类型，比如&#39;red&#39;，&#39;green&#39;，&#39;magenta&#39;等，不设置默认为红色
+--width/-w: border的宽度，参数为CGFloat类型，不设置默认宽度为2
+</code></pre>
+<p>假设我们写了这么一段代码，可以明显看出，我们没有设置X轴的位置</p>
+<pre><code>UIView *subview = [UIView new];
+[self.view addSubview:subview];
+[subview mas_makeConstraints:^(MASConstraintMaker *make) &#123;
+    make.top.offset(100);
+    make.size.equalTo(@100);
+&#125;];
+</code></pre>
+<p>运行代码之后，在LLDB控制台输入alamborder</p>
+<pre><code>(lldb) alamborder
+</code></pre>
+<p>所有带有Ambiguous Layouts的view立即会被渲染上红色border</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmcz1p8eaj206y0dk0sm.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>可以看到，subview的边框已经变为红色，另外只要有一个View存在Ambiguous Layouts，UIWindow的边框也会变为红色，这就有效的避免了宽度或者高度为0的Ambiguous Layouts不宜察觉的缺陷。</p>
+<h4 id="alamunborder"><a href="#alamunborder" class="headerlink" title="alamunborder"></a>alamunborder</h4><p>将alamborder设置的border去掉。</p>
+<pre><code>语法:
+Syntax: alamunborder
+    
+</code></pre>
+<p>刚刚设置的border，在lldb控制台输入alamunborder即可去掉边框</p>
+<pre><code>(lldb) alamborder
+</code></pre>
+<h4 id="paltrace"><a href="#paltrace" class="headerlink" title="paltrace"></a>paltrace</h4><p>打印某个View的autolayout详细信息，相当于调用_autolayoutTrace。</p>
+<pre><code>语法:
+Syntax: paltrace &lt;view&gt;
+说明:
+view: 需要打印详细信息的view，不传参数默认为keyWindow
+</code></pre>
+<p>查看一下keyWindow上有哪个view存在Ambiguous Layouts</p>
+<pre><code>(lldb) paltrace 
+•UIWindow:0x7ff450d2fb50 - AMBIGUOUS LAYOUT
+|   •UIView:0x7ff450e14430
+|   |   *_UILayoutGuide:0x7ff450d30e90
+|   |   *_UILayoutGuide:0x7ff450d31230
+|   |   *UIView:0x7ff450d32870- AMBIGUOUS LAYOUT for UIView:0x7ff450d32870.minX&#123;id: 46&#125;
+
+Legend:
+    * - is laid out with auto layout
+    + - is laid out manually, but is represented in the layout engine because translatesAutoresizingMaskIntoConstraints = YES
+    • - layout engine host
+</code></pre>
+<p>我们可以看到，UIView:0x7ff450d32870存在Ambiguous Layouts，原因是缺少minX。也就是没有设置X轴的位置</p>
+<hr>
+<h2 id="Print"><a href="#Print" class="headerlink" title="Print"></a>Print</h2><p>在LLDB中，我们执行的最多的可能就是打印操作了，chisel专门为这类操作封装了一些打印命令</p>
+<h4 id="pviews"><a href="#pviews" class="headerlink" title="pviews"></a>pviews</h4><p>循环打印view层级，正常情况下等效于调用recursiveDescription命令，即 po [self.view recursiveDescription] 和 pviews self.view 是一样的。</p>
+<pre><code>语法:
+pviews [--up] [--depth=depth] &lt;aView&gt;
+说明:
+--up/-u: 以view为起始位置，向上打印，直到打印到window层
+--depth/-d: 传入int类型，表示打印的层数，0表示没有限制
+</code></pre>
+<p>打印一下self.view层级</p>
+<pre><code>(lldb) pviews self.view
+&lt;UIView: 0x7fee7ae1fa60; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fee7ae1d3c0&gt;&gt;
+   | &lt;UIButton: 0x7fee7ae1dd90; frame = (54 244; 46 30); opaque = NO; autoresize = RM+BM; layer = &lt;CALayer: 0x7fee7ae1e300&gt;&gt;
+   | &lt;UIView: 0x7fee7ae1f2e0; frame = (35 312; 240 128); autoresize = RM+BM; layer = &lt;CALayer: 0x7fee7ae1f660&gt;&gt;
+   | &lt;_UILayoutGuide: 0x7fee7ae1fc20; frame = (0 0; 0 0); hidden = YES; layer = &lt;CALayer: 0x7fee7ae20030&gt;&gt;
+   | &lt;_UILayoutGuide: 0x7fee7ae20b30; frame = (0 0; 0 0); hidden = YES; layer = &lt;CALayer: 0x7fee7ae1d100&gt;&gt;
+   | &lt;UILabel: 0x7fee7ae1d3f0; frame = (0.4 150; 58.25 20.5); text = &#39;aaa&#39;; userInteractionEnabled = NO; layer = &lt;_UILabelLayer: 0x7fee7ae1bb30&gt;&gt;
+   
+   
+</code></pre>
+<h4 id="pvc"><a href="#pvc" class="headerlink" title="pvc"></a>pvc</h4><p>循环打印viewController的层级。</p>
+<pre><code>语法:
+Syntax: pvc &lt;aViewController&gt;
+说明:
+aViewController: 表示要打印的viewController，不传参数默认viewController为当前的VC。
+</code></pre>
+<p>打印一下当前VC</p>
+<pre><code>(lldb) pvc
+&lt;UINavigationController 0x7fce1a03d800&gt;, state: appeared, view: &lt;UILayoutContainerView 0x7fce19500c00&gt;
+   | &lt;ViewController 0x7fce1c03a1d0&gt;, state: disappeared, view: &lt;UIView 0x7fce19517b40&gt; not in the window
+   | &lt;TableViewController 0x7fce1951f7b0&gt;, state: appeared, view: &lt;UIView 0x7fce1c053e60&gt;
+   
+</code></pre>
+<h4 id="pclass"><a href="#pclass" class="headerlink" title="pclass"></a>pclass</h4><p>循环打印class的继承关系。</p>
+<pre><code>语法:
+Syntax: pclass &lt;object&gt;
+说明:
+object: 要打印继承关系的对象
+</code></pre>
+<p>打印一个View对象的继承关系</p>
+<pre><code>(lldb) pclass [UIView new]
+UIView
+   | UIResponder
+   |    | NSObject
+   
+</code></pre>
+<h4 id="presponder"><a href="#presponder" class="headerlink" title="presponder"></a>presponder</h4><p>打印响应链。</p>
+<pre><code>语法:
+Syntax: presponder &lt;startResponder&gt;
+说明:
+startResponder: UIResponder对象，响应链开始位置
+</code></pre>
+<p>打印一个tableView的响应链</p>
+<pre><code>(lldb) presponder tableView
+&lt;UITableView: 0x7fde54810e00; frame = (0 0; 0 0); clipsToBounds = YES; gestureRecognizers = &lt;NSArray: 0x7fde52519ac0&gt;; layer = &lt;CALayer: 0x7fde5253b4c0&gt;; contentOffset: &#123;0, 0&#125;; contentSize: &#123;0, 220&#125;&gt;
+   | &lt;UIView: 0x7fde5255c710; frame = (0 0; 600 600); autoresize = W+H; layer = &lt;CALayer: 0x7fde5253b300&gt;&gt;
+   |    | &lt;TableViewController: 0x7fde52491310&gt;
+   
+</code></pre>
+<h4 id="ptv"><a href="#ptv" class="headerlink" title="ptv"></a>ptv</h4><p>打印屏幕中显示的tableView，主要是与pcells联合使用。如果有多个tableView，打印View层级中最上面的一个。</p>
+<pre><code>语法:
+Syntax: ptv
+    
+</code></pre>
+<p>看看当前最上面是哪个tableView</p>
+<pre><code>(lldb) ptv
+&lt;UITableView: 0x7fde52811800; frame = (0 0; 414 736); clipsToBounds = YES; autoresize = RM+BM; gestureRecognizers = &lt;NSArray: 0x7fde526418d0&gt;; layer = &lt;CALayer: 0x7fde5260adc0&gt;; contentOffset: &#123;0, -64&#125;; contentSize: &#123;414, 176&#125;&gt;
+</code></pre>
+<h4 id="pcells"><a href="#pcells" class="headerlink" title="pcells"></a>pcells</h4><p>打印tableView中当前可见的cell，如果有多个tableView，打印View层级中最上面的tableView的可见cell。</p>
+<pre><code>语法:
+Syntax: pcells
+</code></pre>
+<p>看看当前可见的cell有哪些</p>
+<pre><code>(lldb) pcells
+&lt;__NSArrayI 0x7fde52565a00&gt;(
+&lt;UITableViewCell: 0x7fde52551180; frame = (0 0; 414 44); text = &#39;BasicViewController&#39;; autoresize = W; layer = &lt;CALayer: 0x7fde52537140&gt;&gt;,
+&lt;UITableViewCell: 0x7fde5255bea0; frame = (0 44; 414 44); text = &#39;DateViewController&#39;; autoresize = W; layer = &lt;CALayer: 0x7fde5255b1a0&gt;&gt;,
+&lt;UITableViewCell: 0x7fde5255e2d0; frame = (0 88; 414 44); text = &#39;PPTViewController&#39;; autoresize = W; layer = &lt;CALayer: 0x7fde5255e270&gt;&gt;,
+&lt;UITableViewCell: 0x7fde5255fce0; frame = (0 132; 414 44); text = &#39;TableViewController&#39;; autoresize = W; layer = &lt;CALayer: 0x7fde5255fa90&gt;&gt;
+)
+</code></pre>
+<h4 id="pinternals"><a href="#pinternals" class="headerlink" title="pinternals"></a>pinternals</h4><p>打印一个对象内部的成员变量，这个方法我一般用来看model属性。</p>
+<pre><code>语法:
+Syntax: pinternals &lt;object&gt;
+说明:
+object: 需要打印内部成员变量的对象
+</code></pre>
+<p>我们来看看一个model内部属性的值</p>
+<pre><code>(lldb) pinternals model
+(Model) $5 = &#123;
+  _name = 0x000000010dd1c0a0 @&quot;老鼠爱大米&quot;
+  _URL = nil
+  _array = nil
+  _dictionary = nil
+  _string = nil
+  _model = nil
+&#125;
+</code></pre>
+<h4 id="pdata"><a href="#pdata" class="headerlink" title="pdata"></a>pdata</h4><p>对编码过的NSData进行解码打印，等效于调用-[NSString initWithData:encoding:]。</p>
+<pre><code>语法:
+Syntax: pdata [--encoding=encoding] &lt;data&gt;
+说明:
+--encoding/-e: 编码类型(ascii utf8 utf16 utf16l utf16b utf32 utf32l utf32b latin1 latin2 cp1251 cp1252 cp1253 cp1254 cp1250)，缺省默认为utf8
+data: 需要打印的data，NSData类型
+</code></pre>
+<p>将一个utf8的NSData打印</p>
+<pre><code>(lldb) pdata -e=utf8 data
+老鼠爱大米
+</code></pre>
+<h4 id="pkp"><a href="#pkp" class="headerlink" title="pkp"></a>pkp</h4><p>通过-valueForKeyPath:打印key path对应的值。</p>
+<pre><code>语法:
+Syntax: pkp &lt;keypath&gt;
+说明:
+keypath: 需要打印的路径，如self.view
+</code></pre>
+<p>以前打印属性一般都用po obj.xxx，现在我想用pkp obj.xxx是一个更好的选择了，因为po obj.xxx是调用getter方法，如果没有getter方法就无法打印了。pkp obj.xxx不仅会调用getter方法，没有getter方法还会去查找成员变量。</p>
+<p>打印一下self.view</p>
+<pre><code>(lldb) pkp self.view
+&lt;UIView: 0x7fd1da52d5d0; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fd1da52d740&gt;&gt;
+</code></pre>
+<h4 id="pivar"><a href="#pivar" class="headerlink" title="pivar"></a>pivar</h4><p>打印对象成员变量。</p>
+<pre><code>语法:
+Syntax: pivar &lt;object&gt; &lt;ivarName&gt;
+说明:
+object: id类型，要打印成员变量的对象
+ivarName: 成员变量的名称，注意:如果是属性，对应成员变量的名字默认有_前缀
+</code></pre>
+<p>继续打印self.view</p>
+<pre><code>(lldb) pivar self _view
+&lt;UIView: 0x7fd1da52d5d0; frame = (0 0; 375 667); autoresize = W+H; layer = &lt;CALayer: 0x7fd1da52d740&gt;&gt;
+</code></pre>
+<h4 id="pca"><a href="#pca" class="headerlink" title="pca"></a>pca</h4><p>从渲染服务器的角度来打印layer tree，命令的完整名字是PrintCoreAnimationTree，相当于调用po [NSString stringWithCString:(char *)CARenderServerGetInfo(0, 2, 0)]。</p>
+<pre><code>语法:
+Syntax: pca
+</code></pre>
+<h4 id="panim"><a href="#panim" class="headerlink" title="panim"></a>panim</h4><p>显示是否正在执行动画，相当于调用p (BOOL)[UIView _isInAnimationBlock]。</p>
+<pre><code>语法:
+Syntax: panim
+</code></pre>
+<p>在动画中，我们打印一下:</p>
+<pre><code>(lldb) panim
+(BOOL) $0 = YES
+</code></pre>
+<hr>
+<h2 id="Find"><a href="#Find" class="headerlink" title="Find"></a>Find</h2><p>debug的时候，我们经常需要查找一些东西，比如View，viewController等。</p>
+<h4 id="fvc"><a href="#fvc" class="headerlink" title="fvc"></a>fvc</h4><p>根据viewController的Class名字查找VC。</p>
+<pre><code>语法:
+Syntax: fvc [--name=classNameRegex] [--view=view]
+说明:
+--name/-n: string类型参数，根据viewController的Class名字查找viewController
+--view/-v: UIView类型参数，根据viewController拥有的view查找viewController
+</code></pre>
+<p>注意，上面2个option不能同时使用，只能使用某一个。</p>
+<p>我们先根据名字查找一下VC</p>
+<pre><code>(lldb) fvc --name=viewcontroller
+0x7fd01a90f310 ViewController
+</code></pre>
+<p>如果我们知道VC的view地址，也可以根据view来查找VC</p>
+<pre><code>(lldb) fvc --view=0x7fd0194194d0
+Found the owning view controller.
+&lt;ViewController: 0x7fd01a90f310&gt;
+</code></pre>
+<h4 id="fv"><a href="#fv" class="headerlink" title="fv"></a>fv</h4><p>根据view的class名字查找view。</p>
+<pre><code>语法:
+Syntax: fv &lt;classNameRegex&gt;
+说明:
+classNameRegex: view的class名称
+</code></pre>
+<p>查找一下屏幕上的UILabel</p>
+<pre><code>(lldb) fv uilabel
+0x7fd01a91dc10 UILabel
+</code></pre>
+<h4 id="taplog"><a href="#taplog" class="headerlink" title="taplog"></a>taplog</h4><p>将点击的view打印出来，这个命令对于查找哪个view非常有帮助。</p>
+<pre><code>语法:
+Syntax: taplog
+</code></pre>
+<p>要查看的view必须能接收点击事件，也就是他的userInteractionEnabled必须为YES才能被找到，UILabel和UIImageView默认userInteractionEnabled为NO。</p>
+<p>我们需要先将程序暂停，输入taplog，程序会自己运行，这时候点击你需要查看的view，控制台上就会显示出你刚刚点击的view相关信息。</p>
+<p>我们先将程序暂停，输入taplog</p>
+<pre><code>(lldb) taplog
+Process 28421 resuming
+</code></pre>
+<p>程序会自己运行，我们再点击一个UIButton:</p>
+<pre><code>&lt;UIButton: 0x7fe6785284e0; frame = (54 244; 46 30); opaque = NO; autoresize = RM+BM; layer = &lt;CALayer: 0x7fe678528a50&gt;&gt;
+</code></pre>
+<h4 id="flicker"><a href="#flicker" class="headerlink" title="flicker"></a>flicker</h4><p>将view闪烁一下，以便于查找view的位置。</p>
+<pre><code>语法:
+Syntax: flicker &lt;viewOrLayer&gt;
+说明:
+viewOrLayer: 需要闪烁的view或者layer
+</code></pre>
+<p>我们来看看self.subView的位置</p>
+<pre><code>(lldb) flicker self.subView
+</code></pre>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ezmcz9efa1g209q0330r9.gif" srcset="/img/loading.gif" lazyload></p>
+<h4 id="vs"><a href="#vs" class="headerlink" title="vs"></a>vs</h4><p>在view层级中搜索view，并显示出来。</p>
+<pre><code>语法:
+Syntax: vs &lt;view&gt;
+说明:
+view: 要查找的view
+</code></pre>
+<p>相比fv，vs主要用于显示view在屏幕上的位置，2个命令可以配合使用。</p>
+<p>假设我们要找屏幕上的一个view</p>
+<p>首先用fv查找UIView类型的view</p>
+<pre><code>(lldb) fv uiview
+0x7fbcf37228d0 UIView
+0x7fbcf3725e90 UIView
+</code></pre>
+<p>然后看看这2个view到底哪个是我们想要找的view</p>
+<pre><code>(lldb) vs 0x7fbcf3725e90
+
+Use the following and (q) to quit.
+(w) move to superview
+(s) move to first subview
+(a) move to previous sibling
+(d) move to next sibling
+(p) print the hierarchy
+
+&lt;UIView: 0x7fbcf3725e90; frame = (0 100; 100 100); layer = &lt;CALayer: 0x7fbcf3712a40&gt;&gt;
+</code></pre>
+<p>输入命令后他会帮我们在屏幕上用粉红色标志出来vs的view</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ezmcziflf5j20kq07ujr6.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>控制台中vs的view也有相应log。并且还提示有6种子命令:</p>
+<ul>
+<li>w: 移动到superview</li>
+<li>s: 移动到第一个subview</li>
+<li>a: 移动到前面的同级view</li>
+<li>d: 移动到后面的同级view</li>
+<li>p: 打印出层级</li>
+<li>q: 退出</li>
+</ul>
+<p>如果这个不是我们要找的view，可以使用w,s,a,d,p命令继续查找。</p>
+<hr>
+<h2 id="Display"><a href="#Display" class="headerlink" title="Display"></a>Display</h2><p>debug的时候，可能有一小半的工作是跟UI打交道，关于UI显示上的东西，也有几个命令。</p>
+<h4 id="caflush"><a href="#caflush" class="headerlink" title="caflush"></a>caflush</h4><p>刷新UI界面。一般我们用LLDB命令改变UI，UI并不会立即更新，我们需要使用caflush刷新界面。</p>
+<pre><code>语法:
+Syntax: caflush
+</code></pre>
+<p>我们用命令将label的背景色改为红色</p>
+<pre><code>(lldb) fv uilabel
+0x7fb3919189d0 UILabel
+(lldb) e [((UILabel*)0x7fb3919189d0) setBackgroundColor:[UIColor redColor]]
+(lldb) caflush
+</code></pre>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmczorxsgj20ko02ka9v.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="border"><a href="#border" class="headerlink" title="border"></a>border</h4><p>给View或者layer加上border。</p>
+<pre><code>语法:
+Syntax: border [--color=color] [--width=width] &lt;viewOrLayer&gt;
+说明:
+--color/-c: 边框颜色，string类型，比如:&#39;red&#39;，&#39;green&#39;，&#39;magenta&#39;等，不设置默认为红色
+--width/-w: 边框宽度，不设置默认为2
+viewOrLayer: 需要设置边框的view或者layer
+</code></pre>
+<p>给刚刚的label加上边框</p>
+<pre><code>(lldb) fv uilabel
+0x7fe713901f10 UILabel
+(lldb) border 0x7fe713901f10
+</code></pre>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmczvy6ufj20kk02qmx0.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="unborder"><a href="#unborder" class="headerlink" title="unborder"></a>unborder</h4><p>去掉view或者layer的border。</p>
+<pre><code>语法:
+Syntax: unborder &lt;viewOrLayer&gt;
+</code></pre>
+<p>将刚刚加上的border去掉</p>
+<pre><code>(lldb) unborder 0x7fe713901f10
+</code></pre>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ezmd034xwxj20ko02mt8i.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="mask"><a href="#mask" class="headerlink" title="mask"></a>mask</h4><p>给view添加一个半透明的矩形mask，用来查看view的位置。</p>
+<pre><code>语法:
+Syntax: mask [--color=color] [--alpha=alpha] &lt;viewOrLayer&gt;
+说明:
+--color/-c: mask的颜色，string类型，比如:&#39;red&#39;, &#39;green&#39;,&#39;magenta&#39;等，不设置默认为红色
+--alpha/-a: mask的透明度，不设置默认为0.5
+viewOrLayer: 需要添加mask的view或者layer
+</code></pre>
+<p>假如label是隐藏的，我们给他添加一个mask，看看他的位置在哪儿</p>
+<pre><code>(lldb) fv uilabel
+0x7fe713901f10 UILabel
+(lldb) mask 0x7fe713901f10
+</code></pre>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd0aq6t3j20kq02sdfl.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="unmask"><a href="#unmask" class="headerlink" title="unmask"></a>unmask</h4><p>将添加的mask去掉。</p>
+<pre><code>语法:
+Syntax: unmask &lt;viewOrLayer&gt;
+说明:
+viewOrLayer: 需要去掉mask的view或者layer
+</code></pre>
+<p>我们将刚刚添加的mask去掉</p>
+<pre><code>(lldb) unmask 0x7fe713901f10
+</code></pre>
+<p>使用命令之后，我们可以看到什么都没有了，因为label是hidden的。</p>
+<h4 id="show"><a href="#show" class="headerlink" title="show"></a>show</h4><p>显示一个view或者layer，相当于执行view.hidden = NO。</p>
+<pre><code>语法:
+Syntax: show &lt;viewOrLayer&gt;
+说明:
+viewOrLayer: 需要显示的view或者layer
+</code></pre>
+<p>将刚刚的label显示出来</p>
+<pre><code>(lldb) show 0x7fe713901f10
+</code></pre>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ezmd0ghv9lj20kk02e3yb.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="hide"><a href="#hide" class="headerlink" title="hide"></a>hide</h4><p>隐藏一个view或者layer，相当于执行view.hidden = YES。</p>
+<pre><code>语法:
+Syntax: hide &lt;viewOrLayer&gt;
+说明:
+viewOrLayer: 需要隐藏的view或者layer
+</code></pre>
+<p>把label隐藏</p>
+<pre><code>(lldb) hide 0x7fe713901f10
+</code></pre>
+<p>可以看到label位置什么都没有了。</p>
+<h4 id="slowanim"><a href="#slowanim" class="headerlink" title="slowanim"></a>slowanim</h4><p>减慢动画的速度。</p>
+<pre><code>语法:
+Syntax: slowanim &lt;speed&gt;
+说明:
+speed: 动画的速度，速度越大，动画越快。1表示原始速度。不传参数默认为0.1
+</code></pre>
+<p>原始动画我们设置为1s</p>
+<pre><code>[UIView animateWithDuration:1 animations:^&#123;
+    self.subView.frame = frame;
+&#125;];
+</code></pre>
+<p>暂停程序，将动画放慢5倍</p>
+<pre><code>(lldb) slowanim 0.2
+</code></pre>
+<p>我们可以看到动画变慢了:</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ezmd0nval3g20ad032glo.gif" srcset="/img/loading.gif" lazyload></p>
+<h4 id="unslowanim"><a href="#unslowanim" class="headerlink" title="unslowanim"></a>unslowanim</h4><p>取消slowanim效果，将动画速度变为正常。</p>
+<pre><code>语法:
+Syntax: unslowanim
+</code></pre>
+<p>我们将刚刚的slowanim效果取消</p>
+<pre><code>(lldb) unslowanim
+</code></pre>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd0upccmg20ad032745.gif" srcset="/img/loading.gif" lazyload></p>
+<hr>
+<h2 id="Preview"><a href="#Preview" class="headerlink" title="Preview"></a>Preview</h2><p>预览功能，帮助我们用命令查看一个view或者图片的真正样子。</p>
+<h4 id="visualize"><a href="#visualize" class="headerlink" title="visualize"></a>visualize</h4><p>用预览App打开UIImage, CGImageRef, UIView, CALayer等对象。</p>
+<pre><code>语法:
+Syntax: visualize &lt;target&gt;
+说明:
+target: 需要预览的对象，id类型
+</code></pre>
+<p>我们来看看某个image的样子</p>
+<pre><code>(lldb) visualize image
+</code></pre>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd10m7ppj20h00h00v0.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Debug"><a href="#Debug" class="headerlink" title="Debug"></a>Debug</h2><p>LLDB主要用于Debug，chisel怎么可能缺少debug相关命令呢？</p>
+<h4 id="wivar"><a href="#wivar" class="headerlink" title="wivar"></a>wivar</h4><p>为对象的成员变量设置<a target="_blank" rel="noopener" href="http://www.jianshu.com/p/e89af3e9a8d7">watchpoint</a>。</p>
+<pre><code>语法:
+Syntax: wivar &lt;object&gt; &lt;ivarName&gt;
+说明:
+object: 需要为成员变量设置watchpoint的对象。id类型
+ivarName: 成员变量的名字，注意一般属性对应的成员变量带有_前缀
+</code></pre>
+<p>为self.subView设置watchpoint</p>
+<pre><code>(lldb) wivar self _subView
+Remember to delete the watchpoint using: watchpoint delete 1
+</code></pre>
+<p>这时候，_subView值改变就会中断程序</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ezmd17evopj20xa052dg5.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="bmessage"><a href="#bmessage" class="headerlink" title="bmessage"></a>bmessage</h4><p>根据方法名设置断点。</p>
+<pre><code>语法:
+Syntax: bmessage &lt;expression&gt;
+说明:
+expression: 方法名，如-[MyView setFrame:], +[MyView awesomeClassMethod], -[0xabcd1234 setFrame:]等
+</code></pre>
+<p>一般设置断点，如果这个方法本类没有实现，是父类实现的，断点是无效的。bmessage有效避免了这种缺陷，即使本类没有实现，也能设置上断点。</p>
+<p>给self中的btnAction:方法设置一个断点</p>
+<pre><code>(lldb) bmessage -[self btnAction:]
+Setting a breakpoint at -[ViewController btnAction:] with condition (void*)(id)$rdi == 0x00007ff2485311e0
+Breakpoint 4: where = TLLDB`-[ViewController btnAction:] at ViewController.m:42, address = 0x000000010c4bb620
+</code></pre>
+<h4 id="binside"><a href="#binside" class="headerlink" title="binside"></a>binside</h4><p>通过一个相对地址，给framework(library)设置断点。</p>
+<pre><code>语法:
+Syntax: binside &lt;address&gt;
+说明:
+address: framework的相对地址
+</code></pre>
+<h4 id="pinvocation"><a href="#pinvocation" class="headerlink" title="pinvocation"></a>pinvocation</h4><p>打印方法调用堆栈，仅支持x86。</p>
+<pre><code>语法:
+Syntax: pinvocation [--all]
+说明:
+--all/-a: 表示打印所有堆栈，不设置默认只打印当前堆栈
+</code></pre>
+<p>与bt命令类似，不过信息比bt打印得更详细，遗憾的是只能支持x86。</p>
+<p>打印一下当前堆栈</p>
+<pre><code>(lldb) pinvocation
+frame #0: 0x000962aa TMasonry`-[ViewController viewDidLoad](self=0x7bf2d9c0, _cmd=&quot;viewDidLoad&quot;) + 234 at ViewController.m:28
+NSInvocation: 0x7bf433e0
+self: 0x7bf2d9c0
+</code></pre>
+<p>打印所有堆栈:</p>
+<pre><code>(lldb) pinvocation -a
+frame #0: 0x000962aa TMasonry`-[ViewController viewDidLoad](self=0x7bf2d9c0, _cmd=&quot;viewDidLoad&quot;) + 234 at ViewController.m:28
+NSInvocation: 0x7d2bb050
+self: 0x7bf2d9c0
+---------------------------------
+frame #1: 0x008062ae UIKit`-[UIViewController _sendViewDidLoadWithAppearanceProxyObjectTaggingEnabled] + 44
+NSInvocation: 0x7be18a50
+self: 0x7bf2d9c0
+---------------------------------
+frame #2: 0x0080adce UIKit`-[UIViewController loadViewIfRequired] + 1384
+NSInvocation: 0x7bf0cc40
+self: 0x7bf2d9c0
+---------------------------------
+frame #3: 0x008569f9 UIKit`-[UINavigationController _layoutViewController:] + 52
+NSInvocation: 0x7d340c90
+self: 0x7c89ee00
+
+Argument:
+0xbff69108, address of @&#125; 0x7bf2d9c0
+---------------------------------
+frame #4: 0x008572b1 UIKit`-[UINavigationController _updateScrollViewFromViewController:toViewController:] + 421
+NSInvocation: 0x7d340cc0
+self: 0x7c89ee00
+
+2 Arguments:
+0xbff69158, address of @&#125; 0x0
+0xbff6915c, address of @&#125; 0x7bf2d9c0
+---------------------------------
+frame #5: 0x00857458 UIKit`-[UINavigationController _startTransition:fromViewController:toViewController:] + 145
+NSInvocation: 0x7bf24870
+self: 0x7c89ee00
+
+3 Arguments:
+0xbff69298, address of i&#125; 0
+0xbff6929c, address of @&#125; 0x0
+0xbff692a0, address of @&#125; 0x7bf2d9c0
+---------------------------------**
+</code></pre>
+<hr>
+<h2 id="Accessibility"><a href="#Accessibility" class="headerlink" title="Accessibility"></a>Accessibility</h2><p>这个模块的命令主要利用了<a target="_blank" rel="noopener" href="http://nshipster.cn/uiaccessibility/">UIAccessibility</a>相关特性，需要开启才能使用。</p>
+<h4 id="fa11y"><a href="#fa11y" class="headerlink" title="fa11y"></a>fa11y</h4><p>根据view的<a target="_blank" rel="noopener" href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAccessibility_Protocol/#//apple_ref/occ/instp/NSObject/accessibilityLabel">accessibilityLabel</a>查找view。</p>
+<pre><code>语法:
+Syntax: fa11y &lt;labelRegex&gt;
+说明:
+labelRegex: 需要匹配的text
+</code></pre>
+<p>注意，UILabel，UIButton的accessibilityLabel等于title。</p>
+<p>我们根据显示的文案，查找相应的控件</p>
+<pre><code>(lldb) fa11y 妈妈
+(UILabel 0x176b5bd0) 妈妈叫你回家吃饭了
+</code></pre>
+<h4 id="pa11y"><a href="#pa11y" class="headerlink" title="pa11y"></a>pa11y</h4><p>打印view层级中所有的accessibilityLabel。</p>
+<pre><code>语法:
+Syntax: pa11y &lt;aView&gt;
+说明:
+aView: 需要打印层级的View，UIView类型
+</code></pre>
+<p>我们打印一下self.view层级中所有的accessibilityLabel</p>
+<pre><code>(lldb) pa11y self.view
+UIView self.view
+   | (UIButton 0x176b4600) Button
+   | (UILabel 0x176b5bd0) 妈妈叫你回家吃饭了
+   
+</code></pre>
+<hr>
+<h2 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/gkassabli/chisel">chisel</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.jianshu.com/p/e89af3e9a8d7">小笨狼与LLDB的故事</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.apple.com/library/tvos/documentation/UserExperience/Conceptual/AutolayoutPG/AmbiguousLayouts.html#//apple_ref/doc/uid/TP40010853-CH18-SW1">Ambiguous Layouts</a></li>
+<li><a target="_blank" rel="noopener" href="http://nshipster.cn/uiaccessibility/">UIAccessibility</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIAccessibility_Protocol/#//apple_ref/occ/instp/NSObject/accessibilityLabel">accessibilityLabel</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Chisel</div>
+      <div>https://hllovesgithub.github.io/2016/01/03/2016-01-03-Chisel/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2016年1月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2016/01/10/2016-01-10-Effective-Objective-C%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0-%E4%B8%8A/" title="Effective Objective-C 读书笔记-上">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Effective Objective-C 读书笔记-上</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/12/25/2015-12-25-Xcode-Debug/" title="Xcode Debug">
+                        <span class="hidden-mobile">Xcode Debug</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

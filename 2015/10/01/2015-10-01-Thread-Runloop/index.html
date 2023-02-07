@@ -1,0 +1,994 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一般一个线程一次只执行一个任务，执行完成后就会退出。如果需要一个机制，让线程能随时响应处理新的任务并长时间存在不退出，那么它就是RunLoop。 RunLoop就是一个不断调度工作和处理事件的事件处理循环，对事件处理过程进行了更好的抽象和封装，让客户代码不用关心底层琐碎的消息处理实现的同时，能够轻松动态地添加删除执行任务。目的是让线程有任务时忙碌工作，没任务时休眠节能。 RunLoop不是完全自动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Thread RunLoop">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/10/01/2015-10-01-Thread-Runloop/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="一般一个线程一次只执行一个任务，执行完成后就会退出。如果需要一个机制，让线程能随时响应处理新的任务并长时间存在不退出，那么它就是RunLoop。 RunLoop就是一个不断调度工作和处理事件的事件处理循环，对事件处理过程进行了更好的抽象和封装，让客户代码不用关心底层琐碎的消息处理实现的同时，能够轻松动态地添加删除执行任务。目的是让线程有任务时忙碌工作，没任务时休眠节能。 RunLoop不是完全自动">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewmvfz9j1nj20zc0gmgph.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewmy1wfdtgj215w0go47f.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewmy2ah70rj21620lmwpj.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewn43j8dc5j21jy168tub.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewntcgsy3aj20yk0f0whi.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewo1cebznfj20pa0ju75l.jpg">
+<meta property="article:published_time" content="2015-10-01T07:53:46.000Z">
+<meta property="article:modified_time" content="2015-11-15T06:10:58.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewmvfz9j1nj20zc0gmgph.jpg">
+  
+  
+  
+  <title>Thread RunLoop - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Thread RunLoop"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-10-01 15:53" pubdate>
+          2015年10月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          15k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          126 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Thread RunLoop</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>一般一个线程一次只执行一个任务，执行完成后就会退出。如果需要一个机制，<strong>让线程能随时响应处理新的任务并长时间存在不退出</strong>，那么它就是RunLoop。</p>
+<p>RunLoop就是一个<strong>不断调度工作和处理事件的事件处理循环</strong>，对事件处理过程进行了更好的抽象和封装，让客户代码不用关心底层琐碎的消息处理实现的同时，能够轻松动态地添加删除执行任务。目的是<strong>让线程有任务时忙碌工作，没任务时休眠节能</strong>。</p>
+<p>RunLoop不是完全自动的。需要给线程设定代码在合适的时候启动并响应事件。Cocoa和Core Foundation都提供了runloop objects帮助配置和管理线程的RunLoop。每个线程都有关联的RunLoop，主线程启动时自动启动，子线程需要显式地启动。</p>
+<h3 id="RunLoop剖析"><a href="#RunLoop剖析" class="headerlink" title="RunLoop剖析"></a>RunLoop剖析</h3><p>RunLoop接收两种不同输入事件：输入源(<em>input source</em>)传递异步事件，通常来自于其他线程或程序。定时源(<em>timer source</em>)传递同步事件，发生在特定时间或者重复的时间间隔。这两种源事件到达时都使用对应回调函数处理。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewmvfz9j1nj20zc0gmgph.jpg" srcset="/img/loading.gif" lazyload></p>
+<h5 id="RunLoop模式"><a href="#RunLoop模式" class="headerlink" title="RunLoop模式"></a>RunLoop模式</h5><p>RunLoop<strong>模式</strong>是所有<strong>输入源定时源和观察者(CFRunLoopObserverRef实例)的集合</strong>。RunLoop每次只以某个模式运行，只有相关的源才会被监视、传递、处理事件，只有相关的观察者会被通知。否则，不相关的源不被监视，不相关观察者不被通知。Cocoa和Core Foundation定了一个默认模式和几个常用模式:</p>
+<ul>
+<li><strong>Default</strong>(NSDefaultRunLoopMode-Cocoa ， kCFRunLoopDefaultMode-CoreFoundation) 默认模式是最常用的模式。大部分时间你应该用这种模式启动RunLoop配置事件源。</li>
+<li><strong>Connection</strong>(NSConnectionReplyMode-Cocoa) Cocoa用这个模式结合NSConnection对象来检测网络响应。你自己很少会用到这个模式。</li>
+<li><strong>Modal</strong>(NSModalPanelRunLoopMode-Cocoa) Cocoa用这个模式辨别出模态界面想要的事件。</li>
+<li><strong>Event tracking</strong>(NSEventTrackingRunLoopMode-Cocoa) Cocoa用这个模式在MouseDrag循环中和其他需要跟踪用户的界面循环中限制事件输入。</li>
+<li><strong>Common modes</strong>(NSRunLoopCommonModes-Cocoa， kCFRunLoopCommonModes-CoreFoundation) 这是一个常用模式的可配置组合。关联常用模式就是关联组合里每个模式。Cocoa程序里常用模式默认包括default<br>，modal，event tracking。Core Foundation只有default。你可以用CFRunLoopAddCommonMode添加自定义模式到常用模式中。</li>
+</ul>
+<p>创建自定义模式<strong>必须添加至少一个事件源或者观察者</strong>，否则无效。使用特定模式可以过滤事件。比如大多数时间运行在默认模式上，模态界面运行在”Modal”模式下，此时只有模态模式相关信息能传递给线程。</p>
+<h4 id="输入源"><a href="#输入源" class="headerlink" title="输入源"></a>输入源</h4><p>输入源异步发送消息到线程。事件来源取决于种类：<strong>端口源</strong>和<strong>自定义源</strong>。端口源监听程序相应端口，自定义源监听自定义事件源。区别在于如何触发：<strong>端口源由内核自动发送，自定义源则需要手动从其他线程发送</strong>。</p>
+<h4 id="基于端口的输入源"><a href="#基于端口的输入源" class="headerlink" title="基于端口的输入源"></a>基于端口的输入源</h4><p>Cocoa不需要直接创建输入源，只需要创建NSPort对象并添加到RunLoop，它会自己处理创建和配置属于远。Core Foundation必须手动创建端口和输入源用CFMachPortRef，CFMessagePortRef，FSocketRef来创建合适的对象。</p>
+<h4 id="自定义输入源"><a href="#自定义输入源" class="headerlink" title="自定义输入源"></a>自定义输入源</h4><p>创建自定义输入源使用CFRunLoopSourceRef，使用回调函数来进行配置。Core Foundation会在配置、处理、移除调用回调函数。</p>
+<h4 id="Cocoa执行Selector源"><a href="#Cocoa执行Selector源" class="headerlink" title="Cocoa执行Selector源"></a>Cocoa执行Selector源</h4><p>Cocoa定义了允许你在任何线程执行selector的自定义输入源。和端口源一样，执行selector的请求在目标线程上串行排列，避免许多线程上多个方法一起运行引起的同步问题。不像端口源，<strong>一个selector源执行完后会自动从RunLoop里面移除</strong>。RunLoop每次循环处理所有(而不是一个)排列的selector的调用。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewmy1wfdtgj215w0go47f.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewmy2ah70rj21620lmwpj.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="RunLoop观察者"><a href="#RunLoop观察者" class="headerlink" title="RunLoop观察者"></a>RunLoop观察者</h4><pre><code>typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) &#123;
+    kCFRunLoopEntry         = (1UL &lt;&lt; 0), // 即将进入Loop
+    kCFRunLoopBeforeTimers  = (1UL &lt;&lt; 1), // 即将处理Timer
+    kCFRunLoopBeforeSources = (1UL &lt;&lt; 2), // 即将处理Source
+    kCFRunLoopBeforeWaiting = (1UL &lt;&lt; 5), // 即将进入休眠
+    kCFRunLoopAfterWaiting  = (1UL &lt;&lt; 6), // 刚从休眠中唤醒
+    kCFRunLoopExit          = (1UL &lt;&lt; 7), // 即将退出Loop
+&#125;;
+</code></pre>
+<p>通过使用Core Foundation注册为RunLoop的观察者来接收RunLoop行为的通知。和同步或异步事件发生时才触发的事件源不同，RunLoop观察者是在RunLoop本身运行的特定时刻候触发。和定时器类似，RunLoop观察者(在创建时指定)可以只用一次(RunLoop启动后，观察者会从RunLoop里移除)或循环使用。</p>
+<h4 id="RunLoop事件队列"><a href="#RunLoop事件队列" class="headerlink" title="RunLoop事件队列"></a>RunLoop事件队列</h4><p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewn43j8dc5j21jy168tub.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="何时使用RunLoop"><a href="#何时使用RunLoop" class="headerlink" title="何时使用RunLoop"></a>何时使用RunLoop</h4><p>不需要在任何情况下都启动线程的RunLoop。比如，用线程处理一个预先定义的长时间(虽然长)任务就不用。RunLoop只在需更多交互时才需要：</p>
+<ul>
+<li>使用<strong>端口或自定义输入源</strong>来和其他线程<strong>通信</strong></li>
+<li>使用线程的<strong>定时器</strong></li>
+<li>Cocoa中使用任何<strong>performSelector</strong>方法</li>
+<li>使线程<strong>周期性工作</strong></li>
+</ul>
+<h4 id="获得RunLoop对象"><a href="#获得RunLoop对象" class="headerlink" title="获得RunLoop对象"></a>获得RunLoop对象</h4><pre><code>//Cocoa
+NSRunLoop cocoa = [NSRunLoop currentRunLoop];
+
+//Core Foundation
+CFRunLoopRef coreFoundation = CFRunLoopGetCurrent();
+</code></pre>
+<h4 id="配置RunLoop"><a href="#配置RunLoop" class="headerlink" title="配置RunLoop"></a>配置RunLoop</h4><p>子线程运行RunLoop前，<strong>必须添加至少一个事件源</strong>。如果没有任何事件源，RunLoop会在启动之际立马退出。使用CFRunLoopAddObserver将观察者添加到RunLoop:</p>
+<pre><code>- (void)threadMain &#123;
+    NSRunLoop* myRunLoop = [NSRunLoop currentRunLoop];
+    CFRunLoopObserverContext context = &#123;0， self， NULL， NULL， NULL&#125;; 
+    CFRunLoopObserverRef observer = CFRunLoopObserverCreate(kCFAllocatorDefault，kCFRunLoopAllActivities， YES， 0， &amp;myRunLoopObserver， &amp;context);
+    if (observer) &#123;
+        CFRunLoopRef cfLoop = [myRunLoop getCFRunLoop];
+        CFRunLoopAddObserver(cfLoop， observer， kCFRunLoopDefaultMode);
+    &#125;
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(doFireTimer:) userInfo:nil repeats:YES];
+    NSInteger loopCount = 10;
+    do &#123;
+        [myRunLoop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+        loopCount--;            ￼￼￼￼
+    &#125; while (loopCount);
+&#125;
+</code></pre>
+<h4 id="启动RunLoop"><a href="#启动RunLoop" class="headerlink" title="启动RunLoop"></a>启动RunLoop</h4><p><strong>无条件的</strong>启动RunLoop最简单的，但也最不推荐。因为这会使线程永久循环，失去控制。虽然可以添加或删除事件源，但是退出RunLoop的唯一方法是杀死它，也没有任何办法可以让RunLoop运行在自定义模式下。</p>
+<p>更好的办法是用<strong>设置超时时间</strong>来启动RunLoop，这样RunLoop运作直到事件到达或者规定时间超时。如果是事件到达，RunLoop会传递消息给相应的处理方法然后退出。如果是规定时间超时直接退出。重新启动RunLoop进行下一次循环。</p>
+<p><strong>特定模式</strong>启动RunLoop可以限制传递给RunLoop的事件源的类型。</p>
+<pre><code>- (void)skeletonThreadMain &#123;
+    BOOL done = NO;
+    do &#123;
+        SInt32 result = CFRunLoopRunInMode(kCFRunLoopDefaultMode， 10， YES);
+        if ((result == kCFRunLoopRunStopped) || (result == kCFRunLoopRunFinished)) &#123;
+            done = YES;
+        &#125;
+    &#125; while (!done);
+&#125;
+</code></pre>
+<h4 id="退出RunLoop"><a href="#退出RunLoop" class="headerlink" title="退出RunLoop"></a>退出RunLoop</h4><p>如果可以，尽量使用<strong>设置超时时</strong>，它让RunLoop退出前完成所有正常操作，包括通知观察者。<strong>显式停止</strong>(CFRunLoopStop)和超时结果相似，Runloop把所有剩余的通知发送出去再退出。与设置超时的不同的是，显式停止可以在无条件启动的Runloop里面使用。</p>
+<p>尽管移除所有事件源也能导致RunLoop退出，但这并不可靠。系统会添加输入源来处理所需事件。因为移除事件源未必会考虑到这些输入源，可能导致无法退出RunLoop。</p>
+<h4 id="线程安全和RunLoop对象"><a href="#线程安全和RunLoop对象" class="headerlink" title="线程安全和RunLoop对象"></a>线程安全和RunLoop对象</h4><p>线程的否安全取决于API操纵RunLoop的API。<strong>Core Foundation的函数是线程安全的</strong>，可以被任意线程调用。修改RunLoop配置并执行操作，<strong>最好在RunLoop所属线程完成</strong>。</p>
+<p><strong>Cocoa的NSRunLoop则不具有线程安全性</strong>。 如果使用NSRunLoop来修改RunLoop，<strong>应该在RunLoop所属线程完成</strong>。给其他线程的RunLoop添加事件源可能导致崩溃或产生不可预知的行为。</p>
+<h4 id="创建配置自定义输入源"><a href="#创建配置自定义输入源" class="headerlink" title="创建配置自定义输入源"></a>创建配置自定义输入源</h4><ul>
+<li>输入源要处理的信息。</li>
+<li>一个联系客户代码和输入源的调度方法。</li>
+<li>一个处理客户代码请求的执行方法。</li>
+<li>一个使输入源无效的取消方法。</li>
+</ul>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewntcgsy3aj20yk0f0whi.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>主线程给子线程分发任务时，主线程给命令缓冲区填充命令和信息(主线程和拥有输入源的子线程必须同步访问命令缓冲区)，然后通知(会唤醒)子线程RunLoop开始工作，子线程RunLoop会调用输入源处理函数来执行命令缓冲区中相应的命令。</p>
+<pre><code>// These are the CFRunLoopSourceRef callback functions.
+void RunLoopSourceScheduleRoutine (void *info， CFRunLoopRef rl， CFStringRef mode);
+void RunLoopSourceCancelRoutine (void *info， CFRunLoopRef rl， CFStringRef mode);
+void RunLoopSourcePerformRoutine (void *info);
+
+@interface RunLoopSource : NSObject
+- (instancetype)init;
+- (void)addToCurrentRunLoop;
+- (void)invalidate;
+- (void)sourceFired;
+- (void)addCommand:(NSInteger)command withData:(id)data;
+- (void)fireCommandsOnRunLoop:(CFRunLoopRef)runloop;
+@end
+@implementation RunLoopSource &#123;
+    CFRunLoopSourceRef _runLoopSource;
+    NSMutableArray *_commands;
+&#125;
+- (instancetype)init &#123;
+    self = [super init];
+    if (self) &#123;
+        CFRunLoopSourceContext context = &#123;
+            0，
+            (__bridge void *)(self)，
+            NULL，
+            NULL，
+            NULL，
+            NULL，
+            NULL，
+            RunLoopSourceScheduleRoutine，
+            RunLoopSourceCancelRoutine，
+            RunLoopSourcePerformRoutine
+        &#125;;
+        _runLoopSource = CFRunLoopSourceCreate(NULL， 0， &amp;context);
+        _commands = [[NSMutableArray alloc] init];
+    &#125;
+    return self;
+&#125;
+- (void)addToCurrentRunLoop &#123;
+    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+    CFRunLoopAddSource(runLoop， _runLoopSource， kCFRunLoopDefaultMode);
+&#125;
+- (void)invalidate &#123;&#125;
+- (void)sourceFired &#123;&#125;
+- (void)addCommand:(NSInteger)command withData:(id)data &#123;&#125;
+- (void)fireCommandsOnRunLoop:(CFRunLoopRef)runloop &#123;
+    CFRunLoopSourceSignal(_runLoopSource);
+    CFRunLoopWakeUp(runloop);
+&#125;
+@end
+
+@interface RunLoopContext : NSObject
+@property (readonly) CFRunLoopRef runLoop;
+@property (readonly) RunLoopSource* source;
+- (instancetype)initWithSource:(RunLoopSource *)src andLoop:(CFRunLoopRef)loop;
+@end
+@implementation RunLoopContext &#123;
+    RunLoopSource *_source;
+    CFRunLoopRef _runLoop;
+&#125;
+- (instancetype)initWithSource:(RunLoopSource *)src andLoop:(CFRunLoopRef)loop &#123;
+    self = [super init];
+    if (self) &#123;
+        _source = src;
+        _runLoop = loop;
+    &#125;
+    return self;
+&#125;
+@end
+
+void RunLoopSourceScheduleRoutine (void *info， CFRunLoopRef rl， CFStringRef mode) &#123;
+    id appDelegate = [[NSApplication sharedApplication] delegate];
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    RunLoopContext *theContext = [[RunLoopContext alloc] initWithSource:obj andLoop:rl];
+    [appDelegate performSelectorOnMainThread:@selector(registerSource:) withObject:theContext waitUntilDone:NO];
+&#125;
+void RunLoopSourceCancelRoutine (void *info， CFRunLoopRef rl， CFStringRef mode) &#123;
+    id del = [[NSApplication sharedApplication] delegate];
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    RunLoopContext *theContext = [[RunLoopContext alloc] initWithSource:obj andLoop:rl];
+    [del performSelectorOnMainThread:@selector(removeSource:) withObject:theContext waitUntilDone:YES];
+&#125;
+void RunLoopSourcePerformRoutine (void *info) &#123;
+    RunLoopSource *obj = (__bridge RunLoopSource *)info;
+    [obj sourceFired];
+&#125;
+</code></pre>
+<h4 id="配置定时源"><a href="#配置定时源" class="headerlink" title="配置定时源"></a>配置定时源</h4><pre><code>//Cocoa
+- (void)addTimer &#123;
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(timeFeedback:) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+&#125;
+- (void)timeFeedback:(NSTimer *)timer &#123;&#125;
+
+//Core Foundation
+- (void)addTimer &#123;
+    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+    CFRunLoopTimerContext context = &#123;0， NULL， NULL， NULL， NULL&#125;;
+    CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault， CFAbsoluteTimeGetCurrent()， 0.3， 0， 0， &amp;myCFTimerCallback， &amp;context);
+    CFRunLoopAddTimer(runLoop， timer， kCFRunLoopCommonModes);
+&#125;
+myCFTimerCallback(CFRunLoopTimerRef timer， void *info) &#123;&#125;
+</code></pre>
+<hr>
+<h4 id="RunLoop与线程"><a href="#RunLoop与线程" class="headerlink" title="RunLoop与线程"></a>RunLoop与线程</h4><p>Apple不允许直接创建RunLoop，只提供了两个自动获取API：CFRunLoopGetMain()和CFRunLoopGetCurrent()，大致如下：</p>
+<pre><code>static CFMutableDictionaryRef loopsDic;
+static CFSpinLock_t loopsLock;
+
+CFRunLoopRef _CFRunLoopGet(pthread_t thread) &#123;
+    OSSpinLockLock(&amp;loopsLock);
+    if (!loopsDic) &#123;
+        loopsDic = CFDictionaryCreateMutable();
+        CFRunLoopRef mainLoop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, pthread_main_thread_np(), mainLoop);
+    &#125;
+
+    CFRunLoopRef loop = CFDictionaryGetValue(loopsDic, thread));
+    if (!loop) &#123;
+        loop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, thread, loop);
+        //注册回调在线程销毁的时候销毁RunLoop
+        _CFSetTSD(..., thread, loop, __CFFinalizeRunLoop);
+    &#125;        
+    OSSpinLockUnLock(&amp;loopsLock);
+    return loop;
+&#125;
+
+CFRunLoopRef CFRun    LoopGetMain() &#123;
+    return _CFRunLoopGet(pthread_main_thread_np());
+&#125;
+CFRunLoopRef CFRunLoopGetCurrent() &#123;
+    return _CFRunLoopGet(pthread_self());
+&#125;
+</code></pre>
+<p>从代码看出，线程和RunLoop是一一对应的，映射关系保存在一个全局的Dictionary里。线程的RunLoop不自动创建，只有线程主动获取时才创建(第一次调用会确保主线程的RunLoop创建)，在对应线程销毁时销毁。</p>
+<h4 id="RunLoop的Public-API"><a href="#RunLoop的Public-API" class="headerlink" title="RunLoop的Public API"></a>RunLoop的Public API</h4><p>CoreFoundation有5个类：</p>
+<ul>
+<li>CFRunLoopRef</li>
+<li>CFRunLoopModeRef</li>
+<li>CFRunLoopSourceRef</li>
+<li>CFRunLoopTimerRef</li>
+<li>CFRunLoopObserverRef</li>
+</ul>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewo1cebznfj20pa0ju75l.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>一个RunLoop有若干个Mode，一个Mode有若干个Source|Timer|Observer(统称为<strong>Mode Item</strong>)。RunLoop每次只能运行在一个Mode中。切换Mode必须先退出运行，再以Mode进入。</p>
+<p>CFRunLoopSourceRef分Source0和Source1：<strong>Source0只有一个回调函数</strong>。需要先CFRunLoopSourceSignal(source)标记带处理，再CFRunLoopWakeUp(runloop)唤醒runloop，以此实现自定义输入源。<strong>Source1有一个mach_port和一个回调函数</strong>，以此实现基于端口的输入源。</p>
+<h4 id="RunLoop的Mode"><a href="#RunLoop的Mode" class="headerlink" title="RunLoop的Mode"></a>RunLoop的Mode</h4><p>CFRunLoopMode和CFRunLoop的大致结构：</p>
+<pre><code>struct __CFRunLoopMode &#123;
+    CFStringRef _name;            // Mode Name, 例如 @&quot;kCFRunLoopDefaultMode&quot;
+    CFMutableSetRef _sources0;    // Set&lt;CFRunLoopSourceRef&gt;
+    CFMutableSetRef _sources1;    // Set&lt;CFRunLoopSourceRef&gt;
+    CFMutableArrayRef _observers; // Array&lt;CFRunLoopObserverRef&gt;
+    CFMutableArrayRef _timers;    // Array&lt;CFRunLoopTimerRef&gt;
+    ...
+&#125;;
+ 
+struct __CFRunLoop &#123;
+    CFMutableSetRef _commonModes;     // Set&lt;CFStringRef&gt;
+    CFMutableSetRef _commonModeItems; // Set&lt;Source/Observer/Timer&gt;
+    CFRunLoopModeRef _currentMode;    // Current Runloop Mode
+    CFMutableSetRef _modes;           // Set&lt;CFRunLoopModeRef&gt;
+    ...
+&#125;;
+</code></pre>
+<p>通过将Mode的_name添加到RunLoop的_commonModes中使其成为commonMode。<strong>当RunLoop内容变化时，RunLoop都会自动将_commonModeItems里的ModeItem同步到所有Common Mode里</strong>。</p>
+<h4 id="App启动后RunLoop的状态："><a href="#App启动后RunLoop的状态：" class="headerlink" title="App启动后RunLoop的状态："></a>App启动后RunLoop的状态：</h4><pre><code>CFRunLoop &#123;
+    current mode = kCFRunLoopDefaultMode
+    common modes = &#123;
+        UITrackingRunLoopMode
+        kCFRunLoopDefaultMode
+    &#125;
+ 
+    common mode items = &#123;
+ 
+        // source0 (manual)
+        CFRunLoopSource &#123;order =-1, &#123;
+            callout = _UIApplicationHandleEventQueue&#125;&#125;
+        CFRunLoopSource &#123;order =-1, &#123;
+            callout = PurpleEventSignalCallback &#125;&#125;
+        CFRunLoopSource &#123;order = 0, &#123;
+            callout = FBSSerialQueueRunLoopSourceHandler&#125;&#125;
+ 
+        // source1 (mach port)
+        CFRunLoopSource &#123;order = 0,  &#123;port = 17923&#125;&#125;
+        CFRunLoopSource &#123;order = 0,  &#123;port = 12039&#125;&#125;
+        CFRunLoopSource &#123;order = 0,  &#123;port = 16647&#125;&#125;
+        CFRunLoopSource &#123;order =-1, &#123;
+            callout = PurpleEventCallback&#125;&#125;
+        CFRunLoopSource &#123;order = 0, &#123;port = 2407,
+            callout = _ZL20notify_port_callbackP12__CFMachPortPvlS1_&#125;&#125;
+        CFRunLoopSource &#123;order = 0, &#123;port = 1c03,
+            callout = __IOHIDEventSystemClientAvailabilityCallback&#125;&#125;
+        CFRunLoopSource &#123;order = 0, &#123;port = 1b03,
+            callout = __IOHIDEventSystemClientQueueCallback&#125;&#125;
+        CFRunLoopSource &#123;order = 1, &#123;port = 1903,
+            callout = __IOMIGMachPortPortCallback&#125;&#125;
+ 
+        // Ovserver
+        CFRunLoopObserver &#123;order = -2147483647, activities = 0x1, // Entry
+            callout = _wrapRunLoopWithAutoreleasePoolHandler&#125;
+        CFRunLoopObserver &#123;order = 0, activities = 0x20,          // BeforeWaiting
+            callout = _UIGestureRecognizerUpdateObserver&#125;
+        CFRunLoopObserver &#123;order = 1999000, activities = 0xa0,    // BeforeWaiting | Exit
+            callout = _afterCACommitHandler&#125;
+        CFRunLoopObserver &#123;order = 2000000, activities = 0xa0,    // BeforeWaiting | Exit
+            callout = _ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv&#125;
+        CFRunLoopObserver &#123;order = 2147483647, activities = 0xa0, // BeforeWaiting | Exit
+            callout = _wrapRunLoopWithAutoreleasePoolHandler&#125;
+ 
+        // Timer
+        CFRunLoopTimer &#123;firing = No, interval = 3.1536e+09, tolerance = 0,
+            next fire date = 453098071 (-4421.76019 @ 96223387169499),
+            callout = _ZN2CAL14timer_callbackEP16__CFRunLoopTimerPv (QuartzCore.framework)&#125;
+    &#125;,
+ 
+    modes ＝ &#123;
+        CFRunLoopMode  &#123;
+            sources0 =  &#123; /* same as &#39;common mode items&#39; */ &#125;,
+            sources1 =  &#123; /* same as &#39;common mode items&#39; */ &#125;,
+            observers = &#123; /* same as &#39;common mode items&#39; */ &#125;,
+            timers =    &#123; /* same as &#39;common mode items&#39; */ &#125;,
+        &#125;,
+ 
+        CFRunLoopMode  &#123;
+            sources0 =  &#123; /* same as &#39;common mode items&#39; */ &#125;,
+            sources1 =  &#123; /* same as &#39;common mode items&#39; */ &#125;,
+            observers = &#123; /* same as &#39;common mode items&#39; */ &#125;,
+            timers =    &#123; /* same as &#39;common mode items&#39; */ &#125;,
+        &#125;,
+ 
+        CFRunLoopMode  &#123;
+            sources0 = &#123;
+                CFRunLoopSource &#123;order = 0, &#123;
+                    callout = FBSSerialQueueRunLoopSourceHandler&#125;&#125;
+            &#125;,
+            sources1 = (null),
+            observers = &#123;
+                CFRunLoopObserver &gt;&#123;activities = 0xa0, order = 2000000,
+                    callout = _ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv&#125;
+            )&#125;,
+            timers = (null),
+        &#125;,
+ 
+        CFRunLoopMode  &#123;
+            sources0 = &#123;
+                CFRunLoopSource &#123;order = -1, &#123;
+                    callout = PurpleEventSignalCallback&#125;&#125;
+            &#125;,
+            sources1 = &#123;
+                CFRunLoopSource &#123;order = -1, &#123;
+                    callout = PurpleEventCallback&#125;&#125;
+            &#125;,
+            observers = (null),
+            timers = (null),
+        &#125;,
+        
+        CFRunLoopMode  &#123;
+            sources0 = (null),
+            sources1 = (null),
+            observers = (null),
+            timers = (null),
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<h4 id="AutoreleasePool"><a href="#AutoreleasePool" class="headerlink" title="AutoreleasePool"></a>AutoreleasePool</h4><p>App启动后，Apple在主线程RunLoop里注册了两个Observer，其回调都是_wrapRunLoopWithAutoreleasePoolHandler()。第一个Observer监视Entry(即将进入Loop)，其回调内会调用_objc_autoreleasePoolPush()创建自动释放池。<strong>其优先级最高，保证创建行为发生在其他所有回调之前</strong>。第二个Observer监视了两个事件：BeforeWaiting(即将进入休眠)时调用_objc_autoreleasePoolPop()和_objc_autoreleasePoolPush()从而释放旧池创建新池；Exit(即将退出Loop) 时调用_objc_autoreleasePoolPop()来释放旧池。<strong>其优先级最低，保证释放行为生在其他所有回调之后</strong>。RunLoop处理事件过程中的代码被自动释放池的创建和释放环绕着，所以不会出现内存泄漏。</p>
+<h4 id="事件响应"><a href="#事件响应" class="headerlink" title="事件响应"></a>事件响应</h4><p>App启动后，Apple在主线程RunLoop里注册了一个Source1(基于mach port的)用来接收系统事件，其回调函数为__IOHIDEventSystemClientQueueCallback()。当一个硬件事件(触摸/锁屏/摇晃等)发生后，首先IOKit.framework生成一个IOHIDEvent事件，发送给SpringBoard(接收按键(锁屏/静音等)，触摸，加速，接近传感器等几种Event)，SpringBoard再用mach port转发给对应的App。随后该Source1会被触发并回调_UIApplicationHandleEventQueue()，把IOHIDEvent处理封装成UIEvent分发给UIWindow等。</p>
+<h4 id="手势识别"><a href="#手势识别" class="headerlink" title="手势识别"></a>手势识别</h4><p>当_UIApplicationHandleEventQueue()识别了一个手势时，其首先会调用Cancel打断当前touchesBegin/Move/End，随后将对应UIGestureRecognizer标记为待处理。App启动后，Apple在主线程RunLoop注册了一个Observer监测BeforeWaiting(即将进入休眠)，其回调内会调用_UIGestureRecognizerUpdateObserver()获取所有待处理的 GestureRecognizer并执行回调。</p>
+<h4 id="界面更新"><a href="#界面更新" class="headerlink" title="界面更新"></a>界面更新</h4><p>当在操作UI(改变Frame、更新UIView/CALayer层次)或者手动调用UIView/CALayer的setNeedsLayout/setNeedsDisplay后，这个<strong>UIView/CALayer被标记为待处理，并被提交到一个全局容器</strong>。App启动后，Apple在主线程RunLoop里注册了一个Observer监听BeforeWaiting(即将进入休眠)和Exit(即将退出Loop)，其回调内会调用_ZN2CA11Transaction17observer_callbackEP19__CFRunLoopObservermPv()去遍历所有待处理的UIView/CAlayer并执行绘制和调整，最后更新UI界面。</p>
+<h4 id="定时器"><a href="#定时器" class="headerlink" title="定时器"></a>定时器</h4><p>NSTimer即(toll-free bridged)CFRunLoopTimerRef。一个NSTimer注册到RunLoop时会在未来重复时间点提前注册好事件，<strong>不过为了节省资源，并不会非常准确触发。Timer有个属性Tolerance(宽容度)表示时间点容许的最大误差</strong>。如果某个时间点被错过了，比如在执行一个长任务，那么对应的回调也会跳过去，不会延后执行。CADisplayLink是一个和屏幕刷新率一致的定时器(和NSTimer不一样，其用Source实现，且原理更复杂）。如果两次屏幕刷新之间在执行一个长任务，那么其中一帧就被跳过(和NSTimer相似)，造成界面卡顿的感觉。在快速滑动TableView时，即使一帧的卡顿也会有所察觉。Facebook开源的AsyncDisplayLink(内部也用到RunLoop)就是为了解决界面卡顿的问题。</p>
+<h4 id="PerformSelecter"><a href="#PerformSelecter" class="headerlink" title="PerformSelecter"></a>PerformSelecter</h4><p>调用performSelector系列方法时，实际都会创建一个Timer并添加到对应线程RunLoop中，如果对应线程没有RunLoop则该方法会失效。</p>
+<h4 id="关于GCD"><a href="#关于GCD" class="headerlink" title="关于GCD"></a>关于GCD</h4><p>实际上RunLoop底层也会用到GCD，比如RunLoop是用dispatch_source_t实现的Timer。同时GCD的某些接口也用到RunLoop，例如dispatch_async()。当调用dispatch_async(dispatch_get_main_queue(), block)时，libDispatch会向主线程RunLoop发送消息，主线程RunLoop被唤醒并从消息中取得block，在回调__CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__()里执行这个block。但仅限于dispatch到主线程，dispatch到其他线程仍然是由libDispatch处理的。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.apple.com/library/prerelease/ios/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html#//apple_ref/doc/uid/10000057i-CH16-SW1">Run Loops</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.ibireme.com/2015/05/18/runloop/">深入理解RunLoop</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Thread RunLoop</div>
+      <div>https://hllovesgithub.github.io/2015/10/01/2015-10-01-Thread-Runloop/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年10月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/10/04/2015-10-04-Thread-%E5%90%8C%E6%AD%A5/" title="Thread 同步">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Thread 同步</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/09/26/2015-09-26-Thread-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" title="Thread 基本概念">
+                        <span class="hidden-mobile">Thread 基本概念</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

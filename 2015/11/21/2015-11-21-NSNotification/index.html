@@ -1,0 +1,764 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="NSNotificationCenter是Cocoa上实现观察者模式的中间桥梁，NSNotification抽象了观察者和被观察者之间的通信。因为观察者和被观察者没有类型限制的广播性，所以一般作为程序中用来解耦模块之间纵深通信的方法(MVC中主要用作M向C通信)。NSNotificationCenter是线程安全的，意味着可以在多线程中不用担心同步问题而轻松访问和使用，例如注册观察者，移除观察者，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NSNotification">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/11/21/2015-11-21-NSNotification/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="NSNotificationCenter是Cocoa上实现观察者模式的中间桥梁，NSNotification抽象了观察者和被观察者之间的通信。因为观察者和被观察者没有类型限制的广播性，所以一般作为程序中用来解耦模块之间纵深通信的方法(MVC中主要用作M向C通信)。NSNotificationCenter是线程安全的，意味着可以在多线程中不用担心同步问题而轻松访问和使用，例如注册观察者，移除观察者，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2015-11-21T07:43:56.000Z">
+<meta property="article:modified_time" content="2015-11-21T10:41:16.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>NSNotification - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="NSNotification"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-11-21 15:43" pubdate>
+          2015年11月21日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          52 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">NSNotification</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>NSNotificationCenter是Cocoa上实现观察者模式的中间桥梁，NSNotification抽象了观察者和被观察者之间的通信。因为观察者和被观察者没有类型限制的广播性，所以一般作为程序中用来解耦模块之间纵深通信的方法(MVC中主要用作M向C通信)。NSNotificationCenter是线程安全的，意味着可以在多线程中不用担心同步问题而轻松访问和使用，例如注册观察者，移除观察者，发送与执行等。</p>
+<h3 id="添加观察者"><a href="#添加观察者" class="headerlink" title="添加观察者"></a>添加观察者</h3><pre><code>// A
+- (void)addObserver:(id)notificationObserver
+           selector:(SEL)notificationSelector
+               name:(NSString *)notificationName
+             object:(id)notificationSender
+// B
+- (id&lt;NSObject&gt;)addObserverForName:(NSString *)name
+                            object:(id)obj
+                             queue:(NSOperationQueue *)queue
+                        usingBlock:(void (^)(NSNotification *note))block
+                        
+</code></pre>
+<p>A是传统的方法，B是支持block之后的方法。需要注意的是，NSNotificationCenter<strong>不会retain</strong>方法A的观察者notificationObserver(目前看来也不是weak，我个人认为是为了更本质地暴露问题，而是unsafe_unretained类型的引用)，<strong>但会retain</strong>方法B的返回值id<NSObject>，都将作为记录观察者和被观察者之间映射关系。而且每次添加都会重新注册一次，即使同一对象监听同一消息，而不是去覆盖原来的监听。</p>
+<p>在涉及到block的方法B中，需要注意到不要产生循环引用的内存问题。因为block参数为返回的观察对象(__NSObserver类型)拥有，如果观察对象是成员变量而block中又引用了类本身，就构成了循环引用。</p>
+<h3 id="移除观察者"><a href="#移除观察者" class="headerlink" title="移除观察者"></a>移除观察者</h3><pre><code>// A
+- (void)removeObserver:(id)notificationObserver
+                  name:(NSString *)notificationName
+                object:(id)notificationSender
+// B
+- (void)removeObserver:(id)
+</code></pre>
+<p>方法A移除了观察者、被观察者和通知名都匹配的映射关系，方法B移除了匹配观察者的所有映射关系。良好的编码习惯，就像allloc和dealloc，open和close，需要添加和移除配对出现。否则，当观察者已经无效而被观察者继续发送通知时，通知中心中还记录者映射关系(此时为野指针)，调用方法A的观察者的处理方法就会crash；方法B虽然不会crash，但是block内部引用的对象永远不会释放。</p>
+<p>方法A适合于在阶段性周期性的方法中调用，以避免不知情的情况下移除了可视范围外其他与对象关联的映射关系，即具体地移除自己控制的映射关系。方法B适合于在终极性一次性的方法中调用，这样可以确保清除与对象关联的映射关系；</p>
+<h3 id="通知与执行"><a href="#通知与执行" class="headerlink" title="通知与执行"></a>通知与执行</h3><pre><code>- (void)postNotification:(NSNotification *)notification
+- (void)postNotificationName:(NSString *)notificationName
+                      object:(id)notificationSender
+- (void)postNotificationName:(NSString *)notificationName
+                      object:(id)notificationSender
+                    userInfo:(NSDictionary *)userInfo
+</code></pre>
+<p>可以根据需要指定通知名(notificationName)、发送者(notificationSender)和额外信息(userInfo)，所有这些信息封装在一个NSNotification中，由postNotification:发送，其中参数notification不能为空，否则会引发异常。添加观察者的方法A和B都会<strong>同步地</strong>通知观察者并等待其执行完毕，只不过A在通知发生当前的线程中，而B则是在注册时指定队列的线程中。</p>
+<p>但是，当有通知发送时，NSNotificationCenter是通过遍历所有的观察者映射关系，来找到每一个需要通知的观察者的。所以一旦注册到NSNotificationCenter的观察者过多，那么整个发送到响应通知的过程的效率就比较低，也不是什么需求都通过通知来解决，还是需要仔细思考适不适合。如果的确适合，也尽可能晚地注册，不再使用时也尽可能早地移除，这样使得内部的映射关系保持在最低量。</p>
+<h3 id="通知重定向"><a href="#通知重定向" class="headerlink" title="通知重定向"></a>通知重定向</h3><p>添加观察者的方法B已经很好地解决了这个问题，如果有需要尽量采用方法B，不过实现的原理还是值得研究一下的。下面的方法针对方法A(有可能方法B就是这么在NSNotificationCenter内部实现的)。Apple的<a target="_blank" rel="noopener" href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Notifications/Articles/Threading.html#//apple_ref/doc/uid/20001289-CEGJFDFG">官方文档</a>这么说的：</p>
+<blockquote>
+<p>For example, if an object running in a background thread is listening for notifications from the user interface, such as a window closing, you would like to receive the notifications in the background thread instead of the main thread. In these cases, you must capture the notifications as they are delivered on the default thread and redirect them to the appropriate thread.</p>
+</blockquote>
+<p>思路是自定义一个缓存需要重定向NSNotification的集合(比如数组)。当通知来了时，先检查发送这个通知的线程是不是期望的线程，如果不是，则将这个通知缓存到集合中，并告诉期望的线程有通知需要处理。期望的线程得知后，从集合中移除通知，并进行处理。</p>
+<pre><code>@interface AppDelegate () &lt;NSMachPortDelegate&gt;
+@property (nonatomic,readwrite,strong) NSMutableArray *notifications;
+@property (nonatomic,readwrite,strong) NSThread *notificationThread;
+@property (nonatomic,readwrite,strong) NSLock *notificationLock;
+@property (nonatomic,readwrite,strong) NSMachPort *notificationPort;
+@end
+
+@implementation AppDelegate
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification &#123;
+    NSLog(@&quot;current thread = %@&quot;, [NSThread currentThread]);
+    self.notifications = [[NSMutableArray alloc] init];
+    self.notificationLock = [[NSLock alloc] init];
+    
+    self.notificationThread = [NSThread currentThread];
+    self.notificationPort = [[NSMachPort alloc] init];
+    self.notificationPort.delegate = self;
+    
+    [[NSRunLoop currentRunLoop] addPort:self.notificationPort forMode:(__bridge NSString *)kCFRunLoopCommonModes];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(processNotification:) name:@&quot;TestNotification&quot; object:nil];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^&#123;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@&quot;TestNotification&quot; object:nil userInfo:nil];
+    &#125;);
+&#125;
+- (void)handleMachMessage:(void *)msg &#123;
+    [self.notificationLock lock];
+    while ([self.notifications count]) &#123;
+        NSNotification *notification = [self.notifications objectAtIndex:0];
+        [self.notifications removeObjectAtIndex:0];
+        [self.notificationLock unlock];
+        [self processNotification:notification];
+        [self.notificationLock lock];
+    &#125;;
+    [self.notificationLock unlock];
+&#125;
+- (void)processNotification:(NSNotification *)notification &#123;
+    if ([NSThread currentThread] != _notificationThread) &#123;
+        [self.notificationLock lock];
+        [self.notifications addObject:notification];
+        [self.notificationLock unlock];
+        [self.notificationPort sendBeforeDate:[NSDate date] components:nil from:nil reserved:0];
+    &#125; else &#123;
+        NSLog(@&quot;current thread = %@&quot;, [NSThread currentThread]);
+        NSLog(@&quot;process notification&quot;);
+    &#125;
+&#125;
+@end
+</code></pre>
+<h3 id="多线程安全"><a href="#多线程安全" class="headerlink" title="多线程安全"></a>多线程安全</h3><p>NSNotificationCenter之所以在同一个线程中同步发送和执行通知，应该是Apple出于线程安全的原因，但是并不代表没有线程安全的问题。因为通知的发送和执行没有限制必须在某一个线程(例如主线程)，所以在线程A执行通知的期间，会有线程B释放观察者的可能性。如果观察者的执行方法里访问了观察者自己，那么这种情况下就会因访问野指针而crash：</p>
+<pre><code>@interface Poster : NSObject
+@end
+@implementation Poster
+- (instancetype)init &#123;
+    self = [super init];
+    if (self)&#123;
+        [self performSelectorInBackground:@selector(postNotification) withObject:nil];
+    &#125;
+    return self;
+&#125;
+- (void)postNotification &#123;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@&quot;Test&quot; object:nil];
+&#125;
+@end
+
+@interface Observer : NSObject &#123;
+    Poster  *_poster;
+&#125;
+@property (nonatomic, assign) NSInteger i;
+@end
+@implementation Observer
+- (instancetype)init &#123;
+    self = [super init];
+    if (self) &#123;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@&quot;Test&quot; object:nil];
+        _poster = [[Poster alloc] init];
+    &#125;
+    return self;
+&#125;
+- (void)handleNotification:(NSNotification *)notification &#123;
+    NSLog(@&quot;handle notification begin&quot;);
+    sleep(1);
+    self.i = 10;
+    NSLog(@&quot;handle notification end&quot;);
+&#125;
+- (void)dealloc &#123;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSLog(@&quot;Observer dealloc&quot;);
+&#125;
+@end
+
+@implementation AppDelegate
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification &#123;
+    __autoreleasing Observer *observer = [[Observer alloc] init];
+&#125;
+@end
+</code></pre>
+<p>总之一句话，如何才能保证方法所有涉及到的对象，在方法执行期间有效？不过这类问题已经很典型了，在方法开始时确保所有对象的有效性后再执行，ARC下使用strong，MRC下使用retain+autorelease。今天写这篇文章的时候(XCode7.1.1)，我检测了引用文章的例子，惊奇的是已经<strong>没有问题</strong>了。我认为Apple解决了这个问题，应该是在执行通知方法前，内部strong或者retain+autorelease观察者。这能做到通知方法<strong>执行期间</strong>至少不会产生观察者都无效，如果执行前观察者都已经无效就会直接crash。引用文的例子是方法A，我认为方法B本身就不会有问题，因为它是个block对象，内部strong了观察者，而__NSObserver必须通过NSNotificationCenter的removeObserver方法才能移除。</p>
+<hr>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://southpeak.github.io/blog/2015/03/20/cocoa-foundation-nsnotificationcenter/">Foundation: NSNotificationCenter</a></li>
+<li><a target="_blank" rel="noopener" href="http://southpeak.github.io/blog/2015/03/14/nsnotificationyu-duo-xian-cheng/">Notification与多线程</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>NSNotification</div>
+      <div>https://hllovesgithub.github.io/2015/11/21/2015-11-21-NSNotification/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年11月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/12/06/2015-11-29-Test/" title="Test">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Test</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/11/15/2015-11-15-Autorelease/" title="Autorelease">
+                        <span class="hidden-mobile">Autorelease</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

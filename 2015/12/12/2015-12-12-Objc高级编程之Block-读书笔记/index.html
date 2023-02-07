@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Block存储域Block也是Objc对象，其类型有以下几种：  _NSConcreteStatckBlock _NSConcreteGlobalBlock _NSConcreteMallocBlock  目前ARC已经不再创建_NSConcreteStatckBlock类型的Block对象，进一步确保了block在使用时候的有效性，不过本书的内容我还是如实记录。_NSConcreteStatck">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Objc高级编程之Block-读书笔记">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/12/12/2015-12-12-Objc%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B9%8BBlock-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="Block存储域Block也是Objc对象，其类型有以下几种：  _NSConcreteStatckBlock _NSConcreteGlobalBlock _NSConcreteMallocBlock  目前ARC已经不再创建_NSConcreteStatckBlock类型的Block对象，进一步确保了block在使用时候的有效性，不过本书的内容我还是如实记录。_NSConcreteStatck">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyexv5omj20zi0t6tdm.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyf5zapgj21eq0pwwl4.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyffcaq6j21do15c7db.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxyh6kwg9j21xm0l8n2b.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyfmyecjj212y0smtdw.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyfy0c8rj21qq1ceand.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxygbkd1rj21tw1d87kg.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxygqh06uj21qa1bwqfc.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxyhiguv6j21xi0f8n0z.jpg">
+<meta property="article:published_time" content="2015-12-12T06:01:03.000Z">
+<meta property="article:modified_time" content="2015-12-13T05:20:44.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyexv5omj20zi0t6tdm.jpg">
+  
+  
+  
+  <title>Objc高级编程之Block-读书笔记 - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Objc高级编程之Block-读书笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-12-12 14:01" pubdate>
+          2015年12月12日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          45 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Objc高级编程之Block-读书笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="Block存储域"><a href="#Block存储域" class="headerlink" title="Block存储域"></a>Block存储域</h3><p>Block也是Objc对象，其类型有以下几种：</p>
+<ul>
+<li>_NSConcreteStatckBlock</li>
+<li>_NSConcreteGlobalBlock</li>
+<li>_NSConcreteMallocBlock</li>
+</ul>
+<p>目前ARC已经不再创建_NSConcreteStatckBlock类型的Block对象，进一步确保了block在使用时候的有效性，不过本书的内容我还是如实记录。_NSConcreteStatckBlock类的对象存储在栈(Stack)上，_NSConcreteGlobalBlock类的对象存储在数据区(.data)上，_NSConcreteMallocBlock类的对象存储在堆(Heap)上。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyexv5omj20zi0t6tdm.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>因为_NSConcreteGlobalBlock类型的block内部不依赖执行时的状态，所以能够用结构体存储在与全局变量相同的数据区域中。在整个程序周期内都可以安全地使用。但是在栈上_NSConcreteStatckBlock类的block，如果其所在作用域结束后就会被销毁，__block变量也一样。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyf5zapgj21eq0pwwl4.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>Apple提供了将block和__block变量从栈<strong>复制</strong>到堆的方法解决了这个问题，这样即使block的作用域结束，我们还是可以继续安全地访问堆上的block。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyffcaq6j21do15c7db.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>通过block结构体成员变量__forwarding的帮助，__block变量无论在栈上还是在堆上都能够被正确地访问(后面详细说明)。</p>
+<pre><code>typedef int (^blk_t)(int);
+blk_t func(int rate) &#123;
+    return ^(int count) &#123;return rate * count;&#125;;
+&#125;
+//等价于
+typedef int (^blk_t)(int);
+blk_t func(int rate) &#123;
+    blk_t tmp = &amp;__func_block_impl_0(__func_block_func_0, &amp;__func_block_desc_0_DATA, rate);
+    tmp = objc_retainBlock(tmp);
+    return objc_autoreleaseReturnValue(tmp);
+&#125;
+//而objc_retainBlock实际上就是_Block_copy
+</code></pre>
+<p>大多数情况下编译器会适当地判断block的内存管理，不过少数情况还是需要开发者手动管理。比如向方法的参数传递block时，编译器就不能判断是否对block进行copy。这主要以来方法内部的实现是否自己对作为参数的block进行copy，对于copy过的方法，使用时就不用再对block手动copy。相反，就需要考虑手动复制(当然，目前已经没有_NSConcreteStatckBlock类的block存在也不存在这样的问题了)。</p>
+<pre><code>- (id)getBlockArray &#123;
+    int val = 10;
+    return @[[^&#123;NSLog(@&quot;blk0:%d&quot;, val);&#125; copy], [^&#123;NSLog(@&quot;blk1:%d&quot;, val);&#125; copy]];
+&#125;
+</code></pre>
+<p>不管block之前存储在哪，用copy复制都不会引起任何问题，如果不确定时最好copy。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxyh6kwg9j21xm0l8n2b.jpg" srcset="/img/loading.gif" lazyload></p>
+<h3 id="block变量存储域"><a href="#block变量存储域" class="headerlink" title="__block变量存储域"></a>__block变量存储域</h3><p>当block从栈copy到堆时，其使用的所有__block变量也全部从栈复制到堆。如果block已经在堆上，对block再次copy也不会对__block变量有任何影响。</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1eyxyfmyecjj212y0smtdw.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>多个block使用同一个__block变量时，任何一个block先从栈copy到堆后，__block变量也被copy到堆上并被持有，当其他block再copy到堆上时，仅仅增加__block变量的引用计数。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxyfy0c8rj21qq1ceand.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>block从堆中被销毁时，其使用的__block变量也会被销毁。block的内存管理和objc对象的内存管理完全相同。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxygbkd1rj21tw1d87kg.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>不管__block变量存储在栈上还是堆上，都能够正确地访问对应的变量。所有栈中的__block变量，将其架构体内部的forwarding值从自己替换为堆上的__block变量，这样无论栈上__block还是堆上__block都是forwarding指向同一个堆上结构体。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxygqh06uj21qa1bwqfc.jpg" srcset="/img/loading.gif" lazyload></p>
+<h3 id="截获对象"><a href="#截获对象" class="headerlink" title="截获对象"></a>截获对象</h3><pre><code>blk_t blk;
+&#123;
+   id array = [[]NSMutableArray alloc] init];
+   blk = [^(id obj) &#123;
+       [array addObject:obj];
+       NSLog(@&quot;array count = %ld&quot;, [array count]);
+   &#125; copy];
+&#125;
+blk([[NSObject alloc] init]);
+blk([[NSObject alloc] init]);
+blk([[NSObject alloc] init]);
+</code></pre>
+<p>作用域结束后block调用正常，意味着变量array其超出作用域而存在并没有被销毁。</p>
+<pre><code>//编译器模拟代码
+struct __block_impl &#123;
+    void *isa;
+    int Flags;
+    int Reserved;
+    void *FuncPtr;
+&#125;;
+
+static void __main_block_copy_0(struct __main_block_impl_0 *dst, struct __main_block_impl_0 *src) &#123;
+    _Block_object_assign(&amp;dst-&gt;array, src-&gt;array, BLOCK_FIELD_IS_OBJECT);
+&#125;
+
+static void __main_block_dispose_0(struct __main_block_impl_0 *src) &#123;
+    _Block_object_dispose(src-&gt;array, BLOCK_FIELD_IS_OBJECT);
+&#125;
+
+static struct __main_block_desc_0 &#123;
+    unsigned long reserved;
+    unsigned long Block_size;
+    void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);
+    void (*dispose)(struct __main_block_impl_0*);
+&#125;__main_block_desc_0_DATA = &#123;
+    0,
+    sizeof(struct __main_block_impl_0),
+    __main_block_copy_0,
+    __main_block_dispose_0
+&#125;;
+
+struct __main_block_impl_0 &#123;
+    struct __block_impl impl;
+    struct __main_block_desc_0* Desc;
+    id __strong array;
+    __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, id __strong _array, int flags=0) : array(_array) &#123;
+        impl.isa = &amp;_NSConcreteStackBlock;
+        impl.Flags = flags;
+        impl.FuncPtr = fp;
+        Desc = desc;
+    &#125;
+&#125;;
+
+static void __main_block_func_0(struct __main_block_impl_0 *__cself, id obj) &#123;
+    id __strong array = __cself-&gt;array;
+    [array addObject:obj];
+    NSLog(@&quot;array count = %ld&quot;, [array count]);
+&#125;
+
+blk_t blk;
+&#123;
+    id __strong array = [[NSMutableArray alloc] init];
+    blk = &amp;__main_block_impl_0(__main_block_func_0, &amp;__main_block_desc_0_DATA, array, 0x22000000);
+    blk = [blk copy];
+&#125;
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+(*blk-&gt;impl.FuncPtr)(blk, [[NSObject alloc] init]);
+</code></pre>
+<p>作用域的局部自动变量array赋值给了block结构体中的成员变量，按照之前的描述，C语言结构体不能含有strong修饰符变量，因为编译器不知道应该何时对C语言结构体进行初始化和销毁从而管理内存，但是objc的runtime能够准确把握block从栈copy到堆以及从堆中销毁的时机，因此能够自动管理block结构体的初始化和销毁时机。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxyhiguv6j21xi0f8n0z.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>具体表现如下：</p>
+<ul>
+<li>调用block的copy方法时</li>
+<li>block作为方法的返回值返回时</li>
+<li>将block赋值给类的__strong修饰符id类型成员变量</li>
+<li>方法名中含有usingBlock的Cocoa框架方法和GCD方法中传递block作为参数时</li>
+</ul>
+<p>实现该功能需要在block描述结构体(XX_block_desc_X)中添加copy和dispose方法。在main_block_copy_0方法里，**_Block_object_assign<strong>相当于retain，持有对象并赋值给block实现结构体(XX_block_impl_X)中的成员变量。在main_block_dispose_0方法里，</strong>_Block_object_dispose**相当于release，释放赋值在block实现结构体中的成员变量。其中，参数BLOCK_FIELD_IS_OBJECT和BLOCK_FIELD_IS_BYREF用语区分对象类型和__block类型。</p>
+<h3 id="block变量和对象"><a href="#block变量和对象" class="headerlink" title="__block变量和对象"></a>__block变量和对象</h3><pre><code>__block id obj = [[NSObject alloc] init];
+
+//编译器模拟代码
+struct __Block_byref_obj_0 &#123;
+    void *__isa;
+    __Block_byref_obj_0 *__forwarding;
+    int __flags;
+    int __size;
+    void (*__Block_byref_id_object_copy)(void*, void*);
+    void (*__Block_byref_id_object_dispose)(void*);
+    __strong id obj;
+&#125;;
+
+static void __Block_byref_id_object_copy_131(void *dst, void *src) &#123;
+    _Block_object_assign((char*)dst + 40, *(void * *) ((char*)src + 40), 131);
+&#125;
+
+static void __Block_byref_id_object_dispose_131(void *src) &#123;
+    _Block_object_dispose(*(void * *) ((char*)src + 40), 131);
+&#125;
+
+__Block_byref_obj_0 obj = &#123;
+    0,
+    &amp;obj,
+    0x2000000,
+    sizeof(__Block_byref_obj_0),
+    __Block_byref_id_object_copy_131,
+    __Block_byref_id_object_dispose_131,
+    [[NSObject alloc] init]
+&#125;;
+</code></pre>
+<p>由此看出，__block变量虽然是个结构体，但实际上也是一个objc对象，并有持有和释放方法，其中使用_Block_object_assign持有__block对象，使用_Block_object_dispose释放__block对象。__block对象可以为__strong、__weak和__unsafe_unretained，不过使用__unsafe_unretained时注意出现野指针访问无效对象的情况，而__autoreleasing与__block编译时不通过。</p>
+<h3 id="copy-release"><a href="#copy-release" class="headerlink" title="copy/release"></a>copy/release</h3><p>由于block时C语言的扩展，所以在C语言中也可以使用block语法。此时，使用Block_copy和Block_release代替objc的copy和release方法即可。另外，ARC无效时，__block修饰符被用来避免block中的循环引用。因为block从栈copy到堆时，__block成员变量如果是对象类型，则block不会retain它，反之则retain它。这样来避免block的循环引用。由于ARC和MRC时，__block修饰符的用途有很大区别，因为在开发时，必须要知道编译环境是ARC还是MRC，这一点需要特别注意。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Objc高级编程之Block-读书笔记</div>
+      <div>https://hllovesgithub.github.io/2015/12/12/2015-12-12-Objc高级编程之Block-读书笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年12月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/12/19/2015-12-19-LLDB%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/" title="LLDB基本使用">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LLDB基本使用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/12/06/2015-12-06-Objc%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B9%8BARC-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" title="Objc高级编程之ARC-读书笔记">
+                        <span class="hidden-mobile">Objc高级编程之ARC-读书笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

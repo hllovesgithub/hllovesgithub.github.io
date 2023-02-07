@@ -1,0 +1,1026 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="内存管理原则MRC和ARC都使用引用计数方式来对内存进行管理，简单地说就是下面几条原则：  自己生成的对象，自己所持有。 非自己生成的对象，自己也能持有。 自己不再需要持有对象时需要释放。 非自己持有的对象无法释放。  以上对对象的操作与Objc方法的映射关系为：  生成并持有对象 ＝ alloc&#x2F;new&#x2F;copy&#x2F;mutableCopy等 持有对象 ＝ retain 释放对象 ＝ release">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Objc高级编程之ARC-读书笔记">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/12/06/2015-12-06-Objc%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B9%8BARC-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="内存管理原则MRC和ARC都使用引用计数方式来对内存进行管理，简单地说就是下面几条原则：  自己生成的对象，自己所持有。 非自己生成的对象，自己也能持有。 自己不再需要持有对象时需要释放。 非自己持有的对象无法释放。  以上对对象的操作与Objc方法的映射关系为：  生成并持有对象 ＝ alloc&#x2F;new&#x2F;copy&#x2F;mutableCopy等 持有对象 ＝ retain 释放对象 ＝ release">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxjmtzfhj21x41b4duo.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxk6u6tlj218q0mwn0q.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxkkgy1rj215e0oswih.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxktjifvj21140twaeo.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxl5ffx8j21fw0oodm4.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxm9s493j21aq0pwq7y.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxmjmwutj21v418atl5.jpg">
+<meta property="article:published_time" content="2015-12-06T01:55:18.000Z">
+<meta property="article:modified_time" content="2015-12-13T05:10:06.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxjmtzfhj21x41b4duo.jpg">
+  
+  
+  
+  <title>Objc高级编程之ARC-读书笔记 - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Objc高级编程之ARC-读书笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-12-06 09:55" pubdate>
+          2015年12月6日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          11k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          95 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Objc高级编程之ARC-读书笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="内存管理原则"><a href="#内存管理原则" class="headerlink" title="内存管理原则"></a>内存管理原则</h3><p>MRC和ARC都使用引用计数方式来对内存进行管理，简单地说就是下面几条原则：</p>
+<ul>
+<li>自己生成的对象，自己所持有。</li>
+<li>非自己生成的对象，自己也能持有。</li>
+<li>自己不再需要持有对象时需要释放。</li>
+<li>非自己持有的对象无法释放。</li>
+</ul>
+<p>以上对对象的操作与Objc方法的映射关系为：</p>
+<ul>
+<li>生成并持有对象 ＝ alloc/new/copy/mutableCopy等</li>
+<li>持有对象 ＝ retain</li>
+<li>释放对象 ＝ release</li>
+<li>销毁对象 ＝ dealloc</li>
+</ul>
+<p>实际上以上这些方法并不是语言本身，而是Cocoa/CocoaTouch Framework的Foundation里面的NSObject的方法。Apple建议所有的Objc对象都继承自NSObject，这样可以依赖已有的稳定安全内存管理不用自己操心。</p>
+<p>GNUstep是一个盒Cocoa Framework兼容的实现，虽然不能期望它是完全和Apple一样实现的，但是它有相同的表现所以实现上也应该很相似。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxjmtzfhj21x41b4duo.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>理解了GNUstep的源代码可以帮助我们猜测Apple的Cocoa是如何实现的。以下是<strong>GNUstep</strong>的实现：</p>
+<pre><code>struct obj_layout &#123;
+    NSUInteger retained;
+&#125;;
++ (id)alloc &#123;
+    return [self allocWithZone:NSDefaultMallocZone()];
+&#125;
++ (id)allocWithZone:(NSZone *)z &#123;
+    return NSAllocateObject(self, 0, z);
+&#125;
+inline id NSAllocateObject(Class aClass, NSUInteger extraBytes, NSZone *zone) &#123;
+    int size = baseBytes + extraBytes
+    id new = NSZoneMalloc(zone, size);
+    memset(new, 0, size);
+    new = (id)&amp;((struct obj_layout *)new)[1];
+&#125;
+</code></pre>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxk6u6tlj218q0mwn0q.jpg" srcset="/img/loading.gif" lazyload></p>
+<pre><code>- (NSUInteger)retainCout &#123;
+    return NSExtraRefCount(self) + 1;
+&#125;
+inline NSUInteger NSExtraRefCount(id anObject) &#123;
+    return ((struct obj_layout *)anObject)[-1].retained;
+&#125;
+</code></pre>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxkkgy1rj215e0oswih.jpg" srcset="/img/loading.gif" lazyload></p>
+<pre><code>- (id)retain &#123;
+    NSIncrementExtraRefCount(self);
+    return self;
+&#125;
+inline void NSIncrementExtraRefCount(id anObject) &#123;
+    if (((struct obj_layout *)anObject)[-1].retained == UINT_MAX - 1) &#123;
+        NSString *format = @&quot;NSIncrementExtraRefCount() asked to increment too far&quot;;
+        [NSException raise:NSInternalInconsistencyException format:format];
+    &#125;
+    ((struct obj_layout *)anObject)[-1].retained++;
+&#125;
+
+- (void)release &#123;
+    if (NSDecrementExtraRefCountWasZero(eslf)) &#123;
+        []self dealloc];
+    &#125;
+&#125;
+inline BOOL NSDecrementExtraRefCountWasZero(id anObject) &#123;
+    if (((struct obj_layout *)anObject)[-1].retained == 0) &#123;
+        return YES;
+    &#125; else &#123;
+        ((struct obj_layout *)anObject)[-1].retained--;
+        return NO;
+    &#125;
+&#125;
+
+- (void)dealloc &#123;
+    NSDeallocateObject(self);
+&#125;
+inline void NSDeallocateObject(id anObject) &#123;
+    struct obj_layout *o = &amp;((struct obj_layout *)anObject)[-1];
+    free(o);
+&#125;
+</code></pre>
+<p>可以看出每个Objc对象，在其内存布局前都有一个NSUInteger类型变量，用来表示引用计数。alloc/new/copy/mutableCopy/retain都会增加计数，release会减少计数，当计数减至为0时调用dealloc从内存中销毁该对象。</p>
+<p>研究<strong>Apple</strong>的实现之前因为NSObject的源代码没有公开，通过使用Xcode的调试器(lldb)来研究其实现。在NSObject类的alloc里设置端点，可以发现栈中的调用顺序为：</p>
+<pre><code>+alloc
++allocWithZone:    
+class_createInstance
+calloc
+</code></pre>
+<p>大体上Apple和GNUstep的实现没有什么差别。同样的方法能够得到retainCount和retain还有release的调用顺序。</p>
+<pre><code>-retainCount
+__CFDoExternRefOperation
+CFBasicHashGetCountOfKey
+
+-retain
+__CFDoExternRefOperation
+CFBasicHashAddValue
+
+-release
+__CFDoExternRefOperation
+CFBaseHashRemoveValue
+</code></pre>
+<p>在Core Foundation Framework中找到__CFDoExternRefOperation：</p>
+<pre><code>int __CFDoExternRefOperation(uintptr_t op, id obj) &#123;
+    CFBasicHashRef table = get hashtable from obj;
+    int count;
+    switch (op) &#123;
+        case OPERATION_retainCount:
+            count = CFBasicHashGetCountOfKey(table, obj);
+            return count;
+
+        case OPERATION_retain:
+            CFBasicHashAddValue(table, obj);
+            return obj;
+
+        case OPERATION_release:
+            count = CFBasicHashRemoveValue(table, obj);
+            return 0 == count;
+    &#125;
+&#125;
+</code></pre>
+<p>由此可以猜测，retainCount和retain还有release的实现大致是这样：</p>
+<pre><code>- (NSUInteger)retainCount &#123;
+    return (NSUInteger)__CFDoExternRefOperation(OPERATION_retainCount, self);
+&#125;
+- (id)retain &#123;
+    return (id)__CFDoExternRefOperation(OPERATION_retain, self);
+&#125;
+- (void)release &#123;
+    return __CFDoExternRefOperation(OPERATION_release, self);
+&#125;
+</code></pre>
+<p>同时也可以猜测，Apple的实现大概是采用Hash散列表(引用计数表)完成的：</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1eyxxktjifvj21140twaeo.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>GNUstep将引用计数保存在对象内存块头部的变量中，Apple将引用计数保存在一张散列表中。GNUstep的实现看起来简单又高效，但Apple这样实现也必然有它的好处。GNUstep的好处是：少量代码就能实现；引用计数内存和对象内存能统一管理。Apple的好处是：为对象分配内存时无需考虑引用计数，不用担心对象内存块头部问题；散列表用对象内存地址作为Key，这样能追溯各个对象内存块位置，在调试时非常有用。即使出现错误导致对象内存块损坏，只要散列表没问题，就能找到正确的内存块位置。</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1eyxxl5ffx8j21fw0oodm4.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>另外利用Instrument检查内存泄漏时，散列表的记录也有助于帮助检测各对象持有者是否存在。</p>
+<hr>
+<h3 id="GNUstep实现的Autorelease"><a href="#GNUstep实现的Autorelease" class="headerlink" title="GNUstep实现的Autorelease"></a>GNUstep实现的Autorelease</h3><pre><code>- (id)autorelease &#123;
+    [NSAutoreleasePool addObject:self];
+&#125;
+</code></pre>
+<p>实际上，GNUstep应用了IMP缓存技术，缓存了不变的Class，SEL，IMP使得运行效率能满足频繁调用的autorelease</p>
+<pre><code>id autorelease_class = [NSAutoreleasePool class];
+SEL autorelease_sel = @selector(addObject:);
+IMP autorelease_imp = [autorelease_class methodForSelector: autorelease_sel];
+- (id)autorelease &#123;
+    (*autorelease_imp)(autorelease_class, autorelease_sel, self);
+&#125;
+</code></pre>
+<p>NSAutoreleasePool：</p>
+<pre><code>+ (void)addObject:(id)anObj &#123;
+    NSAutoreleasePool *pool = //获取当前的autoreleasePool;
+    if (pool != nil) &#123;
+        [pool addObject:anObj];
+    &#125; else &#123;
+        NSLog(@&quot;autorelease is called without active NSAutoreleasePool.&quot;);
+    &#125;
+&#125;
+- (void)drain &#123;
+    [self dealloc];
+&#125;
+- (void)dealloc &#123;
+    [self emptyPool];
+&#125;
+- (void)emptyPool &#123;
+    for (id obj in array) &#123;
+        [obj release];
+    &#125;
+&#125;
+</code></pre>
+<h3 id="Apple实现的Autorelease"><a href="#Apple实现的Autorelease" class="headerlink" title="Apple实现的Autorelease"></a>Apple实现的Autorelease</h3><pre><code>class AutoreleasePoolPage &#123;
+    static inline void *push() &#123;
+        //生成或持有NSAutoreleasePool对象
+    &#125;
+    static inline void pop(void *token) &#123;
+        //废弃NSAutoreleasePool对象
+        releaseAll();
+    &#125;
+    static inline id autorelease(id obj) &#123;
+        //相当于NSAutoreleasePool的类方法addObject
+        AutoreleasePoolPage *autoreleasePoolPage = //获取当前的autoreleasePool;
+        autoreleasePoolPage-&gt;add(obj);
+    &#125;
+    id *add(id obj) &#123;
+        //添加对象到内部数组
+    &#125;
+    void releaseAll() &#123;
+        //对内部数组里的每一个对象调用release方法
+    &#125;
+&#125;;
+void *objc_autoreleasePoolPush(void) &#123;
+    return AutoreleasePoolPage::push();
+&#125;
+void objc_autoreleasePoolPop(void *ctxt) &#123;
+    AutoreleasePoolPage::pop(ctxt);
+&#125;
+id objc_autorelease(id obj) &#123;
+    return AutoreleasePoolPage::autorelease(obj);
+&#125;
+</code></pre>
+<p>使用<strong>extern void _objc_autoreleasePoolPrint()<strong>私有方法可以查看AutoreleasePool的状态。如果对AutoreleasePool对象进行autorelease的话，会产生</strong>NSInvalidArgumentException</strong>的异常。</p>
+<hr>
+<h3 id="所有权"><a href="#所有权" class="headerlink" title="所有权"></a>所有权</h3><p>ARC有效时，objc的对象类型必须附加所有权修饰符，一共有4种：</p>
+<p><strong>__strong</strong>表示对修饰的对象的“强引用”，持有强引用的变量在<strong>超出其作用域时失效</strong>，其引用的对象会被释放。默认情况下，缺省所有权声明的对象类型变量，都隐式声明为__strong类型。通过遵循内存管理原则的__strong修饰符，不必再依赖retain或release，也能正确管理内存。</p>
+<p><strong>__weak</strong>的设计主要是解决循环引用的问题。__weak修饰符与__strong相反，仅仅引用但不持有。同时__weak的另一个优点是，其所引用的对象如果被销毁，该变量将被<strong>自动安全地设置为nil</strong>，再也不会出现指向已经释放的对象内存块的野指针了。</p>
+<p><strong>__unsafe_unretained</strong>正如其名unsafe所示，是<strong>不安全</strong>的所有权修饰符。其基本与__weak表现一致，除了在引用对象销毁时不被自动设置为nil。</p>
+<p><strong>__autoreleasing</strong>修饰符的变量被某对象赋值时，就代表该对象在MRC时调用了autorelease的方法，即对象被注册到了AutoreleasePool里。同时，使用@autoreleasepool{}块代替NSAutoreleasePool的方法调用。</p>
+<h3 id="隐式使用-autoreleasing"><a href="#隐式使用-autoreleasing" class="headerlink" title="隐式使用__autoreleasing"></a>隐式使用__autoreleasing</h3><p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxm9s493j21aq0pwq7y.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>获取并持有非自己生成的对象时，该对象已经被注册到了autoreleasepool。这是由于编译器会检查方法名是否以alloc/new/copy/mutableCopy开头，如果不是则自动将方法返回的对象注册到autoreleasepool(当然init方法不会)。这些方法里，return使得对象变量超出其作用域，__strong类型变量会释放其持有的对象，所以编译器会使用__autorelease修饰符将对象注册到autoreleasePool延迟释放。</p>
+<pre><code>+ (id)array &#123;
+    return [[NSArray alloc] init];
+&#125;
+等价于
++ (id)arrya &#123;
+    __autoreleasing obj = [[NSArray alloc] init];
+    return obj;
+&#125;
+</code></pre>
+<p>使用__weak类变量时，因为该变量只有引用并不持有，而在访问该变量的过程中有被销毁的可能性。如果把指向的对象注册到autoreleasePool中，那么在@autoreleasePool{}结束前都能保证期间对象存在。</p>
+<pre><code>id _weak obj = XXX;
+NSLog(@&quot;Class = %@&quot;, [obj class]);
+等价于
+id _weak obj = XXX;
+id __autoreleasing tmp = obj;
+NSLog(@&quot;Class = %@&quot;, [tmp class]);
+</code></pre>
+<p>默认情况下，缺省所有权声明对象的指针变量，都隐式声明为__autoreleasing。因为编译器将alloc/new/copy/mutableCopy开头的方法产生的新对象看作自己生成并持有，其他情况下产生的新对象都应该看作非自己生成并持有。虽然strong类型变量也能够传递，但还是应该统一遵循内存管理原则。同时，<strong>对象指针的赋值操作时所有权修饰符必须一致</strong>否则编译不通过。</p>
+<pre><code>- (BOOL)doSomething:(NSError *)error &#123;
+    //发生错误
+    *error = [[NSError alloc] init];
+    return NO;
+&#125;
+NSError *error = nil;
+BOOL result = [self doSomething:&amp;error];
+等价于
+- (BOOL)doSomething:(__autoreleasing NSError *)error &#123;
+    //发生错误
+    *error = [[NSError alloc] init];
+    return NO;
+&#125;
+__autoreleasing NSError *error = nil;
+BOOL result = [self doSomething:&amp;error];
+</code></pre>
+<p>另外，在显示地指定__autoreleasing修饰符时，必须注意修饰的对象要为<strong>自动变量</strong>(包括局部变量、方法参数)。</p>
+<h3 id="ARC使用规则"><a href="#ARC使用规则" class="headerlink" title="ARC使用规则"></a>ARC使用规则</h3><p>在ARC有效时必须要遵循以下规则：</p>
+<ul>
+<li>不能使用retain/release/retainCount/autorelease</li>
+<li>不能使用NSAllocateObject/NSDeallocateObject(分别实现了影响内存管理的alloc和dealloc)</li>
+<li>方法命名需遵循内存管理原则</li>
+<li>不再显示调用dealloc(遵循无法显示影响内存管理)</li>
+<li>使用@autoreleasepool{}代替NSAutoreleasePool</li>
+<li>不能使用NSZone</li>
+<li>objc对象类型变量不能作为C语言结构体(struct/union)的成员(没有方法管理C语言结构体成员的生命周期)</li>
+<li>id和void*之间转换需要显示指明所有权变化(C语言类型变量超出ARC对objc对象类型变量的管理范围，需手动指明所有权变化)</li>
+</ul>
+<p><strong>__bridge</strong>对象所有权不变，编译器继续自动管理；</p>
+<p><strong>__bridge_retained</strong>或<strong>CFBridgingRetain</strong>移交对象所有权从编译器到开发者，至此开发者需手动管理；</p>
+<p><strong>__bridge_transfer</strong>或<strong>CFBridgingRelease</strong>移交对象所有权从开发者到编译器，至此编译器能自动管理</p>
+<hr>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>Apple称ARC是“右边一起进行内存管理”的，但实际上只有编译器是无法完全胜任的，在此基础上还需要Runtime的支持。也就是说，ARC是由Clang(LLVM编译器)3.0＋和Objc Runtime493.9＋实现的。编译器选项“-S”运行clang，可以取得程序汇编输出。通过阅读汇编和objc4库源代码，可以模拟ARC是如何实现的。</p>
+<h5 id="strong修饰符"><a href="#strong修饰符" class="headerlink" title="__strong修饰符"></a>__strong修饰符</h5><pre><code>&#123;
+    id __strong obj = [[NSObject alloc] init];
+&#125;
+//编译器模拟代码
+&#123;
+    id obj = objc_msgSend(NSObject, @selector(alloc));
+    objc_msgSend(obj, @selector(init));
+    objc_release(obj);
+&#125;
+</code></pre>
+<p>由此可知，对于自己生成并持有的对象，编译器自动地在作用域结束前插入release。</p>
+<pre><code>+ (id)array
+&#123;
+    return [[NSMutableArray alloc] init];
+&#125;
+
+&#123;
+    id __strong obj = [NSMutableArray array];
+&#125;
+//模拟器代码
++ (id)array
+&#123;
+    id obj = objc_msgSend(NSMutableArray, @selector(alloc));
+    objc_msgSend(obj, @selector(init));
+    return objc_autoreleaseReturnValue(obj);
+&#125;
+
+&#123;
+    id obc = objc_msgSend(NSMutableArray, @selector(array));
+    objc_retainAutoreleasedReturnValue(obj);
+    objc_release(obj);
+&#125;
+</code></pre>
+<p>由此可知，对于非标准对象生成方法里，编译器自动地在作用域结束前插入<strong>objc_autoreleaseReturnValue</strong>方法(该方法将生成的对象autorelease－即注册到autorelresepool)。而对于非自己生成能持有的对象，和之前一样编译器自动地在作用域结束前插入release，同时在获取对象后，会插入<strong>objc_retainAutoreleasedReturnValue</strong>方法(该方法将持有返回得到的autoreleased对象)。</p>
+<p>不过，objc_autoreleaseReturnValue和objc_autorelase不同的是，前者是要用于最优化程序。objc_retainAutoreleasedReturnValue会检查调用方的执行命令列表(参见<a href="http://hllovesgithub.github.io/2015/11/15/2015-11-15[Autorelease]/">Autorelease</a>)，如果发现调用房在调用非标准对象生成方法(例如+array)后紧结着调用了objc_retainAutoreleasedReturnValue的话，那么就<strong>不</strong>将生成的对象autorelease－即注册到autorelresepool，而是直接返回。同理，且objc_retainAutoreleasedReturnValue和objc_retain不同的是，如果之前调用过objc_autoreleaseReturnValue，那么就<strong>不</strong>将返回的对象retain，而是直接使用。这两个方法共同协作，可以将生成的对象不注册到autoreleasepool中直接使用，省去了2次objc的msgSend方法，达到最优化。同时，也解决了非标准方法在ARC和MRC模块之间传递对象的问题。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1eyxxmjmwutj21v418atl5.jpg" srcset="/img/loading.gif" lazyload></p>
+<h5 id="weak修饰符"><a href="#weak修饰符" class="headerlink" title="__weak修饰符"></a>__weak修饰符</h5><pre><code>&#123;
+    id __weak obj = another;
+&#125;
+//编译器模拟代码
+&#123;
+    id obj = 0;
+    objc_initWeak(&amp;obj, another);
+    objc_destroyWeak(&amp;obj);
+&#125;
+//等价于
+&#123;
+    id obj = 0;
+    objc_storeWeak(&amp;obj, another);
+    objc_storeWeak(&amp;obj, 0);
+&#125;
+</code></pre>
+<p>objc_storeWeak方法将__weak修饰符变量的地址(即第1个参数)作为Value，将被引用的对象(即第2个参数)作为Key，注册到runtime维护的weak关系映射表(Hash散列表)中，当Key为0时，将Value从对应的weak关系映射表中删除。使用weak表，将销毁的对象进行检索，就能快速地获得weak引用它的所有变量的地址。对象的销毁过程：</p>
+<ul>
+<li>objc_release</li>
+<li>当引用计数为0时而执行dealloc</li>
+<li>_objc_rootDealloc</li>
+<li>object_dispose</li>
+<li>objc_destructInstance</li>
+<li>objc_clear_deallocating</li>
+</ul>
+<p>最后调用objc_clear_deallocating时，首先从weak表中获取销毁对象为Key的所有Value(即所有weak变量的地址)，然后通过指针将weak变量的值设为nil，再在weak表中删除销毁对象对应记录，最后把销毁对象也从计数表中删除对应记录。由此可知，如果有大量__weak修饰符变量，则会在引用的对象被销毁时大量被设置为nil消耗CPU，所以应该尽可能在需要的地方使用__weak。</p>
+<p>使用__weak修饰符变量即是使用autoreleased对象：</p>
+<pre><code>&#123;
+    id __weak obj = another;
+    NSLog(@&quot;%@&quot;, obj);
+&#125;
+//编译器模拟代码
+&#123;
+    id obj = 0;
+    objc_initWeak(&amp;obj, another);
+    id tmp = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp);
+    NSLog(@&quot;%@&quot;, tmp);
+    objc_destroyWeak(&amp;obj);
+&#125;
+</code></pre>
+<p><strong>objc_loadWeakRetained</strong>取出__weak修饰符变量引用的对象并持有，objc_autorelease将获取的对象注册到autoreleasepool中延迟释放。所以，__weak引用的对象在@autoreleasepool{}期间都是有效的可以放心使用。但是，如果大量地使用__weak变量，会产生大量的autoreleased对象，因为在使用__weak变量时最好暂时赋值给一个__strong变量再使用__strong。</p>
+<pre><code>&#123;
+    id __weak objc = another;
+    NSLog(@&quot;1 %@&quot;, obj);
+    NSLog(@&quot;2 %@&quot;, obj);
+    NSLog(@&quot;3 %@&quot;, obj);
+&#125;
+//等价于
+&#123;
+    id _weak objc = another;
+    id tmp1 = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp1);
+    NSLog(@&quot;1 %@&quot;, tmp1);
+    id tmp2 = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp2);
+    NSLog(@&quot;2 %@&quot;, tmp2);
+    id tmp3 = objc_loadWeakRetained(&amp;ojc);
+    objc_autorelease(tmp3);
+    NSLog(@&quot;3 %@&quot;, tmp3);
+&#125;
+
+//使用__strong
+&#123;
+    id __weak objc = another;
+    id __strong tmp = objc;
+    NSLog(@&quot;1 %@&quot;, tmp);
+    NSLog(@&quot;2 %@&quot;, tmp);
+    NSLog(@&quot;3 %@&quot;, tmp);
+&#125;
+//等价于
+&#123;
+    id _weak objc = another;
+    id tmp = objc_loadWeakRetained(&amp;ojc);
+    NSLog(@&quot;1 %@&quot;, tmp);
+    NSLog(@&quot;2 %@&quot;, tmp);
+    NSLog(@&quot;3 %@&quot;, tmp);
+    objc_release(tmp);
+&#125;
+</code></pre>
+<h5 id="autoreleasing修饰符"><a href="#autoreleasing修饰符" class="headerlink" title="__autoreleasing修饰符"></a>__autoreleasing修饰符</h5><pre><code>@autoreleasepool &#123;
+    id __autoreleasing obj = [[NSObject alloc] init];
+&#125;
+@autoreleasepool &#123;
+    id __autoreleasing obj = [NSMutableArray array];
+&#125;
+//等价于
+id pool = objc_autoreleasePoolPush();
+id obj = objc_msgSend(NSObject, @selector(alloc));
+objc_msgSend(obj, @selector(init));
+objc_autorelease(obj);
+objc_autoreleasePoolPop(pool);
+
+id pool = objc_autoreleasePoolPush();
+id obj = objc_msgSend(NSMutableArray, @selector(array));
+objc_retainAutoreleasedReturnValue(obj);
+objc_autorelease(obj);
+objc_autoreleasePoolPop(pool);
+</code></pre>
+<hr>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><p>ARC虽然不能使用retainCount查看引用计数，但能参考**extern uintptr_t _objc_rootRetainCount(id obj)**私有方法查看。不过也不能够完全信任该方法。对于已经销毁的对象已经地址不正确的对象，有时候也返回“1”。另外，在多线程环境中使用时，因为存在静态条件的问题，所以取得的数值不一定完全可信。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Objc高级编程之ARC-读书笔记</div>
+      <div>https://hllovesgithub.github.io/2015/12/06/2015-12-06-Objc高级编程之ARC-读书笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年12月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/12/12/2015-12-12-Objc%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B9%8BBlock-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" title="Objc高级编程之Block-读书笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Objc高级编程之Block-读书笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2015/12/06/2015-11-29-Test/" title="Test">
+                        <span class="hidden-mobile">Test</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

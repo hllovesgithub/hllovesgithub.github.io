@@ -1,0 +1,867 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Hu Liang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="这是一本iOS4的入门书籍，有一些概念过时，有一些概念没有，但不妨碍学习一些最基本的概念。从头学起，从最基础学起。 Chapter 1MVC XibA XIB file is an XML representation of the archived objects. When you build a project, the XIB file is compiled into a NIB fil">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS Programming Guide(2nd) 读书笔记">
+<meta property="og:url" content="https://hllovesgithub.github.io/2015/09/19/2015-09-19-iOS-Programming-Guide-2nd-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Stay Hungry, Stay Foolish.">
+<meta property="og:description" content="这是一本iOS4的入门书籍，有一些概念过时，有一些概念没有，但不妨碍学习一些最基本的概念。从头学起，从最基础学起。 Chapter 1MVC XibA XIB file is an XML representation of the archived objects. When you build a project, the XIB file is compiled into a NIB fil">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgybn3huqj21ge0s2n6b.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgybvtcynj21as0qigrf.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgycom7qtj21aq144auq.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewh10qiz5wj21c20r0dub.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgydfbkgpj21h00rgall.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgydpsmvfj216u0xon3b.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgye7rnedj20zs10cgw5.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyeeiejhj217s0hwaec.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyeutxd3j219o0l810f.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewh10zfrvnj21160o045d.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyfcq1ukj21ac09k77d.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewh116tjwtj218c0rqjx0.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyfytt8oj21ai0l2dnh.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewh11hoy2zj21b20t2gt7.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyh5uveuj21am0q2tgt.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyhnhdnpj21920wk490.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyi3bxnoj21by0q8dpo.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgyio1khcj21ca14wtkk.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyivfkt5j217g0g8wix.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyj492i4j219q0gsgrc.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgyjltkklj21cy0kigu5.jpg">
+<meta property="og:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyk5j5luj21ew14cgw0.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgykcc1iqj212y0getbu.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgykp63z7j215k0igtfl.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyl4gq9hj21cy0qawos.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgylc534dj217m0jmgpz.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgylrbeapj21gc0m8k00.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgymcadzxj21e210egxs.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgymvhfpuj21cc0n0k2f.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyncuc8bj21cs0pcajj.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/9460be12gw1ewh14b3y30j21ae1dgttj.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyo5m80pj21hy09yn39.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewlfp4kcjmj21g80hkn5f.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewlfn87ka7j21dk0nq457.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyonjc2jj219q0qe7bn.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyotd61yj21dy0omjvl.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgypa0hd7j21bc0oqqbn.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgypole3qj21bw0ri45v.jpg">
+<meta property="article:published_time" content="2015-09-19T03:39:30.000Z">
+<meta property="article:modified_time" content="2015-10-31T06:47:37.000Z">
+<meta property="article:author" content="Hu Liang">
+<meta property="article:tag" content="Tech">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgybn3huqj21ge0s2n6b.jpg">
+  
+  
+  
+  <title>iOS Programming Guide(2nd) 读书笔记 - Stay Hungry, Stay Foolish.</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"hllovesgithub.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="iOS Programming Guide(2nd) 读书笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2015-09-19 11:39" pubdate>
+          2015年9月19日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          38k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          318 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">iOS Programming Guide(2nd) 读书笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>这是一本iOS4的入门书籍，有一些概念过时，有一些概念没有，但不妨碍学习一些最基本的概念。从头学起，从最基础学起。</p>
+<h2 id="Chapter-1"><a href="#Chapter-1" class="headerlink" title="Chapter 1"></a>Chapter 1</h2><h4 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h4><p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgybn3huqj21ge0s2n6b.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Xib"><a href="#Xib" class="headerlink" title="Xib"></a>Xib</h4><p>A XIB file is an XML representation of the archived objects. When you build a project, the XIB file is compiled into a NIB file. Developers manipulate XIB files (they’re easier to work with), and applications use NIB files (they’re smaller and easier to parse). When you build an application, the compiled NIB file is copied into the application’s bundle. An iOS application is really <strong>a directory containing the executable and any resources the executable uses</strong>. We refer to this directory as the <strong>bundle</strong>. When your application reads in the NIB file, the objects in the archive are brought to life. A complex application can have many NIB files that are read in as they are needed.</p>
+<h4 id="Deploy-an-app"><a href="#Deploy-an-app" class="headerlink" title="Deploy an app"></a>Deploy an app</h4><p>To install an application on your development device, you need a developer certificate from Apple. Developer certificates are issued to registered iOS Developers who have paid the developer fee. <strong>This certificate grants you the ability to sign your code</strong>, which allows it to run on a device. Without a valid certificate, devices will not run your application.</p>
+<h4 id="Developer-Certificate"><a href="#Developer-Certificate" class="headerlink" title="Developer Certificate"></a>Developer Certificate</h4><p>This certificate file is added to your Mac’s keychain using Keychain Access. It is used to digitally sign your code.</p>
+<h4 id="App-ID"><a href="#App-ID" class="headerlink" title="App ID"></a>App ID</h4><p>The application identifier is <strong>a string that uniquely identifies your application on the App Store</strong>. Application identifiers typically look like this: com.bignerdranch.AwesomeApp, where the name of the application follows the name of your company. The App ID in your provisioning profile must match the bundle identifier of your application. A development profile, like you just created, will have a wildcard character (*) for its App ID<br>and therefore will match any bundle identifier.</p>
+<h4 id="Device-ID-UDID"><a href="#Device-ID-UDID" class="headerlink" title="Device ID (UDID)"></a>Device ID (UDID)</h4><p>This identifier is unique for each iOS device.</p>
+<h4 id="Provisioning-Profile"><a href="#Provisioning-Profile" class="headerlink" title="Provisioning Profile"></a>Provisioning Profile</h4><p>This is a file that lives on your development device and on your computer. <strong>It references a Developer Certificate, a single App ID, and a list of the device IDs for the devices that the application can be installed on</strong>. When an application is deployed to a device, Xcode uses a provisioning profile on your computer to access the appropriate certificate. This certificate is used to sign the application binary. Then, the development device’s UDID is matched to one of the UDIDs contained within the provisioning profile, and the App ID is matched to the bundle identifier. The signed binary is then sent to your development device where it is confirmed by the same provisioning profile on the device and finally launched.</p>
+<h2 id="Chapter-2"><a href="#Chapter-2" class="headerlink" title="Chapter 2"></a>Chapter 2</h2><h4 id="Exceptions"><a href="#Exceptions" class="headerlink" title="Exceptions"></a>Exceptions</h4><p>In a language like C, we have functions, and when we call a function, code is executed. If we try and call a function that doesn’t exist, the compiler says, “I can’t do that, Joe,” and the code will fail to compile. This is known as a <strong>compile-time error</strong>. Objective-C, being a dynamically typed language, isn’t able to figure out at compile time whether an object will respond to a message. (An object only responds to a message if its class implements the associated method.) The compiler will warn you if it thinks you are sending a message to an object that won’t respond, but the code will still compile. If, for some reason (and there are many), you end up sending a message to an object that doesn’t respond, your application will throw an exception, also known as a <strong>run-time error</strong>.</p>
+<h2 id="Chapter-3"><a href="#Chapter-3" class="headerlink" title="Chapter 3"></a>Chapter 3</h2><h4 id="Autorelease-pool-draining"><a href="#Autorelease-pool-draining" class="headerlink" title="Autorelease pool draining"></a>Autorelease pool draining</h4><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgybvtcynj21as0qigrf.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Chapter-4"><a href="#Chapter-4" class="headerlink" title="Chapter 4"></a>Chapter 4</h2><h4 id="Projects-targets-and-frameworks"><a href="#Projects-targets-and-frameworks" class="headerlink" title="Projects, targets, and frameworks"></a>Projects, targets, and frameworks</h4><p>A project is <strong>a file that contains a list of references to other files (source code, resources, frameworks, and libraries) as well as a number of settings that lay out the rules for items within the project</strong>. Projects end in .xcodeproj, as in Whereami.xcodeproj. A project always has at least one target. </p>
+<p>A target <strong>uses the files in the project to build a particular product</strong>. When you build and run, you build and run the target, not the project.</p>
+<p>The product the target builds is typically <strong>an application, although it can be a compiled library or a unit test bundle</strong>. When you create a new project and choose a template, Xcode automatically creates a target for you.</p>
+<p>A framework is <strong>a collection of related classes</strong> that you can add to a target. Cocoa Touch is a collection of frameworks. One of the benefits of Cocoa Touch being organized into frameworks is that you only have to add the frameworks that a target needs.</p>
+<h4 id="Delegation"><a href="#Delegation" class="headerlink" title="Delegation"></a>Delegation</h4><p>Delegation is <strong>an object-oriented approach to callbacks</strong>. A callback is a function that is supplied in advance of an event and is called every time the event occurs. Some objects need to make a callback for more than one event. In a target-action pair, you have a target object that you send an action message to when an event occurs. The target must implement the action message, and, for each event, a new target-action pair must be created. With delegation, on the other hand, you set the delegate once and can then send it messages for different events. The delegate will implement the method for each event it wants to hear about.</p>
+<h4 id="Build-Phases"><a href="#Build-Phases" class="headerlink" title="Build Phases"></a>Build Phases</h4><p>Building an application in Xcode takes several steps. We call these steps build phases.</p>
+<ul>
+<li><strong>Compile Sources</strong> This build phase contains the source code files that are compiled when this target is built. By default, any time you add a source code file to a project, it is added to this build phase.</li>
+<li><strong>Link Binary With Libraries</strong> After your source code has been compiled, it is linked with the frameworks (libraries). This allows your code to use classes from these frameworks.</li>
+<li><strong>Copy Bundle Resources</strong> After your code is compiled and linked, an executable is created and placed inside an application bundle, which is really just a folder. Then, the files listed in the Copy Bundle Resources phase are added to the bundle alongside the executable. These resources are the data files that your application uses at runtime, like MainWindow.xib and any images or sounds that are part of the application. By default, when you add a file to a project that is not source code, it is added to this build phase.</li>
+</ul>
+<h4 id="Preprocessing"><a href="#Preprocessing" class="headerlink" title="Preprocessing"></a>Preprocessing</h4><p>The goal of the preprocessing phase is to create an intermediate file for each implementation file (.m). The intermediate file is still Objective-C code like the implementation file, but the intermediate file can get very large. To create an intermediate file, the preprocessor resolves all the preprocessor directives in the implementation file. Preprocessor directives are statements prefixed with the pound symbol (#), like #import. The resolution of a #import statement replaces the import statement with the contents of the imported file.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgycom7qtj21aq144auq.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Compiling"><a href="#Compiling" class="headerlink" title="Compiling"></a>Compiling</h4><p>Once the preprocessor has finished, the generated intermediate files are compiled. Compiling an intermediate file takes the Objective-C code and turns it into machine code. This machine code is stored in an object file, one for each intermediate file. The compiling phase – the transition to machine code – is where we see most of our errors as programmers. When the compiler doesn’t understand our code, it generates an error. We call errors generated during this phase compile-time errors or syntax errors. Compile-time errors are typically misplaced semicolons, unbalanced brackets ([]) or braces ({}), spelling or capitalization errors.</p>
+<h4 id="Linking"><a href="#Linking" class="headerlink" title="Linking"></a>Linking</h4><p>An object file contains the machine code for the methods implemented in the implementation file. However, within an implementation file, you use code from other implementation files. Instead of copying the code for this method into the object file, the compiler leaves a link to the other object file.</p>
+<p>A framework is a collection of classes, and a class is defined by two files: a header file and an implementation file. A framework, however, has pre-compiled its implementation files and shoved the resulting object files into one or more library files. That’s why in Objective-C you can’t see the implementation files in a framework – they are already machine code.</p>
+<p>If a link cannot be resolved (because the object file that contains the code cannot be found or because the object file doesn’t contain the referenced code), you get a linker error. Linker errors are more difficult for new developers to understand because they use unfamiliar terms and because there isn’t one line of code that generated the error.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewh10qiz5wj21c20r0dub.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Chapter-6"><a href="#Chapter-6" class="headerlink" title="Chapter 6"></a>Chapter 6</h2><h4 id="The-drawRect-method"><a href="#The-drawRect-method" class="headerlink" title="The drawRect: method"></a>The drawRect: method</h4><p>Each time an instance of UIView needs to be drawn (or redrawn), <strong>the system prepares a graphics context specifically for that view</strong>. Then the context is activated, and the message drawRect: is sent to the instance of UIView that is being drawn. The graphics context’s type is CGContextRef (Core Graphics Context Reference), and <strong>it is responsible for aggregating drawing commands and producing an image as a result</strong>. This image is the appearance of the view instance. A graphics context also stores its drawing state, which includes things like the current drawing color, coordinate system, and the current line width. Sometimes when drawing a view, you will use Objective-C to make calls defined in the UIKit framework that implicitly use the active graphics context. Other times, you will get hold of the graphics context explicitly and draw using the C functions of the Core Graphics framework. </p>
+<h4 id="class"><a href="#class" class="headerlink" title="@class"></a>@class</h4><p>Notice the @class directive after the import statement. This is a forward declaration for the class. When you forward declare a class, you aren’t going as far as importing the header file; you are just informing the Header File of the class so the compiler can validate it. Forward declaring a class <strong>saves time when compiling – especially with large projects</strong>.</p>
+<h4 id="Redrawing-Views"><a href="#Redrawing-Views" class="headerlink" title="Redrawing Views"></a>Redrawing Views</h4><p>When a UIView instance is sent the message setNeedsDisplay, that view is marked for re-display. View subclasses send themselves setNeedsDisplay when their drawable content changes. When a view has marked itself for re-display, it is not immediately redrawn; instead, <strong>it is added to a list of views that need updating</strong>. Your application is a giant infinite loop called the run loop. The run loop’s job is to check for input (a touch, Core Location updates, data coming in through a network interface, etc.) and then find the appropriate handlers for that event (like an action or delegate method for an object). Those handler methods call other methods, which call more methods, and so on. <strong>Views are not redrawn until after the methods have completed and control returns to the run loop</strong>.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgydfbkgpj21h00rgall.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>When control returns to the run loop, it says, “Well, a bunch of code was just executed. I’m going to check if any views need to be redrawn.” Then the run loop prepares the necessary drawing contexts and sends the message drawRect: to all of the views that have been sent setNeedsDisplay in this iteration of the loop. <strong>After a view has redrawn itself, its subviews are automatically asked to redraw themselves as well</strong>.</p>
+<h2 id="Chapter-7"><a href="#Chapter-7" class="headerlink" title="Chapter 7"></a>Chapter 7</h2><h4 id="File’s-Owner"><a href="#File’s-Owner" class="headerlink" title="File’s Owner"></a>File’s Owner</h4><p>We need some way to connect objects loaded from the XIB file to objects that exist in memory before the XIB file is loaded. This way, the already existing CurrentTimeViewController could set its view instance variable to point at the view loaded from this XIB file. This is where the File’s Owner comes in. The File’s Owner is <strong>a placeholder object</strong>. When a XIB file is loaded, placeholder objects are not instantiated. You can think of a placeholder object as <strong>a hole in which existing objects can be placed</strong> so that connections can be made between them and the objects in the XIB file.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgydpsmvfj216u0xon3b.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>When your application first launches, an instance of UIApplication is created and it loads MainWindow.xib. The UIApplication is the File’s Owner. The File’s Owner of this file has a outlet connection for its delegate that has been connected to HypnoTimeAppDelegate. Therefore, after the XIB file loads, the delegate of the UIApplication is set to point at the HypnoTimeAppDelegate object – the reason why HypnoTimeAppDelegate gets sent the message application:didFinishLaunchingWithOptions:.</p>
+<h4 id="The-View-Controller-Lifecycle-and-Low-Memory-Warnings"><a href="#The-View-Controller-Lifecycle-and-Low-Memory-Warnings" class="headerlink" title="The View Controller Lifecycle and Low-Memory Warnings"></a>The View Controller Lifecycle and Low-Memory Warnings</h4><p>A view controller, like any other object, is created through alloc and init. It does not, however, create its view at that time. Instead, <strong>it waits until the view is really needed before it calls loadView</strong>. When the system is running low on RAM, it issues a low-memory warning to the running application. The application responds by freeing up any resources that it doesn’t need at the moment and can easily recreate. View controllers, during a low-memory warning, are sent the message didReceiveMemoryWarning. The default implementation of this method will check to see if the view is currently on screen; if it is not, it is released. (If the view is on screen, nothing happens.)</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgye7rnedj20zs10cgw5.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><strong>A rule</strong>: Never access a view controller’s view in that view controller’s initialization method. If you have extra work you want to perform on the view, do so in viewDidLoad. This message is sent to a view controller each time it loads its view.</p>
+<h2 id="Chapter-8"><a href="#Chapter-8" class="headerlink" title="Chapter 8"></a>Chapter 8</h2><h4 id="FirstResponder"><a href="#FirstResponder" class="headerlink" title="FirstResponder"></a>FirstResponder</h4><p>The window’s firstResponder is <strong>the object that gets sent all of the motion events</strong>. Motion events have nothing to do with the UIAccelerometer delegate. The system determines there is a shake by querying the accelerometer hardware and then sends the appropriate messages to the firstResponder.</p>
+<h4 id="Retina-Display"><a href="#Retina-Display" class="headerlink" title="Retina Display"></a>Retina Display</h4><p>For vector graphics, like HypnosisView’s drawRect: method and drawn text, you don’t need to do anything; the same code will render as crisply as the device allows. However, if you draw using <strong>Core Graphics functions, these graphics will appear differently on different devices</strong>. In Core Graphics, also called Quartz, we describe lines, curves, text, etc. in terms of points. On a non-Retina display, a point is 1x1 pixel. On a Retina display, a point is 2x2 pixels.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyeeiejhj217s0hwaec.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>Given these differences, bitmap images (like JPEG or PNG files) will be unattractive if the image isn’t tailored to the device’s screen type. Say your application includes a small image of 25x25 pixels. If this image is displayed on a Retina display, then the image must be stretched to cover an area of 50x50 pixels. At this point, the system does a type of averaging called anti-aliasing to keep the image from looking jagged. The result is an image that isn’t jagged – but it is fuzzy.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyeutxd3j219o0l810f.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>You could use a larger file instead, but the averaging would then cause problems in the other direction when the image is shrunk for a non-Retina display. The only solution is to bundle two image files with your application: <strong>one at a pixel resolution equal to the number of points on the screen for non-Retina displays and one twice that size in pixels for Retina displays</strong>.</p>
+<p>Fortunately, you do not have to write any extra code to handle which image gets loaded on which device. All you have to do is suffix the higher-resolution image with @2x. Then, when you use UIImage’s imageNamed: method to load the image, this method looks in the bundle and gets the file that is appropriate for the particular device.</p>
+<h2 id="Chapter-9"><a href="#Chapter-9" class="headerlink" title="Chapter 9"></a>Chapter 9</h2><h4 id="NSNotificationCenter"><a href="#NSNotificationCenter" class="headerlink" title="NSNotificationCenter"></a>NSNotificationCenter</h4><p>The notification center does <strong>not retain observers</strong>. If an object registers with the notification center, that object must unregister before it is deallocated. If it doesn’t, the next time a notification it registered for is posted, the center will try to send the object a message. Since that object has been deallocated, your application will crash.</p>
+<h4 id="Autosizing"><a href="#Autosizing" class="headerlink" title="Autosizing"></a>Autosizing</h4><p>You can click this control in six different places: on the four sides outside the inner box and along the vertical and horizontal axes inside the inner box. We call the outside four struts, and the inside two springs. Clicking on one of these areas toggles an autoresizing mask option. A solid red line means the option is on, and a dim red dotted line means the option is off.</p>
+<p><strong>A spring</strong> that is turned on tells the view to <strong>change size when its superview changes size</strong>. For example, if you turn on the horizontal spring, the view will change its width at the same rate its superview changes its width.</p>
+<p><strong>A strut</strong> tells the view to <strong>keep the margin between the view and its superview constant</strong>. For example, if you turn on the left strut, the view will maintain the distance from the left side of its superview when the superview changes its width.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewh10zfrvnj21160o045d.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Chapter-10"><a href="#Chapter-10" class="headerlink" title="Chapter 10"></a>Chapter 10</h2><h4 id="UITableViewCells"><a href="#UITableViewCells" class="headerlink" title="UITableViewCells"></a>UITableViewCells</h4><p><strong>Table views can be broken up into sections, and each section has its own set of rows</strong>. A UITableViewCell is a subclass of UIView, and each row in a UITableView is a UITableViewCell. A table in iOS can only have one column, so a row only has one cell. The UITableViewCells are subviews of the UITableView.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyfcq1ukj21ac09k77d.jpg" srcset="/img/loading.gif" lazyload>. `</p>
+<p>A cell itself has one subview – its contentView. The contentView is the superview for the content of the cell. </p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewh116tjwtj218c0rqjx0.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>It also can draw an accessory indicator. The accessory indicator shows an action-oriented icon, such as a checkmark, a disclosure icon, or a fancy blue dot with a chevron inside. These icons are accessed through pre-defined constants for the appearance of the accessory indicator. </p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyfytt8oj21ai0l2dnh.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Reusing-UITableViewCells"><a href="#Reusing-UITableViewCells" class="headerlink" title="Reusing UITableViewCells"></a>Reusing UITableViewCells</h4><p>iOS devices have a limited amount of memory. If we were displaying a list with thousands of entries in a UITableView, we would have thousands of instances of UITableViewCell. To preserve the lives of iOS devices everywhere, you can reuse table view cells. When the user scrolls the table, some cells move offscreen. <strong>Offscreen cells are put into a pool of cells available for reuse</strong>. Then, instead of creating a brand new cell for every request, the data source first checks the pool. If there is an unused cell, the data source configures it with new data and returns it to the table view.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewh11hoy2zj21b20t2gt7.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>There is one problem: sometimes a UITableView has different types of cells. Occasionally, you have to subclass UITableViewCell to create a special look or behavior. However, different subclasses floating around the pool of reusable cells create the possibility of getting back a cell of the wrong type. You must be sure of the type of the cell returned to you so that you can be sure of what properties and methods it has.</p>
+<h2 id="Chapter-11"><a href="#Chapter-11" class="headerlink" title="Chapter 11"></a>Chapter 11</h2><p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyh5uveuj21am0q2tgt.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Editing-Mode"><a href="#Editing-Mode" class="headerlink" title="Editing Mode"></a>Editing Mode</h4><p>UITableView has an editing property, and when this property is set to YES, the UITableView enters editing mode. Once the table view is in editing mode, the rows of the table can be manipulated by the user. The user can change the order of the rows, add rows, or remove rows. Editing mode does not allow the user to edit the content of a row.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyhnhdnpj21920wk490.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="NSBundle"><a href="#NSBundle" class="headerlink" title="NSBundle"></a>NSBundle</h4><p>To load a XIB file manually, you use NSBundle. <strong>This class is the interface between an application and the application bundle it lives in. When you want to access a file in the application bundle, you ask NSBundle for it</strong>. An instance of NSBundle is created when your application launches, and you can get a pointer to this instance by sending the message mainBundle to NSBundle.</p>
+<p>XIB files are typically used to create the window and application delegate (MainWindow.xib) and to create the view for a view controller (for example, CurrentTimeViewController.xib). The code to load these XIB files is already written in the implementations of UIApplication and UIViewController. </p>
+<p>However, as you can see, a XIB file can be used any time you wish to archive view objects, and any object can load a XIB file.</p>
+<pre><code>- (UIView *)headerView
+&#123;
+       // If we haven&#39;t loaded the headerView yet...
+       if (!headerView) &#123;
+           // Load HeaderView.xib
+           [[NSBundle mainBundle] loadNibNamed:@&quot;HeaderView&quot; owner:self options:nil];
+       &#125;
+       return headerView;
+&#125;
+</code></pre>
+<h4 id="Adding-Rows-amp-amp-Deleting-Rows-amp-amp-Moving-Rows"><a href="#Adding-Rows-amp-amp-Deleting-Rows-amp-amp-Moving-Rows" class="headerlink" title="Adding Rows &amp;&amp; Deleting Rows &amp;&amp; Moving Rows"></a>Adding Rows &amp;&amp; Deleting Rows &amp;&amp; Moving Rows</h4><p>Implement the corresponding DataSource Methods</p>
+<h2 id="Chapter-12"><a href="#Chapter-12" class="headerlink" title="Chapter 12"></a>Chapter 12</h2><h4 id="UINavigationController"><a href="#UINavigationController" class="headerlink" title="UINavigationController"></a>UINavigationController</h4><p>When your application presents multiple screens of information, UINavigationController maintains a stack of those screens. <strong>The stack is an NSArray of view controllers, and each screen is the view of a UIViewController. When a UIViewController is on top of the stack, its view is visible</strong>. </p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyi3bxnoj21by0q8dpo.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>When writing iOS applications, it is important to treat each UIViewController as its own little world. </p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgyio1khcj21ca14wtkk.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="UINavigationBar"><a href="#UINavigationBar" class="headerlink" title="UINavigationBar"></a>UINavigationBar</h4><p>Every UIViewController has a navigationItem property of type UINavigationItem. However, unlike UINavigationBar, UINavigationItem is not a subclass of UIView, so it cannot appear on the screen. Instead, the navigation item supplies the navigation bar with the content it needs to draw. When a UIViewController comes to the top of a UINavigationController’s stack, the UINavigationBar uses the UIViewController’s navigationItem to configure itself.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyivfkt5j217g0g8wix.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyj492i4j219q0gsgrc.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgyjltkklj21cy0kigu5.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="SEL"><a href="#SEL" class="headerlink" title="SEL"></a>SEL</h4><p><strong>The SEL data type is a pointer to a selector. A selector is a unique ID for a method</strong>. Wrapping a method name in the @selector() directive returns the SEL that points at that method. Remember that a selector is the entire method name including any colons. </p>
+<p>Notice that @selector() <strong>doesn’t care about the return type, argument types, or names of arguments</strong> – only the selector itself. Also, know that @selector() <strong>doesn’t check to see if the method actually exists</strong>. If you give a SEL to a button, that button will send the corresponding message regardless of whether the method is implemented by the target.</p>
+<h4 id="Pushing-view-controllers"><a href="#Pushing-view-controllers" class="headerlink" title="Pushing view controllers"></a>Pushing view controllers</h4><p>When using a UINavigationController, you cannot simply store all of the possible view controllers in its stack. The viewControllers array of a navigation controller is <strong>dynamic</strong> – you start with a root view controller and add view controllers depending on user input.</p>
+<p>Any view controller in a navigation controller’s stack can get a pointer to the navigation controller by sending itself the message <strong>navigationController</strong>. </p>
+<p>Having a view controller push the next view controller is a common pattern. In any application with a UINavigationController, the navigation controller has one root view controller. The root view controller typically creates the next view controller, and the next view controller creates the one after that, and so on. </p>
+<h2 id="Chapter-13"><a href="#Chapter-13" class="headerlink" title="Chapter 13"></a>Chapter 13</h2><p>A UIToolbar works a lot like a UINavigationBar in that you can add UIBarButtonItems to it. However, where a navigation bar has two bar button items, a toolbar has an array of items. You can place as many UIBarButtonItems in a toolbar as can fit on the screen.</p>
+<p><img src="http://ww2.sinaimg.cn/mw690/9460be12gw1ewgyk5j5luj21ew14cgw0.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>When a view controller is modal, it takes over the entire screen until it has finished its work. To present a view modally, presentModalViewController:animated: is sent to the UIViewController whose view is on the screen. The view controller to be presented is passed to it, and its view slides up from the bottom of the screen.</p>
+<p>A view controller should re-populate its view’s subviews with data whenever it is sent the message viewWillAppear:, eliminating the possibility that a low-memory warning could wipe out its content.</p>
+<h2 id="Chapter-14"><a href="#Chapter-14" class="headerlink" title="Chapter 14"></a>Chapter 14</h2><p>Show a view controller’s view: </p>
+<ul>
+<li>Set it as the root view controller of the window</li>
+<li>Push it onto a UINavigationController’s stack</li>
+<li>Add it to a UITabBarController</li>
+<li>Present it modally</li>
+</ul>
+<p>Every view controller has a property named <strong>modalViewController</strong>. If a view controller presents another view controller modally, then this property holds a pointer to that view controller. Every modally-presented view controller has a pointer named <strong>parentViewController</strong> that it sets to the view controller.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgykcc1iqj212y0getbu.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Chapter-15"><a href="#Chapter-15" class="headerlink" title="Chapter 15"></a>Chapter 15</h2><h4 id="Saving-Loading-and-Multitasking"><a href="#Saving-Loading-and-Multitasking" class="headerlink" title="Saving, Loading, and Multitasking"></a>Saving, Loading, and Multitasking</h4><p>Every iOS application has its own application sandbox. An application sandbox is <strong>a directory on the filesystem that is barricaded from the rest of the filesystem</strong>. Your application must stay in its sandbox, and no other application can access your sandbox.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgykp63z7j215k0igtfl.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="application-bundle"><a href="#application-bundle" class="headerlink" title="application bundle"></a>application bundle</h4><p>This directory contains all the <strong>resources and the executable</strong>. It is read-only.</p>
+<h4 id="Library-Preferences"><a href="#Library-Preferences" class="headerlink" title="Library/Preferences/"></a>Library/Preferences/</h4><p>This directory is where any preferences are stored and where the Settings application looks for <strong>application preferences</strong>. Library/Preferences is handled automatically by the class NSUserDefaults (which you will learn about in Chapter 19) and is backed up when the device is synchronized with iTunes.</p>
+<h4 id="tmp"><a href="#tmp" class="headerlink" title="tmp/"></a>tmp/</h4><p>This directory is <strong>where you write data that you will use temporarily during an application’s runtime</strong>. You should remove files from this directory when done with them, and the operating system may purge them while your application is not running. It does not get backed up when the device is synchronized with iTunes. To get the path to the tmp directory in the application sandbox, you can use the convenience function <strong>NSTemporaryDirectory</strong>.</p>
+<h4 id="Documents"><a href="#Documents" class="headerlink" title="Documents/"></a>Documents/</h4><p>This directory is <strong>where you write data that the application generates during runtime and that you want to persist between runs of the application</strong>. It is backed up when the device is synchronized with iTunes. If something goes wrong with the device, files in this directory can be restored from iTunes. For example, in a game application, the saved game files would be stored here.</p>
+<h4 id="Library-Caches"><a href="#Library-Caches" class="headerlink" title="Library/Caches/"></a>Library/Caches/</h4><p>This directory is where you write data that the application generates during runtime and that you want to persist between runs of the application. However, unlike the Documents directory, <strong>it does not get backed up when the device is synchronized with iTunes</strong>. A major reason for not backing up cached data is that the data can be very large and extend the time it takes to synchronize your device. Data stored somewhere else – like a web server – can be placed in this directory. If the user needs to restore the device, this data can be downloaded from the web server again.</p>
+<h4 id="Archiving"><a href="#Archiving" class="headerlink" title="Archiving"></a>Archiving</h4><p>There are many ways to write data to the filesystem on iOS, and one of the most important is called archiving. <strong>Archiving is the process of taking one or more objects from memory and writing them to the filesystem. Unarchiving reads these objects back from the filesystem into memory</strong>.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyl4gq9hj21cy0qawos.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>Archiving works by creating an instance of NSCoder, which is essentially just a container for data, and placing objects and their data inside it. Once the NSCoder has all of the data you have instructed it to collect, it will be written to a specific file in the filesystem.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgylc534dj217m0jmgpz.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>Not all objects can be archived – only those whose class conforms to the NSCoding protocol. The NSCoding protocol has two methods, and both are required: encodeWithCoder: (for archiving) and initWithCoder: (for unarchiving).</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgylrbeapj21gc0m8k00.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>Like NSString, the classes NSDictionary and NSArray have writeToFile: and initWithContentsOfFile: methods. In order to write objects of these types to the filesystem in this fashion, they must contain <strong>only property list serializable objects</strong>. The only objects that are property list serializable are <strong>NSString</strong>, <strong>NSNumber</strong>, <strong>NSDate</strong>, <strong>NSData</strong>, <strong>NSArray</strong>, and <strong>NSDictionary</strong>. When an NSArray or NSDictionary is written to the filesystem with these methods, an XML property list is created.</p>
+<h4 id="Application-States-Transitions-and-Multitasking"><a href="#Application-States-Transitions-and-Multitasking" class="headerlink" title="Application States, Transitions, and Multitasking"></a>Application States, Transitions, and Multitasking</h4><p>An application in the suspended state cannot execute code, and any resources it doesn’t need while suspended are released. A suspended application is essentially freeze-dried and can be quickly thawed when the user relaunches it. The resources that are released are ones that can be reloaded, like cached images, system-managed caches, and other graphics data.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewgymcadzxj21e210egxs.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="The-Application-Bundle"><a href="#The-Application-Bundle" class="headerlink" title="The Application Bundle"></a>The Application Bundle</h4><p>When you build an iOS application project in Xcode, you create an application bundle. The application bundle contains the <strong>application executable and any resources</strong> you have bundled with your application. Resources are things like XIB files, images, audio files – any files that will be used at runtime. When you add a resource file to a project, Xcode is smart enough to realize that it should be bundled with your application and categorizes it accordingly.</p>
+<p>Also, files within the application bundle are <strong>read-only</strong>. You <strong>cannot</strong> <strong>modify</strong> them nor can you <strong>dynamically</strong> <strong>add</strong> files to the application bundle at runtime. Files in the application bundle are typically things like button images, interface sound effects, or the initial state of a database you ship with your application. You will use this method in later chapters to load these types of resources at runtime.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgymvhfpuj21cc0n0k2f.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Chapter-16"><a href="#Chapter-16" class="headerlink" title="Chapter 16"></a>Chapter 16</h2><h4 id="Subclassing-UITableViewCell"><a href="#Subclassing-UITableViewCell" class="headerlink" title="Subclassing UITableViewCell"></a>Subclassing UITableViewCell</h4><p>You subclass UITableViewCell by changing the view objects in a cell’s contentView. Adding subviews to the contentView instead of directly to the UITableViewCell subclass is important because the cell will resize the contentView at certain times. For example, when a table view enters editing mode, the contentView redraws itself to make room for the editing controls.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyncuc8bj21cs0pcajj.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>If you were to add subviews directly to the UITableViewCell, these editing controls would obscure the subviews. The cell doesn’t know to adjust its size when entering edit mode, but the contentView does.</p>
+<h4 id="Laying-out-subviews"><a href="#Laying-out-subviews" class="headerlink" title="Laying out subviews"></a>Laying out subviews</h4><p>When a table view’s data source is asked for a cell, it creates a cell, configures its content, and returns it to the table view. The table view then adds the cell as a subview of itself and positions and sizes the cell. Therefore, when you first create a cell, it doesn’t know its size quite yet. For this reason, you do not set the frames of a cell’s content view at initialization time. Instead, you wait until the cell knows how big it is.</p>
+<p>First, you always invoke the superclass’ implementation of <strong>layoutSubviews</strong>. Invoking this method allows the UITableViewCell to layout its subview, the contentView. Then, you get the bounds of the contentView to find out how much area you have to work with when sizing and positioning all of the subviews. (If you don’t invoke the superclass’ implementation of layoutSubviews, the bounds of the contentView may not be correct.) Finally, you set the frame of each subview relative to the contentView’s bounds.</p>
+<h2 id="Chapter-18"><a href="#Chapter-18" class="headerlink" title="Chapter 18"></a>Chapter 18</h2><p>Internationalization is making sure your native cultural information is <strong>not hard-coded</strong> into your application. (By cultural information, we mean language, currency, date formats, number formats, and more.) Localization, on the other hand, is providing the appropriate data in your application <strong>based on the user’s Language and Region Format settings</strong>. NSLocale knows how different regions display symbols, dates, and decimals and whether they use the metric system.</p>
+<h4 id="Localizing-Resources"><a href="#Localizing-Resources" class="headerlink" title="Localizing Resources"></a>Localizing Resources</h4><p>Localization is the process by which application-specific substitutions given a region or a language setting are created. This usually means one of two things:</p>
+<ul>
+<li>Generating multiple copies of resources like images, sounds, and interfaces for different regions and languages</li>
+<li>Creating and accessing “strings tables” to translate text into different languages</li>
+</ul>
+<p><strong>ibtool</strong></p>
+<h4 id="NSLocalizedString-and-Strings-Tables"><a href="#NSLocalizedString-and-Strings-Tables" class="headerlink" title="NSLocalizedString and Strings Tables"></a>NSLocalizedString and Strings Tables</h4><p>A strings table is a file containing a list of key-value pairs for all of the strings your application uses and their associated translations. </p>
+<p><strong>NSLocalizedString()</strong>.</p>
+<h4 id="NSBundle’s-Role-in-Internationalization"><a href="#NSBundle’s-Role-in-Internationalization" class="headerlink" title="NSBundle’s Role in Internationalization"></a>NSBundle’s Role in Internationalization</h4><p>The real work of adding a localization is done for you by the class NSBundle. For example, when a UIViewController is initialized, it is given two arguments: the name of a XIB file and an NSBundle object. The bundle argument is typically nil, which is interpreted as the application’s main bundle. (The main bundle is another name for the application bundle – all of the resources and the executable for the application. When an application is built, all of the lproj directories are copied into this bundle.)</p>
+<p>When the view controller loads its view, it asks the bundle for the XIB file. The bundle, being very smart, <strong>checks the current language settings of the device and looks in the appropriate lproj directory</strong>. The path for the XIB file in the lproj directory is returned to the view controller and loaded.</p>
+<p>NSBundle knows how to search through localization directories for every type of resource using the instance method pathForResource:ofType:. When you want a path to a resource bundled with your application, you send this message to the main bundle. Here’s an example using the resource file myImage.png:</p>
+<pre><code>NSString *path = [[NSBundle mainBundle] pathForResource:@&quot;myImage&quot; ofType:@&quot;png&quot;];
+</code></pre>
+<p>The bundle first checks to see if there is a myImage.png file in the top level of the application bundle. If so, it returns the full path to that file. <strong>If not, the bundle gets the device’s language settings and looks in the appropriate lproj directory to construct the path</strong>. If no file is found, it returns nil.</p>
+<p>This is why you must delete and clean an application when you localize a file. The previous un-localized file will still be in the root level of the application bundle because Xcode will not delete a file from the bundle when you re-install. Even though there are lproj folders in the application bundle, the bundle finds the top-level file first and returns its path.</p>
+<h2 id="Chapter-19"><a href="#Chapter-19" class="headerlink" title="Chapter 19"></a>Chapter 19</h2><h4 id="NSUserDefaults"><a href="#NSUserDefaults" class="headerlink" title="NSUserDefaults"></a>NSUserDefaults</h4><p>These temporary defaults are placed in the <strong>registration domain</strong> of NSUserDefaults. Any preferences set by the user are stored in a different domain, the <strong>application domain</strong>.<br>By default, the application domain is empty: there are no keys and no values. The first time a user changes a setting, a value is added to the application domain for the specified key. When you ask the NSUserDefaults for the value of a preference, <strong>it first looks in the application domain</strong>. If there is a value for that key, then the user has set a preference, and the NSUserDefaults returns that value. If not, the NSUserDefaults looks in the registration domain and finds the temporary default.</p>
+<p><strong>The application domain is always saved to disk; that’s why it remembers user preferences on the next launch. The registration domain is not, and its values must be set every time the application launches</strong>. To set the values of the registration domain, you create an NSDictionary with a key-value pair for each preference you plan on using in your application. Then, you send the dictionary as an argument to the message registerDefaults: of NSUserDefaults.</p>
+<p>Typically, you send the <strong>registerDefaults:</strong> message before any object is able to access the instance of NSUserDefaults. This means before the instance of the application delegate is created. What comes before the creation of the WhereamiAppDelegate? The creation of the WhereamiAppDelegate class. Like any object, a class also must be initialized before it can receive messages. So, after a class is created but before it receives its first message, it is sent the message initialize.</p>
+<pre><code>+ (void)initialize
+&#123;
+    NSDictionary *defaults = [NSDictionary
+                            dictionaryWithObject:[NSNumber numberWithInt:1]
+                                          forKey:WhereamiMapTypePrefKey];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
+&#125;
+</code></pre>
+<h2 id="Chapter-21"><a href="#Chapter-21" class="headerlink" title="Chapter 21"></a>Chapter 21</h2><h4 id="The-Static-Analyzer"><a href="#The-Static-Analyzer" class="headerlink" title="The Static Analyzer"></a>The Static Analyzer</h4><p>When the static analyzer checks the code, it examines each function and method individually by <strong>iterating over every possible code path</strong>. A method can have a number of control statements (if, for, switch, etc.). The conditions of these statements will dictate which code is actually executed. A code path is one of the possible paths the code will take given these control statements.</p>
+<h4 id="Xcode-Schemes"><a href="#Xcode-Schemes" class="headerlink" title="Xcode Schemes"></a>Xcode Schemes</h4><p><strong>A workspace is a collection of projects, and a project is a collection targets and files. A target has a number of build settings and phases that reference files from its project. When built, a target creates a product, which is usually an application. A scheme contains one or more targets and specifies what to do with the product or products</strong>.</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/9460be12gw1ewh14b3y30j21ae1dgttj.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>When you create a new project, a scheme with the same name as the project is created for you. </p>
+<h4 id="Creating-a-new-scheme"><a href="#Creating-a-new-scheme" class="headerlink" title="Creating a new scheme"></a>Creating a new scheme</h4><p>As projects become larger and more complicated, they require more specific testing and debugging. This can result in more time fiddling with the options for scheme actions. <strong>To avoid constant fiddling, we typically create new schemes for common situations</strong>. For example, if we have an application that consumes a lot of memory, we might want to routinely run the Allocations instrument on it. Instead of having Instruments ask which instrument to use when we profile the application, we can set up a new scheme that always runs Allocations.</p>
+<h4 id="Build-Settings"><a href="#Build-Settings" class="headerlink" title="Build Settings"></a>Build Settings</h4><p>Every target includes build settings that describe how it should be built. Every project also has build settings that serve as defaults for all the targets within the project.</p>
+<p>The far right column shows the iOS Default settings; these serve as the <strong>project’s defaults</strong>, which it can override. The next column to the left shows the <strong>project’s settings</strong>, and the one after that shows the currently selected <strong>target’s settings</strong>. The Resolved column shows which setting will actually be used; <strong>it is always be equal to the left-most specified value</strong>.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyo5m80pj21hy09yn39.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>Each target and project has multiple build configurations. <strong>A build configuration is a set of build settings</strong>. When you create a project, there are two build configurations: <strong>debug</strong> and <strong>release</strong>. The build settings for the debug configuration make it easier to debug your application, while the <strong>release settings turn on optimizations to speed up execution</strong>.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewlfp4kcjmj21g80hkn5f.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>When performing a scheme action, the scheme will use one of these configurations when building its targets. You can specify the build configuration that the scheme uses in the scheme editor in the option for Build Configuration in the Info pane.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewlfn87ka7j21dk0nq457.jpg" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Chapter-22"><a href="#Chapter-22" class="headerlink" title="Chapter 22"></a>Chapter 22</h2><p>At its core, an instance of CALayer is <strong>a buffer containing a bitmap</strong>. When you draw a layer (or a stack of layers), the rendering is <strong>hardware-accelerated</strong>. This makes drawing a layer to the screen incredibly fast. A CAAnimation object <strong>causes a change over time</strong>.</p>
+<h4 id="Layers-and-views"><a href="#Layers-and-views" class="headerlink" title="Layers and views"></a>Layers and views</h4><p>A view doesn’t know how to draw to the screen; it only knows how to draw to an instance of CALayer. When you instantiate a view, it creates a layer, and when the view draws, it is drawing on its layer. We call layers created by views <strong>implicit layers</strong>. Because every view has a layer, there is a matching layer hierarchy that mimics the view hierarchy. After the views draw on their layers, the layers are <strong>composited</strong> to the screen.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgyonjc2jj219q0qe7bn.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>UIView is a subclass of UIResponder. A view is really an abstraction of a visible object that can be interacted with on the screen, wrapped into a tidy class. A layer, on the other hand, is all about the drawing.</p>
+<h4 id="Creating-a-CALayer"><a href="#Creating-a-CALayer" class="headerlink" title="Creating a CALayer"></a>Creating a CALayer</h4><p>Not all layers are implicit layers. You can create a layer by sending alloc to the class CALayer. Layers created this way are called <strong>explicit layers</strong>.</p>
+<h4 id="Layer-Content"><a href="#Layer-Content" class="headerlink" title="Layer Content"></a>Layer Content</h4><p>A layer is simply a bitmap, and its contents can be set programmatically or with an image. To set the contents programmatically, you either <strong>subclass</strong> CALayer or <strong>assign a delegate</strong> to an instance of CALayer. The delegate then implements drawing routines.</p>
+<p>Because layers exist in a hierarchy, they can have sublayers, and each layer has a pointer back to its parent layer called <strong>superlayer</strong>. When a layer is composited to the screen, it is copied to the screen, and then each sublayer is composited atop it. Therefore, a layer always draws on top of its superlayer.</p>
+<p>When the Z-axis is discussed, some developers imagine that perspective is applied, and they expect a layer to appear larger as its zPosition increases. However, Core Animation layers are presented orthographically; they do not appear as different sizes based on their zPositions.</p>
+<p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgyotd61yj21dy0omjvl.jpg" srcset="/img/loading.gif" lazyload></p>
+<h4 id="Implicitly-Animatable-Properties"><a href="#Implicitly-Animatable-Properties" class="headerlink" title="Implicitly Animatable Properties"></a>Implicitly Animatable Properties</h4><p>Several of the properties of CALayer are <strong>implicitly animatable</strong>. This means that changes to these properties are automatically animated when their setters are called.</p>
+<p>To disable an implicit animation, you can use an animation transaction. <strong>Animation transactions allow you to batch animations and set their parameters</strong>, like the duration and animation curve. To begin a transaction, you send the message begin to the class CATransaction. To end a transaction, you send commit to CATransaction. Within the begin and commit block, you can set properties of a layer and also set values for the transaction as a whole.</p>
+<pre><code>[CATransaction begin];
+[CATransaction setDisableActions:YES];
+[CATransaction commit];
+</code></pre>
+<h4 id="Programmatically-Generating-Content"><a href="#Programmatically-Generating-Content" class="headerlink" title="Programmatically Generating Content"></a>Programmatically Generating Content</h4><ul>
+<li>Subclass - drawInContext:</li>
+<li>Delegate - drawLayer:inContext:</li>
+</ul>
+<p>For both subclassing and delegation, you must send an <strong>explicit setNeedsDisplay</strong> to the layer in order for these methods to be invoked. Otherwise, the layer thinks it doesn’t have any content and won’t draw.</p>
+<h4 id="Layers-Bitmaps-and-Contexts"><a href="#Layers-Bitmaps-and-Contexts" class="headerlink" title="Layers, Bitmaps, and Contexts"></a>Layers, Bitmaps, and Contexts</h4><p>A layer is simply a bitmap – <strong>a chunk of memory that holds the red, green, blue, and alpha values of each pixel</strong>. When you send the message setNeedsDisplay to a UIView instance, that method is forwarded to the view’s layer. After the run loop is done processing an event, every layer marked for re-display prepares a CGContextRef. Drawing routines called on this context generate pixels that end up in the layer’s bitmap.</p>
+<p>How do drawing routines get called on the layer’s context? After a layer prepares its context, it sends the message <strong>drawLayer:inContext:</strong> to its delegate. The delegate of an implicit layer is its view, so in the implementation for drawLayer:inContext:, the view sends drawRect: to itself.</p>
+<p>A layer creates the same kind of context when it needs to redraw its contents.</p>
+<h2 id="Chapter-23"><a href="#Chapter-23" class="headerlink" title="Chapter 23"></a>Chapter 23</h2><p>An animation object drives change over time. An animation object is an instruction set (“Move from point A to point B over 2 seconds”) that can be added to a CALayer instance.</p>
+<h4 id="Animation-Objects"><a href="#Animation-Objects" class="headerlink" title="Animation Objects"></a>Animation Objects</h4><p><img src="http://ww4.sinaimg.cn/mw690/9460be12gw1ewgypa0hd7j21bc0oqqbn.jpg" srcset="/img/loading.gif" lazyload></p>
+<p><strong>CAPropertyAnimation</strong> is a subclass of CAAnimation that extends the ability of its superclass by adding the ability to change the properties of a layer. Each property animation has a key path of type NSString. This string is the name of an <strong>animatable property</strong> of a CALayer. Many of CALayer’s properties are animatable. CAPropertyAnimation is an abstract superclass. To create an animation object that modifies a property of a layer, you use one of the two concrete subclasses of CAPropertyAnimation: CABasicAnimation and CAKeyframeAnimation.</p>
+<p><strong>CABasicAnimation</strong> has two properties: <strong>fromValue</strong> and <strong>toValue</strong>, and it inherits CAAnimation’s duration property. When a basic animation is added to a layer, the property to be animated is set to the value in fromValue. Over the time specified by duration, the value of the property is interpolated linearly from fromValue to toValue.</p>
+<p>The difference between CABasicAnimation and <strong>CAKeyframeAnimation</strong> is that a basic animation only interpolates two values while a keyframe animation can interpolate as many values as you give it. These values are put into an NSArray in the order in which they are to occur. This array is then set as the values property of a CAKeyframeAnimation instance. Each value in the values property is called a <strong>keyframe</strong>. Keyframes are the values that the animation will interpolate; the animation will take the property it is animating through each of these keyframes over its duration. A basic animation is really a keyframe animation that is limited to two keyframes. (In addition to allowing more than two keyframes, CAKeyframeAnimation adds the ability to change the timing of each of the keyframes)</p>
+<p>A <strong>CAAnimationGroup</strong> instance holds an array of animation objects. When an animation group is added to a layer, the animations run <strong>concurrently</strong>.</p>
+<p><strong>CATransition</strong> animates layers as they are transitioning on and off the screen. On Mac OS X, CATransition is made very powerful by Core Image Filters. In iOS, it can only do a couple of simple transitions like fading and sliding. (CATransition is used by UINavigationController when pushing a view controller’s view onto the screen.) CATransaction <strong>turn off implicit animations</strong> for any layer modifications occurring within the transaction.</p>
+<h4 id="The-Presentation-Layer-and-the-Model-Layer"><a href="#The-Presentation-Layer-and-the-Model-Layer" class="headerlink" title="The Presentation Layer and the Model Layer"></a>The Presentation Layer and the Model Layer</h4><p>CALayer as having two parts: <strong>the content</strong> that gets composited onto the screen, and <strong>a set of parameters</strong> that describe how it should be composited: opacity, transform, position, etc. When a layer is being animated, it actually has two copies of these parameters: the <strong>model version</strong> and the <strong>presentation version</strong>. The presentation parameters are the ones that are being smoothly changed by the animation object. The model parameters are the persistent ones – the ones that will be used once the animation is over. So, when a layer is being animated, its content is composited to the screen using the presentation parameters. When it is animation-less, the model parameters are used.</p>
+<h2 id="Chapter-24"><a href="#Chapter-24" class="headerlink" title="Chapter 24"></a>Chapter 24</h2><p>A block is <strong>a set of instructions</strong> that can be passed around as a variable and called like a function. Blocks provide conveniences for a programmer and performance boosts for applications. If you are familiar with other high-level languages, you may know blocks as <strong>closures or anonymous functions</strong>. Block <strong>captures variables</strong> which separates it from function pointers. You can define the block’s code at the same point where the block is registered as a callback. This keeps your code nice and clean.</p>
+<p>Categories have another use: <strong>pseudo-private methods</strong>.</p>
+<h4 id="Pros-and-Cons-of-Callback-Options"><a href="#Pros-and-Cons-of-Callback-Options" class="headerlink" title="Pros and Cons of Callback Options"></a>Pros and Cons of Callback Options</h4><p>Callbacks have two major components: <strong>the process of registering it and the code for the callback</strong>.</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/9460be12gw1ewgypole3qj21bw0ri45v.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>You use <strong>target-action</strong> when you have a close relationship between the two objects (like a view controller and one of its views) and when there may be many instances of object that call back.</p>
+<p><strong>Delegation</strong> is used when an object receives many events and it wants the same object to handle each of those events.</p>
+<p><strong>Notifications</strong> are used when you want multiple objects to invoke their callback for the same event and/ or when two objects are not related.</p>
+<p><strong>Blocks</strong> are the outliers when it comes to callbacks because they are not an object-oriented approach. Blocks are useful when the callback is going to happen only once or when the callback is just a quick and simple task (like updating a progress bar). One of the reasons blocks are better suited for this one-shot behavior is because they will retain any objects they reference.</p>
+<p>An approach to callbacks we have not discussed is <strong>subclassing</strong>.</p>
+<h2 id="Chapter-25"><a href="#Chapter-25" class="headerlink" title="Chapter 25"></a>Chapter 25</h2><p>An <strong>NSURL</strong> instance contains the location of a web application in URL format.</p>
+<p>An <strong>NSURLRequest</strong> instance holds all the data necessary to communicate with a web server.</p>
+<p>An <strong>NSURLConnection</strong> instance is responsible for actually making the connection to a web server, sending the information in its NSURLRequest, and gathering the response from the server.</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Tech/">#Tech</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>iOS Programming Guide(2nd) 读书笔记</div>
+      <div>https://hllovesgithub.github.io/2015/09/19/2015-09-19-iOS-Programming-Guide-2nd-读书笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Hu Liang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2015年9月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2015/09/26/2015-09-26-Thread-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" title="Thread 基本概念">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Thread 基本概念</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
